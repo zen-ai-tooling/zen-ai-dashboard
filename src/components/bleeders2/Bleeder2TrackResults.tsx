@@ -1,23 +1,13 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { 
-  Download, 
-  CheckCircle2, 
-  AlertTriangle, 
-  FileText, 
-  Upload,
-  TrendingUp,
-  Info,
-  ChevronDown,
-  ChevronUp
-} from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Download, CheckCircle2, Upload } from "lucide-react";
 import type { Bleeder2TrackResult, Bleeder2TrackType } from "@/lib/bleeder2TrackAnalyzer";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { DecisionFileDropzone } from "./DecisionFileDropzone";
+import ExcelJS from 'exceljs';
 
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
@@ -37,6 +27,20 @@ const TRACK_LABELS: Record<Bleeder2TrackType, string> = {
   'ACOS100': 'Campaigns >100% ACoS'
 };
 
+const TRACK_DECISIONS: Record<Bleeder2TrackType, string[]> = {
+  'SBSD': ['Pause', 'Reduce Bid', 'Keep'],
+  'SP': ['Negative Exact', 'Give it another week', 'Keep'],
+  'SP_KEYWORDS': ['Pause', 'Reduce Bid', 'Keep'],
+  'ACOS100': ['Turn Off', 'Cut Bid', 'Keep'],
+};
+
+const SHEET_MAP: Record<Bleeder2TrackType, string> = {
+  'SP': 'Sponsored Products • Search Term',
+  'SP_KEYWORDS': 'Sponsored Products • Targeting',
+  'SBSD': 'Sponsored Brands • Keywords',
+  'ACOS100': 'Campaign • High ACOS',
+};
+
 export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
   result,
   onDownload,
@@ -47,374 +51,305 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
   amazonFile,
   onDownloadAmazon
 }) => {
-  const [isSOPOpen, setIsSOPOpen] = useState(false);
-  
-  // Debug amazonFile prop with deep inspection
-  React.useEffect(() => {
-    console.log(`[DEBUG] amazonFile useEffect fired for track ${result.trackType}:`, {
-      amazonFile: amazonFile,
-      hasWorkbook: amazonFile ? !!amazonFile.workbook : false,
-      fileName: amazonFile?.fileName,
-      type: typeof amazonFile,
-    });
-  }, [amazonFile, result.trackType]);
-  
-  console.log(`[DEBUG] Bleeder2TrackResults render:`, {
-    trackType: result.trackType,
-    hasDecisionFile: !!decisionFile,
-    hasAmazonFile: !!amazonFile,
-    amazonFile: amazonFile,
-    bleedersCount: result.bleeders.length,
-  });
-  
+  const [decisions, setDecisions] = useState<Record<number, string>>({});
+  const [cutBidValues, setCutBidValues] = useState<Record<number, number>>({});
+  const [isGenerating, setIsGenerating] = useState(false);
+
   const hasBleeders = result.bleeders.length > 0;
-  const topSpenders = result.bleeders.slice(0, 3);
-  
-  // No Action Needed State
+
+  const decisionsMade = useMemo(() => {
+    return Object.values(decisions).filter(d => d && d !== '').length;
+  }, [decisions]);
+
+  const avgAcos = useMemo(() => {
+    if (!hasBleeders) return 0;
+    return result.bleeders.reduce((s, b) => s + b.acos, 0) / result.bleeders.length;
+  }, [result.bleeders, hasBleeders]);
+
+  const handleSetAllPause = () => {
+    const allPause: Record<number, string> = {};
+    result.bleeders.forEach((_, idx) => {
+      allPause[idx] = 'Pause';
+    });
+    setDecisions(allPause);
+  };
+
+  const handleGenerateAmazonFile = async () => {
+    setIsGenerating(true);
+    try {
+      const wb = new ExcelJS.Workbook();
+      const sheetName = SHEET_MAP[result.trackType] || 'Decisions';
+      const ws = wb.addWorksheet(sheetName);
+
+      const headers = [
+        'Campaign Name', 'Ad Group Name',
+        result.trackType === 'SP' ? 'Customer Search Term' : 'Keyword Text',
+        'Match Type', 'Bid', 'Decision',
+        'Campaign Id', 'Ad Group Id', 'Keyword Id',
+        'Product Targeting Id', 'Targeting Id'
+      ];
+      ws.addRow(headers);
+
+      result.bleeders.forEach((b, idx) => {
+        const decision = decisions[idx];
+        if (!decision || decision === '' || decision === 'Keep') return;
+
+        let finalDecision = decision;
+        if (decision === 'Cut Bid' || decision === 'Reduce Bid') {
+          const pct = cutBidValues[idx] || 25;
+          finalDecision = `Cut Bid ${pct}%`;
+        }
+
+        ws.addRow([
+          b.campaignName,
+          b.adGroupName || '',
+          b.entity,
+          b.matchType || '',
+          0,
+          finalDecision,
+          b.campaignId || '',
+          b.adGroupId || '',
+          b.keywordId || '',
+          b.productTargetingId || '',
+          b.targetingId || '',
+        ]);
+      });
+
+      const buffer = await wb.xlsx.writeBuffer();
+      const file = new File([buffer], 'decisions.xlsx', {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+      onUploadDecision(result.trackType, file);
+    } catch (err) {
+      console.error('[Generate] Failed:', err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // No bleeders state
   if (!hasBleeders) {
     return (
-      <Card className="border-green-500/50 bg-green-50/50 dark:bg-green-950/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400">
-            <CheckCircle2 className="h-5 w-5" />
-            ✅ No Action Needed This Cycle
-          </CardTitle>
-          <CardDescription>
-            {TRACK_LABELS[result.trackType]} — 0 actionable rows detected | $0 at risk
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            No actionable rows were detected based on your thresholds. If that's expected, you can skip this track and proceed to another module.
-          </p>
-          
-          <div className="border rounded-lg p-3 bg-card space-y-2">
-            <div className="text-sm font-medium">Thresholds Applied:</div>
-            <div className="flex flex-wrap gap-2">
-              {result.trackType !== 'ACOS100' && (
-                <>
-                  <Badge variant="secondary">Margin: {result.marginPercent}%</Badge>
-                  <Badge variant="secondary">Buffer: {result.bufferPercent}%</Badge>
-                </>
-              )}
-              <Badge variant="secondary">ACoS ≥ {result.acosThreshold}%</Badge>
-              {result.trackType !== 'ACOS100' && (
-                <Badge variant="secondary">Orders ≤ {result.lowSalesThreshold}</Badge>
-              )}
-            </div>
-            <div className="text-xs text-muted-foreground mt-2">
-              Sheets processed: {result.sheetsProcessed.join(', ')}
-            </div>
-          </div>
-          
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription className="text-sm">
-              <strong>💡 Tip:</strong> If you expected to find bleeders, verify your column headers (especially <strong>ACoS %</strong>) are correct and ACoS values are numeric. Otherwise, this is good news — your campaigns are performing well!
-            </AlertDescription>
-          </Alert>
-          
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={onAdjustThresholds} className="flex-1">
-              Adjust Thresholds
-            </Button>
-            <Button variant="outline" onClick={() => onUploadNewFile(result.trackType)} className="flex-1">
-              <Upload className="h-4 w-4 mr-2" />
-              Upload New File
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="rounded-lg border border-border bg-card p-6">
+        <div className="flex items-center gap-2 text-green-700 mb-2">
+          <CheckCircle2 className="h-5 w-5" />
+          <span className="text-[13px] font-medium">No action needed — 0 bleeders found</span>
+        </div>
+        <p className="text-[13px] text-muted-foreground mb-4">
+          {TRACK_LABELS[result.trackType]} returned no actionable rows under current thresholds.
+        </p>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={onAdjustThresholds} className="text-[12px]">
+            Adjust Thresholds
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => onUploadNewFile(result.trackType)} className="text-[12px]">
+            Upload New File
+          </Button>
+        </div>
+      </div>
     );
   }
-  
-  // Results with Bleeders
+
   return (
     <div className="space-y-4">
-      {/* Summary Card */}
-      <Card className="border-orange-500/30 bg-orange-50/30 dark:bg-orange-950/10">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-destructive" />
-            ✅ {TRACK_LABELS[result.trackType]} — File Validated Successfully
-          </CardTitle>
-          <CardDescription>
-            {result.bleeders.length} bleeders found | ${result.totalSpend.toFixed(2)} at risk across {result.sheetsProcessed.length} sheet(s)
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Thresholds */}
-          <div className="border rounded-lg p-3 bg-card space-y-2">
-            <div className="text-sm font-medium">Configuration Applied:</div>
-            <div className="flex flex-wrap gap-2">
-              {result.trackType !== 'ACOS100' && (
-                <>
-                  <Badge variant="secondary">Margin: {result.marginPercent}%</Badge>
-                  <Badge variant="secondary">Buffer: {result.bufferPercent}%</Badge>
-                </>
-              )}
-              <Badge variant="destructive">ACoS Threshold: {result.acosThreshold}%</Badge>
-              {result.trackType !== 'ACOS100' && (
-                <Badge variant="outline">Orders ≤ {result.lowSalesThreshold}</Badge>
-              )}
-            </div>
-          </div>
-          
-          {/* Top Spenders */}
-          {topSpenders.length > 0 && (
-            <div className="border rounded-lg p-3 bg-muted/30">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Top Spenders Among Bleeders</span>
-              </div>
-              <div className="space-y-1">
-                {topSpenders.map((bleeder, idx) => (
-                  <div key={idx} className="flex justify-between text-sm">
-                    <span className="truncate max-w-[200px]">{bleeder.entity}</span>
-                    <span className="font-mono text-destructive">${bleeder.spend.toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Validation Checklist */}
-          <Alert className="bg-green-50/50 dark:bg-green-950/20 border-green-200">
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
-            <AlertDescription>
-              <div className="space-y-1">
-                <div className="font-medium text-green-700 dark:text-green-400">✓ Validation Summary</div>
-                <ul className="text-xs space-y-0.5 ml-4 text-muted-foreground">
-                  <li>✓ Sheets processed: <strong>{result.sheetsProcessed.join(', ')}</strong></li>
-                  <li>✓ Column headers normalized and validated</li>
-                  <li>✓ ACoS values converted to numeric (% symbols stripped)</li>
-                  <li>✓ Filters applied successfully (ACoS ≥ {result.acosThreshold}%{result.trackType !== 'ACOS100' ? `, Orders ≤ ${result.lowSalesThreshold}` : ''})</li>
-                  <li>✓ Results sorted by spend (highest first)</li>
-                </ul>
-              </div>
-            </AlertDescription>
-          </Alert>
-          
-          {/* Download Section */}
-          <div className="border-t pt-4">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <h4 className="font-semibold">Download Operator Sheet</h4>
-                <p className="text-xs text-muted-foreground">
-                  Fill in the "Decision" column and re-upload
-                </p>
-              </div>
-              <Button onClick={onDownload}>
-                <Download className="h-4 w-4 mr-2" />
-                Download XLSX
-              </Button>
-            </div>
-            
-            <Alert variant="default" className="bg-blue-50/50 dark:bg-blue-950/20 border-blue-200">
-              <Info className="h-4 w-4" />
-              <AlertDescription>
-                <strong>Decision Column:</strong> Choose{' '}
-                {result.trackType === 'ACOS100' ? (
-                  <>
-                    <Badge variant="outline" className="mx-1">Turn Off</Badge>
-                    <Badge variant="outline" className="mx-1">Cut Bids 50%</Badge>
-                    <Badge variant="outline" className="mx-1">Keep</Badge>
-                  </>
-                ) : result.trackType === 'SBSD' ? (
-                  <>
-                    <Badge variant="outline" className="mx-1">Negative</Badge>
-                    <Badge variant="outline" className="mx-1">Exact</Badge>
-                    <Badge variant="outline" className="mx-1">Give it another week</Badge>
-                  </>
-                ) : (
-                  // SP or SP_KEYWORDS
-                  <>
-                    <Badge variant="outline" className="mx-1">Pause</Badge>
-                    <Badge variant="outline" className="mx-1">Reduce Bids</Badge>
-                    <Badge variant="outline" className="mx-1">Keep</Badge>
-                  </>
-                )}
-              </AlertDescription>
-            </Alert>
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* Preview Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Preview (First 10 Rows)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Campaign</TableHead>
-                  {result.trackType === 'SBSD' && <TableHead>Ad Group</TableHead>}
-                  <TableHead>{result.trackType === 'SP' ? 'Search Term' : 'Entity'}</TableHead>
-                  <TableHead className="text-right">Spend</TableHead>
-                  {result.trackType !== 'ACOS100' && <TableHead className="text-right">Orders</TableHead>}
-                  <TableHead className="text-right">ACoS</TableHead>
-                  {result.trackType === 'ACOS100' && <TableHead>Ranking?</TableHead>}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {result.bleeders.slice(0, 10).map((bleeder, idx) => (
-                  <TableRow key={idx} className={bleeder.isRankCampaign ? 'bg-yellow-50 dark:bg-yellow-950/10' : ''}>
-                    <TableCell className="font-medium max-w-[200px] truncate">
-                      {bleeder.campaignName}
-                    </TableCell>
-                    {result.trackType === 'SBSD' && (
-                      <TableCell className="max-w-[150px] truncate">
-                        {bleeder.adGroupName || '—'}
-                      </TableCell>
-                    )}
-                    <TableCell className="max-w-[200px] truncate">
-                      {bleeder.entity}
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-destructive">
-                      ${bleeder.spend.toFixed(2)}
-                    </TableCell>
-                    {result.trackType !== 'ACOS100' && (
-                      <TableCell className="text-right">{bleeder.orders}</TableCell>
-                    )}
-                    <TableCell className="text-right font-mono">
-                      {bleeder.acos.toFixed(1)}%
-                    </TableCell>
-                    {result.trackType === 'ACOS100' && (
-                      <TableCell>
-                        {bleeder.isRankCampaign ? (
-                          <Badge variant="outline" className="bg-yellow-100 dark:bg-yellow-900/30">Yes</Badge>
-                        ) : (
-                          <span className="text-muted-foreground">No</span>
-                        )}
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-          {result.bleeders.length > 10 && (
-            <p className="text-xs text-muted-foreground mt-2">
-              Showing 10 of {result.bleeders.length} rows. Download to see all.
-            </p>
-          )}
-        </CardContent>
-      </Card>
-      
-      {/* SOP Instructions */}
-      <Card className="border-primary/50 bg-primary/5">
-        <CardHeader>
-          <Collapsible open={isSOPOpen} onOpenChange={setIsSOPOpen}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full">
-              <CardTitle className="text-base flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                What to do next (SOP)
-              </CardTitle>
-              {isSOPOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <CardContent className="pt-4 space-y-3">
-                <ol className="space-y-2 text-sm list-decimal list-inside">
-                  <li className="font-medium">Download the Operator Sheet above</li>
-                  <li><strong className="text-primary">Open in Excel/Sheets and fill the Decision column:</strong>
-                    <ul className="ml-6 mt-1 space-y-1 list-disc text-muted-foreground">
-                      <li><strong>Negate (Exact or Phrase)</strong> — Creates a Negative Keyword (Exact or Phrase) to permanently stop spend on this Search Term or Target. <em>This is the recommended action for high ACoS bleeders.</em></li>
-                      <li><strong>Pause</strong> — Stops underperforming Keywords or Product Targets by setting their State to 'Paused'.</li>
-                      <li><strong>Keep</strong> — No action is taken. The row will be skipped and not included in the final Bulk Update file.</li>
-                      <li><strong>Leave Blank</strong> — No action is taken. The row will be skipped (same as 'Keep').</li>
-                    </ul>
-                  </li>
-                  <li>Save the file and re-upload it below</li>
-                  <li>We'll generate an Amazon-ready bulk file (optional)</li>
-                  <li>Or implement changes directly in Amazon Ads and archive the report</li>
-                </ol>
-                
-                <Alert variant="default" className="bg-amber-50/50 dark:bg-amber-950/20 border-amber-200">
-                  <Info className="h-4 w-4" />
-                  <AlertDescription className="text-sm">
-                    ⚠️ <strong>IMPORTANT NOTE ON PAUSE DECISIONS:</strong> If you enter 'Pause' for an entity that is a <strong>Search Term</strong> (found in the 'SP Search Term Report' track), the system will <strong>automatically convert</strong> this decision to a <strong>'Negate (Exact)'</strong> operation. This is because Search Terms are reporting data, not biddable entities, and cannot be paused directly.
-                  </AlertDescription>
-                </Alert>
-                
-                <div className="mt-4">
-                  <DecisionFileDropzone
-                    onFileUpload={(file) => onUploadDecision(result.trackType, file)}
-                    disabled={!!amazonFile}
-                    label={decisionFile ? 'Reupload Decision File' : 'Upload Decision File'}
-                  />
-                </div>
-              </CardContent>
-            </CollapsibleContent>
-          </Collapsible>
-        </CardHeader>
-      </Card>
-      
-      {/* Amazon File Ready Section */}
+      {/* Stats row */}
+      <div className="grid grid-cols-3 gap-3">
+        <StatCard label="Bleeders Found" value={result.bleeders.length.toString()} />
+        <StatCard label="Total At-Risk Spend" value={`$${result.totalSpend.toFixed(2)}`} danger />
+        <StatCard label="Average ACoS" value={`${avgAcos.toFixed(1)}%`} danger />
+      </div>
+
+      {/* Step indicator */}
+      <div className="flex items-start gap-3 py-3 px-1">
+        <div className="flex flex-col items-center gap-0">
+          <StepDot status="complete" />
+          <div className="w-px h-5 bg-green-500" />
+          <StepDot status="active" />
+          <div className="w-px h-5 bg-border" />
+          <StepDot status="pending" />
+        </div>
+        <div className="flex flex-col gap-3 pt-0.5">
+          <span className="text-[12px] text-green-700 font-medium">File analyzed</span>
+          <span className="text-[12px] text-primary font-medium">Make decisions</span>
+          <span className="text-[12px] text-muted-foreground">Generate Amazon file</span>
+        </div>
+      </div>
+
+      {/* Amazon file ready banner */}
       {amazonFile && (
-        <Card className="border-green-500/50 bg-green-50/50 dark:bg-green-950/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400 text-lg">
-              <CheckCircle2 className="h-6 w-6" />
-              🎉 Workflow Complete — Amazon Bulk File Ready
-            </CardTitle>
-            <CardDescription className="text-base">
-              All steps are complete! Your Amazon-ready bulk upload file has been generated successfully.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary" className="text-sm">✓ Decisions Processed</Badge>
-              <Badge variant="secondary" className="text-sm">✓ Amazon File Generated</Badge>
-              <Badge variant="secondary" className="text-sm">✓ Ready for Upload</Badge>
-            </div>
-            
-            <Alert className="bg-blue-50/50 dark:bg-blue-950/20 border-blue-300">
-              <Info className="h-5 w-5 text-blue-600" />
-              <AlertDescription>
-                <div className="space-y-3">
-                  <div className="font-semibold text-base text-blue-700 dark:text-blue-400">📋 Next Steps:</div>
-                  <ol className="text-sm space-y-2 ml-1">
-                    <li className="flex items-start gap-2">
-                      <span className="font-bold text-blue-600">1️⃣</span>
-                      <span>Download the Amazon file using the button below</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="font-bold text-blue-600">2️⃣</span>
-                      <span>Go to <strong>Amazon Console → Bulk Operations → Upload</strong></span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="font-bold text-blue-600">3️⃣</span>
-                      <span>Upload the file and confirm changes in Amazon</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="font-bold text-blue-600">4️⃣</span>
-                      <span>Archive this report for your records</span>
-                    </li>
-                  </ol>
-                </div>
-              </AlertDescription>
-            </Alert>
-            
-            <div className="space-y-4 pt-2">
-              <Button onClick={onDownloadAmazon} className="w-full" size="lg" variant="default">
-                <Download className="h-5 w-5 mr-2" />
-                Download Amazon Bulk File
-              </Button>
-              
-              <div className="border-t pt-4">
-                <DecisionFileDropzone
-                  onFileUpload={(file) => onUploadDecision(result.trackType, file)}
-                  variant="compact"
-                  label="Reupload Decision File"
-                />
+        <div className="rounded-lg border border-green-300 bg-green-50 dark:bg-green-950/20 p-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-5 w-5 text-green-600" />
+            <div>
+              <div className="text-[13px] font-medium text-green-800 dark:text-green-300">
+                Amazon Bulk File Ready
               </div>
+              <div className="text-[11px] text-green-600">{amazonFile.fileName}</div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <Button size="sm" onClick={onDownloadAmazon} className="text-[12px]">
+            <Download className="w-3.5 h-3.5 mr-1.5" />
+            Download
+          </Button>
+        </div>
       )}
+
+      {/* Decision table */}
+      <div className="rounded-lg border border-border bg-card">
+        {/* Card header */}
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <div>
+            <h3 className="text-[14px] font-medium text-foreground">
+              Bleeders — {TRACK_LABELS[result.trackType]}
+            </h3>
+            <p className="text-[12px] text-muted-foreground mt-0.5">
+              Select a decision per row then generate
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleSetAllPause} className="text-[11px] h-7">
+              Select all → Pause
+            </Button>
+            <Button variant="outline" size="sm" onClick={onDownload} className="text-[11px] h-7">
+              <Download className="w-3 h-3 mr-1" />
+              Download XLSX
+            </Button>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Campaign</TableHead>
+                {result.trackType === 'SBSD' && (
+                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Ad Group</TableHead>
+                )}
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">
+                  {result.trackType === 'SP' ? 'Search Term' : 'Entity'}
+                </TableHead>
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Match Type</TableHead>
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground text-right">Spend</TableHead>
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground text-right">ACoS</TableHead>
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground w-[180px]">Decision</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {result.bleeders.map((bleeder, idx) => (
+                <TableRow key={idx} className="hover:bg-secondary/50">
+                  <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.campaignName}>
+                    {bleeder.campaignName}
+                  </TableCell>
+                  {result.trackType === 'SBSD' && (
+                    <TableCell className="text-[13px] max-w-[120px] truncate" title={bleeder.adGroupName}>
+                      {bleeder.adGroupName || '—'}
+                    </TableCell>
+                  )}
+                  <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.entity}>
+                    {bleeder.entity}
+                  </TableCell>
+                  <TableCell className="text-[13px] text-muted-foreground">
+                    {bleeder.matchType || '—'}
+                  </TableCell>
+                  <TableCell className="text-[13px] text-right tabular-nums" style={{ color: 'hsl(var(--spend))' }}>
+                    ${bleeder.spend.toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <span className="inline-block text-[11px] tabular-nums px-1.5 py-0.5 rounded-full bg-destructive/10 text-destructive font-medium">
+                      {bleeder.acos.toFixed(1)}%
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1.5">
+                      <Select
+                        value={decisions[idx] || ''}
+                        onValueChange={(val) => setDecisions(prev => ({ ...prev, [idx]: val }))}
+                      >
+                        <SelectTrigger className="h-7 text-[12px] w-[130px]">
+                          <SelectValue placeholder="— select —" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {TRACK_DECISIONS[result.trackType].map(opt => (
+                            <SelectItem key={opt} value={opt} className="text-[12px]">
+                              {opt}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {(decisions[idx] === 'Cut Bid' || decisions[idx] === 'Reduce Bid') && (
+                        <div className="flex items-center gap-0.5">
+                          <Input
+                            type="number"
+                            className="h-7 w-14 text-[12px] tabular-nums"
+                            value={cutBidValues[idx] ?? 25}
+                            onChange={(e) => setCutBidValues(prev => ({
+                              ...prev,
+                              [idx]: parseInt(e.target.value) || 25
+                            }))}
+                          />
+                          <span className="text-[11px] text-muted-foreground">%</span>
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Table footer */}
+        <div className="flex items-center justify-between p-4 border-t border-border bg-muted/30">
+          <span className="text-[12px] text-muted-foreground tabular-nums">
+            {decisionsMade} of {result.bleeders.length} decisions made
+          </span>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={handleGenerateAmazonFile}
+              disabled={decisionsMade === 0 || isGenerating}
+              size="sm"
+              className="text-[13px] font-medium h-8"
+            >
+              {isGenerating ? 'Generating...' : 'Generate Amazon file →'}
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Fallback dropzone */}
+      <div className="rounded-lg border border-dashed border-border p-4 bg-muted/20">
+        <p className="text-[12px] text-muted-foreground mb-2">Or upload a decision file manually</p>
+        <DecisionFileDropzone
+          onFileUpload={(file) => onUploadDecision(result.trackType, file)}
+          disabled={!!amazonFile}
+          label={decisionFile ? 'Reupload Decision File' : 'Upload Decision File'}
+          variant="compact"
+        />
+      </div>
     </div>
   );
 };
+
+function StatCard({ label, value, danger }: { label: string; value: string; danger?: boolean }) {
+  return (
+    <div className="rounded-lg bg-secondary p-4">
+      <div className={`text-[22px] font-medium tabular-nums ${danger ? 'text-destructive' : 'text-foreground'}`}>
+        {value}
+      </div>
+      <div className="text-[11px] text-muted-foreground mt-0.5">{label}</div>
+    </div>
+  );
+}
+
+function StepDot({ status }: { status: 'complete' | 'active' | 'pending' }) {
+  if (status === 'complete') {
+    return <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
+      <CheckCircle2 className="w-3 h-3 text-white" />
+    </div>;
+  }
+  if (status === 'active') {
+    return <div className="w-4 h-4 rounded-full bg-primary border-2 border-primary" />;
+  }
+  return <div className="w-4 h-4 rounded-full border-2 border-border bg-background" />;
+}
