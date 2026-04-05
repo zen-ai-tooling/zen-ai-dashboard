@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { UploadCard } from "@/components/upload/UploadCard";
 import { ProcessorUploadPanel } from "@/components/upload/ProcessorUploadPanel";
 import { AnalysisResults } from "@/components/results/AnalysisResults";
@@ -8,7 +8,7 @@ import { ConfirmModal } from "@/components/modals/ConfirmModal";
 import { HelpDrawer } from "@/components/modals/HelpDrawer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, AlertCircle, FileText, Upload, Download, Loader2 } from "lucide-react";
+import { CheckCircle2, AlertCircle, FileText, Upload, Download, Loader2, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { analyzeBleederReport } from "@/lib/bleederAnalyzer";
 import { processDecisions } from "@/lib/decisionProcessor";
@@ -48,6 +48,21 @@ interface TimelineEntry {
   status: "success" | "warning" | "error";
   timestamp: string;
 }
+
+const TRACK_LABELS_SHORT: Record<Bleeder2Track, string> = {
+  SBSD: 'SB/SD Targets',
+  SP: 'SP Search Terms',
+  SP_KEYWORDS: 'SP Targets',
+  ACOS100: '>100% ACoS',
+};
+
+const STAGE_LABELS: Record<string, string> = {
+  picker: 'Select Track',
+  thresholds: 'Thresholds',
+  upload: 'Upload',
+  results: 'Results',
+  decision: 'Decision',
+};
 
 const Index = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -533,7 +548,6 @@ const Index = () => {
 
   const handleSidebarModuleSelect = (module: typeof activeModule) => {
     if (module === activeModule) return;
-    // Reset state when switching modules
     if (module === 'bleeders_1') {
       setActiveModule('bleeders_1');
       setBleederMode('standard');
@@ -561,6 +575,22 @@ const Index = () => {
       setActiveModule(null);
     }
   };
+
+  // ── Track status for sidebar ──
+  const trackStatus = useMemo(() => {
+    const status: Record<Bleeder2Track, 'idle' | 'active' | 'done'> = {
+      SBSD: 'idle', SP: 'idle', SP_KEYWORDS: 'idle', ACOS100: 'idle',
+    };
+    (['SBSD', 'SP', 'SP_KEYWORDS', 'ACOS100'] as Bleeder2Track[]).forEach(t => {
+      if (bleeder2TrackState[t].amazonFile || bleeder2TrackState[t].result) {
+        status[t] = bleeder2TrackState[t].amazonFile ? 'done' : 'active';
+      }
+      if (bleeder2ActiveTrack === t && bleeder2Stage !== 'picker') {
+        status[t] = bleeder2TrackState[t].amazonFile ? 'done' : 'active';
+      }
+    });
+    return status;
+  }, [bleeder2TrackState, bleeder2ActiveTrack, bleeder2Stage]);
 
   // ── Status badge ──
 
@@ -594,6 +624,65 @@ const Index = () => {
     return 'Home';
   };
 
+  // ── Breadcrumbs ──
+  const getBreadcrumbs = () => {
+    const crumbs: { label: string; onClick?: () => void }[] = [];
+
+    if (activeModule === 'bleeders_2') {
+      if (bleeder2ActiveTrack) {
+        crumbs.push({
+          label: TRACK_LABELS_SHORT[bleeder2ActiveTrack],
+          onClick: bleeder2Stage !== 'picker' ? () => {
+            // Navigate back to track picker level is clicking track name when deeper
+          } : undefined,
+        });
+        if (bleeder2Stage !== 'picker' && bleeder2Stage !== 'results') {
+          crumbs.push({ label: STAGE_LABELS[bleeder2Stage] || bleeder2Stage });
+        }
+        if (bleeder2Stage === 'results') {
+          crumbs.push({ label: 'Results' });
+        }
+      }
+    }
+
+    if (activeModule === 'bleeders_1') {
+      if (analysisResults) {
+        crumbs.push({ label: 'Results' });
+      } else if (decisionResults) {
+        crumbs.push({ label: 'Decision Processing' });
+      } else if (validatorResults) {
+        crumbs.push({ label: 'Validation' });
+      }
+    }
+
+    if (activeModule === 'lifetime_bleeders') {
+      if (lifetimeStage === 'results' || lifetimeStage === 'decision-upload') {
+        crumbs.push({ label: 'Results' });
+      } else if (lifetimeStage === 'decision-results') {
+        crumbs.push({ label: 'Decision Results' });
+      }
+    }
+
+    return crumbs;
+  };
+
+  // ── Determine which topbar actions to show ──
+  const isUploadScreen = (
+    (activeModule === 'bleeders_1' && !analysisResults && !decisionResults && !validatorResults) ||
+    (activeModule === 'bleeders_2' && (bleeder2Stage === 'picker' || bleeder2Stage === 'thresholds' || bleeder2Stage === 'upload')) ||
+    (activeModule === 'lifetime_bleeders' && lifetimeStage === 'upload')
+  );
+
+  const isResultsScreen = !isUploadScreen && activeModule !== null;
+
+  // ── Track picker cards ──
+  const TRACK_CARDS = [
+    { id: 'SBSD' as const, name: 'SB/SD Bad Targets', desc: 'Sponsored Brands & Display targeting', accent: 'border-l-red-500' },
+    { id: 'SP' as const, name: 'SP Bad Search Terms', desc: 'Sponsored Products search terms', accent: 'border-l-amber-500' },
+    { id: 'SP_KEYWORDS' as const, name: 'SP Bad Targets', desc: 'Sponsored Products targets', accent: 'border-l-primary' },
+    { id: 'ACOS100' as const, name: 'Campaigns >100% ACoS', desc: 'High ACoS campaign cleanup', accent: 'border-l-purple-500' },
+  ];
+
   // ── Render ──
 
   return (
@@ -604,19 +693,27 @@ const Index = () => {
         bleeder2ActiveTrack={bleeder2ActiveTrack}
         onSelectTrack={handleSelectTrack}
         showTracks={activeModule === 'bleeders_2'}
+        onBackToTrackPicker={() => {
+          setBleeder2ActiveTrack(null);
+          setBleeder2Stage('picker');
+        }}
+        trackStatus={trackStatus}
       />
 
       <div className="flex-1 flex flex-col min-h-screen">
         <Topbar
           title={getPageTitle()}
+          breadcrumbs={getBreadcrumbs()}
           statusBadge={getStatusBadge()}
           onHelp={() => setShowHelpDrawer(true)}
           onReset={handleReset}
-          onNewFile={activeModule ? handleToolbarReupload : undefined}
+          onNewFile={isResultsScreen ? handleToolbarReupload : undefined}
+          showNewFile={isResultsScreen}
+          showReset={isResultsScreen}
         />
 
-        <main className="flex-1 overflow-y-auto p-5">
-          <div className="max-w-[960px] mx-auto">
+        <main className="flex-1 overflow-y-auto px-8 py-6">
+          <div className="max-w-[960px]">
             {/* HOME */}
             {!activeModule && (
               <HomeScreen onSelectModule={handleSidebarModuleSelect} />
@@ -624,11 +721,12 @@ const Index = () => {
 
             {/* BLEEDERS 1.0 */}
             {activeModule === 'bleeders_1' && !analysisResults && !decisionResults && !validatorResults && (
-              <div className="max-w-lg mx-auto pt-8">
-                <UploadCard onFileUpload={handleFileUpload} isVisible={true} />
-                <p className="text-[12px] text-muted-foreground mt-3 text-center">
+              <div className="pt-4">
+                <h2 className="text-[14px] font-medium text-foreground font-display mb-1">Upload File</h2>
+                <p className="text-[12px] text-muted-foreground mb-4">
                   Amazon Ads → Campaign Manager → Bulk Operations → Create Spreadsheet (60-day range)
                 </p>
+                <UploadCard onFileUpload={handleFileUpload} isVisible={true} />
               </div>
             )}
 
@@ -685,28 +783,36 @@ const Index = () => {
 
             {/* BLEEDERS 2.0 — Track picker */}
             {bleeder2Stage === "picker" && activeModule === "bleeders_2" && (
-              <div className="grid grid-cols-2 gap-3 max-w-xl mx-auto pt-8">
-                {([
-                  { id: 'SBSD' as const, name: 'SB/SD Bad Targets', desc: 'Sponsored Brands & Display targeting', accent: 'border-l-red-500' },
-                  { id: 'SP' as const, name: 'SP Bad Search Terms', desc: 'Sponsored Products search terms', accent: 'border-l-amber-500' },
-                  { id: 'SP_KEYWORDS' as const, name: 'SP Bad Targets', desc: 'Sponsored Products targets', accent: 'border-l-blue-500' },
-                  { id: 'ACOS100' as const, name: 'Campaigns >100% ACoS', desc: 'High ACoS campaign cleanup', accent: 'border-l-purple-500' },
-                ]).map(t => (
-                  <button
-                    key={t.id}
-                    onClick={() => handleSelectTrack(t.id)}
-                    className={`text-left p-4 rounded-lg border border-border bg-card hover:shadow-sm transition-all border-l-4 ${t.accent}`}
-                  >
-                    <div className="text-[14px] font-medium text-foreground">{t.name}</div>
-                    <div className="text-[12px] text-muted-foreground mt-1">{t.desc}</div>
-                  </button>
-                ))}
+              <div className="pt-4">
+                <h2 className="text-[14px] font-medium text-foreground font-display mb-1">Select a Track</h2>
+                <p className="text-[12px] text-muted-foreground mb-5">Choose which analysis to run.</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {TRACK_CARDS.map(t => {
+                    const isDone = trackStatus[t.id] === 'done';
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => handleSelectTrack(t.id)}
+                        className={`group text-left p-4 rounded-lg border border-border bg-card border-l-4 ${t.accent} card-hover btn-press relative`}
+                      >
+                        {isDone && (
+                          <span className="absolute top-3 right-3 text-[10px] bg-success/10 text-success font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" /> Done
+                          </span>
+                        )}
+                        <div className="text-[14px] font-medium text-foreground font-display">{t.name}</div>
+                        <div className="text-[12px] text-muted-foreground mt-1">{t.desc}</div>
+                        <ArrowRight className="w-3.5 h-3.5 text-muted-foreground mt-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
             {/* BLEEDERS 2.0 — Thresholds */}
             {bleeder2Stage === "thresholds" && activeModule === "bleeders_2" && bleeder2ActiveTrack && (
-              <div className="max-w-lg mx-auto pt-8">
+              <div className="pt-4">
                 <ThresholdConfig
                   thresholds={bleeder2Thresholds}
                   onChange={setBleeder2Thresholds}
@@ -717,7 +823,7 @@ const Index = () => {
 
             {/* BLEEDERS 2.0 — Upload */}
             {bleeder2Stage === "upload" && activeModule === "bleeders_2" && bleeder2ActiveTrack && (
-              <div className="max-w-lg mx-auto pt-8 space-y-4">
+              <div className="pt-4 space-y-4">
                 <TrackUploader
                   track={bleeder2ActiveTrack}
                   onUpload={(track, file) => handleBleeder2TrackUpload(file, track)}
@@ -725,24 +831,6 @@ const Index = () => {
                   uploadedFile={bleeder2TrackState[bleeder2ActiveTrack].file}
                   isValidating={bleeder2TrackState[bleeder2ActiveTrack].isValidating}
                 />
-                {bleeder2TrackState[bleeder2ActiveTrack].file && (
-                  <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-card">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-primary" />
-                      <span className="text-[13px] font-medium">{bleeder2TrackState[bleeder2ActiveTrack].file!.name}</span>
-                      <span className="text-[11px] text-muted-foreground">({(bleeder2TrackState[bleeder2ActiveTrack].file!.size / 1024).toFixed(1)} KB)</span>
-                    </div>
-                    <Button variant="ghost" size="sm" onClick={() => handleResetTrack(bleeder2ActiveTrack!)} disabled={bleeder2TrackState[bleeder2ActiveTrack].isValidating} className="text-[12px]">
-                      Reupload
-                    </Button>
-                  </div>
-                )}
-                {bleeder2TrackState[bleeder2ActiveTrack].isValidating && (
-                  <div className="flex items-center gap-2 text-primary text-[13px] px-1">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Validating...
-                  </div>
-                )}
               </div>
             )}
 
@@ -762,31 +850,31 @@ const Index = () => {
 
             {/* LIFETIME BLEEDERS */}
             {activeModule === "lifetime_bleeders" && lifetimeStage === "upload" && (
-              <div className="max-w-lg mx-auto pt-8">
+              <div className="pt-4">
                 <LifetimeUploader onAnalyze={handleLifetimeAnalysis} isProcessing={lifetimeProcessing} />
               </div>
             )}
 
             {activeModule === "lifetime_bleeders" && (lifetimeStage === "results" || lifetimeStage === "decision-upload" || lifetimeStage === "decision-results") && lifetimeResult && (
-              <div className="space-y-4">
+              <div className="space-y-4 pt-4">
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-3">
                   <div className="rounded-lg bg-secondary p-4">
-                    <div className="text-[22px] font-medium tabular-nums text-foreground">{lifetimeResult.bleeders.length}</div>
-                    <div className="text-[11px] text-muted-foreground">Bleeders Found</div>
+                    <div className="text-[22px] font-medium font-mono-nums text-foreground">{lifetimeResult.bleeders.length}</div>
+                    <div className="text-[11px] text-[hsl(var(--text-tertiary))]">Bleeders Found</div>
                   </div>
                   <div className="rounded-lg bg-secondary p-4">
-                    <div className="text-[22px] font-medium tabular-nums text-destructive">${lifetimeResult.totalSpend.toFixed(2)}</div>
-                    <div className="text-[11px] text-muted-foreground">Wasted Spend</div>
+                    <div className="text-[22px] font-medium font-mono-nums text-destructive">${lifetimeResult.totalSpend.toFixed(2)}</div>
+                    <div className="text-[11px] text-[hsl(var(--text-tertiary))]">Wasted Spend</div>
                   </div>
                   <div className="rounded-lg bg-secondary p-4">
-                    <div className="text-[22px] font-medium tabular-nums text-foreground">{lifetimeResult.excludedRankingCount}</div>
-                    <div className="text-[11px] text-muted-foreground">Ranking Excluded</div>
+                    <div className="text-[22px] font-medium font-mono-nums text-foreground">{lifetimeResult.excludedRankingCount}</div>
+                    <div className="text-[11px] text-[hsl(var(--text-tertiary))]">Ranking Excluded</div>
                   </div>
                 </div>
 
                 <div className="flex gap-3">
-                  <Button onClick={handleDownloadLifetimeDecisionSheet} className="flex-1">
+                  <Button onClick={handleDownloadLifetimeDecisionSheet} className="flex-1 btn-press">
                     <Download className="mr-2 h-4 w-4" />
                     Download Decision File
                   </Button>
@@ -794,7 +882,7 @@ const Index = () => {
 
                 {/* Decision upload */}
                 {(lifetimeStage === "decision-upload" || lifetimeStage === "results") && (
-                  <div className="rounded-lg border border-dashed border-border p-6 text-center cursor-pointer hover:bg-muted/30 transition-colors"
+                  <div className="rounded-lg border border-dashed border-border/60 p-6 text-center cursor-pointer hover:bg-muted/30 transition-colors"
                     onDrop={(e) => { e.preventDefault(); if (lifetimeProcessing) return; const file = e.dataTransfer.files[0]; if (file) handleLifetimeDecisionUpload(file); }}
                     onDragOver={(e) => e.preventDefault()}
                     onClick={() => { if (lifetimeProcessing) return; document.getElementById("lifetime-decision-input")?.click(); }}
@@ -807,7 +895,7 @@ const Index = () => {
                       </div>
                     ) : (
                       <div>
-                        <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                        <Upload className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
                         <p className="text-[13px] font-medium">Upload edited Decision File</p>
                         <p className="text-[12px] text-muted-foreground mt-1">Drag & drop or click to browse</p>
                       </div>
@@ -820,15 +908,15 @@ const Index = () => {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-3">
                       <div className="rounded-lg bg-secondary p-4">
-                        <div className="text-[22px] font-medium tabular-nums text-destructive">{lifetimeDecisionResult.pausedCount}</div>
-                        <div className="text-[11px] text-muted-foreground">Targets to Pause</div>
+                        <div className="text-[22px] font-medium font-mono-nums text-destructive">{lifetimeDecisionResult.pausedCount}</div>
+                        <div className="text-[11px] text-[hsl(var(--text-tertiary))]">Targets to Pause</div>
                       </div>
                       <div className="rounded-lg bg-secondary p-4">
-                        <div className="text-[22px] font-medium tabular-nums text-foreground">{lifetimeDecisionResult.keptCount}</div>
-                        <div className="text-[11px] text-muted-foreground">Targets Kept</div>
+                        <div className="text-[22px] font-medium font-mono-nums text-foreground">{lifetimeDecisionResult.keptCount}</div>
+                        <div className="text-[11px] text-[hsl(var(--text-tertiary))]">Targets Kept</div>
                       </div>
                     </div>
-                    <Button onClick={handleDownloadLifetimeBulkUpdate} className="w-full">
+                    <Button onClick={handleDownloadLifetimeBulkUpdate} className="w-full btn-press">
                       <Download className="mr-2 h-4 w-4" />
                       Download Amazon Bulk Update
                     </Button>
