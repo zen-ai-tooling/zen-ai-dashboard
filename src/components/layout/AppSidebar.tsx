@@ -13,6 +13,7 @@ interface AppSidebarProps {
   showTracks: boolean;
   onBackToTrackPicker?: () => void;
   trackStatus?: Record<Bleeder2Track, 'idle' | 'active' | 'done'>;
+  trackCompletionStatus?: Record<string, 'idle' | 'complete'>;
   onReset?: () => void;
 }
 
@@ -37,6 +38,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   showTracks,
   onBackToTrackPicker,
   trackStatus = { SBSD: 'idle', SP: 'idle', SP_KEYWORDS: 'idle', ACOS100: 'idle' },
+  trackCompletionStatus = { SBSD: 'idle', SP: 'idle', SP_KEYWORDS: 'idle', ACOS100: 'idle' },
   onReset,
 }) => {
   const { clients, activeClient, setActiveClient, addClient } = useClient();
@@ -99,11 +101,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             {TRACKS.map((t) => {
               const status = trackStatus[t.id];
               const isTrackActive = bleeder2ActiveTrack === t.id;
-              const dotColor = isTrackActive
-                ? 'hsl(var(--accent-blue))'
-                : status === 'done'
-                ? 'hsl(var(--green))'
-                : 'hsl(var(--text-tertiary))';
+              const isComplete = trackCompletionStatus[t.id] === 'complete';
               return (
                 <button
                   key={t.id}
@@ -114,11 +112,21 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                       : 'text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--border))/0.4]'
                   }`}
                 >
-                  <span className="w-[5px] h-[5px] rounded-full flex-shrink-0" style={{ backgroundColor: dotColor }} />
-                  {t.label}
-                  {status === 'done' && !isTrackActive && (
-                    <span className="ml-auto text-[10px] text-[hsl(var(--green))] font-medium">✓</span>
+                  {isComplete ? (
+                    <span style={{
+                      width: '14px', height: '14px', borderRadius: '50%',
+                      background: '#F0FDF4', border: '1px solid #BBF7D0',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '9px', color: '#16A34A', flexShrink: 0
+                    }}>✓</span>
+                  ) : (
+                    <span style={{
+                      width: '6px', height: '6px', borderRadius: '50%',
+                      background: isTrackActive ? '#2563EB' : status === 'done' ? '#16A34A' : '#E4E6EA',
+                      flexShrink: 0, display: 'inline-block'
+                    }} />
                   )}
+                  {t.label}
                 </button>
               );
             })}
