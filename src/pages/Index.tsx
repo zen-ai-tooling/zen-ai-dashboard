@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
+import { useClient } from "@/context/ClientContext";
 import { UploadCard } from "@/components/upload/UploadCard";
 import { ProcessorUploadPanel } from "@/components/upload/ProcessorUploadPanel";
 import { AnalysisResults } from "@/components/results/AnalysisResults";
@@ -95,11 +96,12 @@ const Index = () => {
   type Bleeder2Stage = "picker" | "thresholds" | "upload" | "results" | "decision";
   const [bleeder2ActiveTrack, setBleeder2ActiveTrack] = useState<Bleeder2Track | null>(null);
   const [bleeder2Stage, setBleeder2Stage] = useState<Bleeder2Stage>("picker");
+  const { activeClient, updateClient } = useClient();
   const [bleeder2Thresholds, setBleeder2Thresholds] = useState<Bleeder2Thresholds>({
-    targetACOS: 35,
+    targetACOS: activeClient.acosTarget,
     clickThreshold: 10,
-    fewerThanOrders: 5,
-    excludeRanking: true,
+    fewerThanOrders: activeClient.fewerThanOrders,
+    excludeRanking: activeClient.excludeRanking,
   });
 
   const [bleeder2TrackState, setBleeder2TrackState] = useState<
@@ -210,6 +212,12 @@ const Index = () => {
   const handleBleeder2ContinueFromThresholds = async () => {
     if (!bleeder2ActiveTrack) return;
     setBleeder2Stage("upload");
+    updateClient({
+      ...activeClient,
+      acosTarget: bleeder2Thresholds.targetACOS,
+      fewerThanOrders: bleeder2Thresholds.fewerThanOrders,
+      excludeRanking: bleeder2Thresholds.excludeRanking,
+    });
   };
 
   const handleBleeder2TrackUpload = async (file: File, track: Bleeder2Track) => {
@@ -851,6 +859,7 @@ const Index = () => {
                   thresholds={bleeder2Thresholds}
                   onChange={setBleeder2Thresholds}
                   onContinue={handleBleeder2ContinueFromThresholds}
+                  clientName={activeClient.name}
                 />
               </div>
             )}
