@@ -683,6 +683,34 @@ const Index = () => {
     { id: 'ACOS100' as const, name: 'Campaigns >100% ACoS', desc: 'High ACoS campaign cleanup', accent: 'border-l-purple-500' },
   ];
 
+  // ── Back navigation ──
+  const getBackHandler = () => {
+    if (!activeModule) return undefined;
+
+    if (activeModule === 'bleeders_2') {
+      if (bleeder2Stage === 'results' || bleeder2Stage === 'decision') return () => setBleeder2Stage('upload');
+      if (bleeder2Stage === 'upload') return () => setBleeder2Stage(bleeder2ActiveTrack === 'ACOS100' ? 'picker' : 'thresholds');
+      if (bleeder2Stage === 'thresholds') return () => { setBleeder2ActiveTrack(null); setBleeder2Stage('picker'); };
+      if (bleeder2Stage === 'picker') return () => handleSidebarModuleSelect(null);
+      return () => handleSidebarModuleSelect(null);
+    }
+
+    if (activeModule === 'bleeders_1') {
+      if (validatorResults) return () => { setValidatorResults(null); setShowProcessorUpload(true); setShowValidatorUpload(false); setCurrentStep(2); };
+      if (decisionResults) return () => { setDecisionResults(null); setProcessorType(null); setShowProcessorUpload(false); setAnalysisResults(null); setChatState('awaiting-upload'); setShowUpload(true); setCurrentStep(1); setCompletedSteps([]); };
+      if (analysisResults) return () => { setAnalysisResults(null); setChatState('awaiting-upload'); setShowUpload(true); setProcessorType(null); setCurrentStep(1); setCompletedSteps([]); };
+      return () => handleSidebarModuleSelect(null);
+    }
+
+    if (activeModule === 'lifetime_bleeders') {
+      if (lifetimeStage === 'decision-results') return () => { setLifetimeDecisionResult(null); setLifetimeStage('decision-upload'); };
+      if (lifetimeStage === 'decision-upload' || lifetimeStage === 'results') return () => { setLifetimeResult(null); setLifetimeStage('upload'); };
+      return () => handleSidebarModuleSelect(null);
+    }
+
+    return () => handleSidebarModuleSelect(null);
+  };
+
   // ── Render ──
 
   return (
@@ -710,6 +738,7 @@ const Index = () => {
           onNewFile={isResultsScreen ? handleToolbarReupload : undefined}
           showNewFile={isResultsScreen}
           showReset={isResultsScreen}
+          onBack={getBackHandler()}
         />
 
         <main className="flex-1 overflow-y-auto px-8 py-6">
