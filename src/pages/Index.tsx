@@ -741,7 +741,7 @@ const Index = () => {
           onBack={getBackHandler()}
         />
 
-        <main className="flex-1 overflow-y-auto px-8 py-6">
+        <main className="flex-1 overflow-y-auto" style={{ padding: '28px 32px' }}>
           <div className="max-w-[960px]">
             {/* HOME */}
             {!activeModule && (
@@ -750,11 +750,13 @@ const Index = () => {
 
             {/* BLEEDERS 1.0 */}
             {activeModule === 'bleeders_1' && !analysisResults && !decisionResults && !validatorResults && (
-              <div className="pt-4">
-                <h2 className="text-[14px] font-medium text-foreground font-display mb-1">Upload File</h2>
-                <p className="text-[12px] text-muted-foreground mb-4">
-                  Amazon Ads → Campaign Manager → Bulk Operations → Create Spreadsheet (60-day range)
-                </p>
+              <div className="space-y-5">
+                <div>
+                  <h2 className="text-[20px] font-semibold text-foreground">Upload your bulk file</h2>
+                  <p className="text-[13px] text-[hsl(var(--text-secondary))] mt-1">
+                    Amazon Ads → Campaign Manager → Bulk Operations → Create Spreadsheet (60-day range)
+                  </p>
+                </div>
                 <UploadCard onFileUpload={handleFileUpload} isVisible={true} />
               </div>
             )}
