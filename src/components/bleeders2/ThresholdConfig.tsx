@@ -52,15 +52,16 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
   };
 
   const handleContinue = () => {
+    setShowSaved(true);
+    setTimeout(() => setShowSaved(false), 2000);
     const targetNum = parsePercentOrUndefined(targetACOSRaw);
     if (targetNum === undefined) {
       toast({ title: "Target ACoS Required", description: "Please enter a Target ACoS (e.g., 35)", variant: "destructive" });
+      setShowSaved(false);
       return;
     }
     const finalThresholds = { ...local, targetACOS: targetNum };
     onChange(finalThresholds);
-    setShowSaved(true);
-    setTimeout(() => setShowSaved(false), 2000);
     onContinue();
   };
 
