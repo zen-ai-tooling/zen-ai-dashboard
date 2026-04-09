@@ -136,6 +136,24 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             })}
           </div>
         )}
+
+        {/* History */}
+        <div className="px-2 mt-3">
+          <div className="text-[10px] font-semibold tracking-[0.08em] uppercase text-[hsl(var(--text-tertiary))] px-3 pb-1.5">
+            History
+          </div>
+          <button
+            onClick={() => setShowHistoryView?.(true)}
+            className={`w-full flex items-center gap-2.5 py-[7px] px-3 rounded-lg text-[13px] font-medium my-[1px] btn-press ${
+              showHistoryView
+                ? 'bg-[hsl(var(--accent-blue-light))] text-[hsl(var(--accent-blue))] border-l-[3px] border-l-[hsl(var(--accent-blue))] pl-[9px]'
+                : 'text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--border))/0.5] border-l-[3px] border-l-transparent pl-[9px]'
+            }`}
+          >
+            <Clock className="w-[14px] h-[14px]" />
+            Session log
+          </button>
+        </div>
       </div>
 
       {/* Client pill */}
