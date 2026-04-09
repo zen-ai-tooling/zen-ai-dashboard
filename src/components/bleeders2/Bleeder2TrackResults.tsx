@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Download, CheckCircle2, Loader2, XCircle } from "lucide-react";
 import type { Bleeder2TrackResult, Bleeder2TrackType } from "@/lib/bleeder2TrackAnalyzer";
 import { DecisionFileDropzone } from "./DecisionFileDropzone";
+import { suggestDecision, getConfidenceStyle } from '@/lib/ui/suggestionEngine';
+import type { Suggestion } from '@/lib/ui/suggestionEngine';
 
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
@@ -42,6 +44,24 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
   const [generateDone, setGenerateDone] = useState(false);
 
   const hasBleeders = result.bleeders.length > 0;
+
+  const suggestions = useMemo(() => result.bleeders.map(bleeder =>
+    suggestDecision({
+      acos: bleeder.acos,
+      spend: bleeder.spend,
+      orders: bleeder.orders,
+      clicks: bleeder.clicks,
+      matchType: bleeder.matchType,
+      entity: bleeder.entity,
+      trackType: result.trackType,
+    })
+  ), [result.bleeders, result.trackType]);
+
+  const getDecisionOptions = () => {
+    if (result.trackType === 'ACOS100') return ['Pause', 'Cut Bid', 'Keep'];
+    if (result.trackType === 'SP') return ['Negative', 'Pause', 'Keep'];
+    return ['Negative', 'Pause', 'Cut Bid', 'Keep'];
+  };
 
   const decisionsMade = useMemo(() => {
     return Object.values(decisions).filter(d => d && d !== '').length;
@@ -238,11 +258,15 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         {/* Bulk action buttons */}
         <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/60 bg-muted/20">
           <span className="text-[11px] text-muted-foreground mr-1">Bulk:</span>
+          <Button variant="outline" size="sm" onClick={() => {
+            const allSuggested: Record<number, string> = {};
+            suggestions.forEach((s, idx) => { allSuggested[idx] = s.decision; });
+            setDecisions(allSuggested);
+          }} className="text-[11px] h-6 px-2.5 btn-press">
+            Apply all suggestions
+          </Button>
           <Button variant="outline" size="sm" onClick={handleSetAllPause} className="text-[11px] h-6 px-2.5 btn-press">
             Select all → Pause
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleSetAllNegative} className="text-[11px] h-6 px-2.5 btn-press">
-            Select all → Negative
           </Button>
           <Button variant="ghost" size="sm" onClick={handleClearAll} className="text-[11px] h-6 px-2.5 btn-press text-muted-foreground">
             <XCircle className="w-3 h-3 mr-1" />
@@ -262,71 +286,100 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">
                   {result.trackType === 'SP' ? 'Search Term' : 'Entity'}
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Match Type</TableHead>
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Match</TableHead>
                 <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground text-right">Spend</TableHead>
+                {result.trackType !== 'ACOS100' && (
+                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground text-right">Orders</TableHead>
+                )}
                 <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground text-right">ACoS</TableHead>
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Suggestion</TableHead>
                 <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground w-[200px]">Decision</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {result.bleeders.map((bleeder, idx) => (
-                <TableRow key={idx} className="hover:bg-secondary/50 transition-colors">
-                  <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.campaignName}>
-                    {bleeder.campaignName}
-                  </TableCell>
-                  {result.trackType === 'SBSD' && (
-                    <TableCell className="text-[13px] max-w-[120px] truncate" title={bleeder.adGroupName}>
-                      {bleeder.adGroupName || '—'}
+              {result.bleeders.map((bleeder, idx) => {
+                const suggestion = suggestions[idx];
+                const confStyle = getConfidenceStyle(suggestion.confidence);
+                return (
+                  <TableRow key={idx} className="hover:bg-secondary/50 transition-colors">
+                    <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.campaignName}>
+                      {bleeder.campaignName}
                     </TableCell>
-                  )}
-                  <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.entity}>
-                    {bleeder.entity}
-                  </TableCell>
-                  <TableCell className="text-[13px] text-muted-foreground">
-                    {bleeder.matchType || '—'}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className="text-[13px] font-mono-nums text-destructive">
-                      ${bleeder.spend.toFixed(2)}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className="inline-block text-[11px] font-mono-nums px-1.5 py-0.5 rounded-full bg-destructive/10 text-destructive font-medium">
-                      {bleeder.acos.toFixed(1)}%
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1.5">
-                      <Select
-                        value={decisions[idx] || ''}
-                        onValueChange={(val) => setDecisions(prev => ({ ...prev, [idx]: val }))}
+                    {result.trackType === 'SBSD' && (
+                      <TableCell className="text-[13px] max-w-[120px] truncate" title={bleeder.adGroupName}>
+                        {bleeder.adGroupName || '—'}
+                      </TableCell>
+                    )}
+                    <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.entity}>
+                      {bleeder.entity}
+                    </TableCell>
+                    <TableCell className="text-[13px] text-muted-foreground">
+                      {bleeder.matchType || '—'}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className="text-[13px] font-mono-nums text-destructive">
+                        ${bleeder.spend.toFixed(2)}
+                      </span>
+                    </TableCell>
+                    {result.trackType !== 'ACOS100' && (
+                      <TableCell className="text-right">
+                        <span className="text-[13px] font-mono-nums">
+                          {bleeder.orders}
+                        </span>
+                      </TableCell>
+                    )}
+                    <TableCell className="text-right">
+                      <span className="inline-block text-[11px] font-mono-nums px-1.5 py-0.5 rounded-full bg-destructive/10 text-destructive font-medium">
+                        {bleeder.acos.toFixed(1)}%
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <button
+                        onClick={() => setDecisions(prev => ({ ...prev, [idx]: suggestion.decision }))}
+                        title={suggestion.reason}
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium cursor-pointer transition-all hover:opacity-80"
+                        style={{
+                          background: confStyle.background,
+                          color: confStyle.color,
+                          border: `1px solid ${confStyle.border}`,
+                        }}
                       >
-                        <SelectTrigger className="h-7 text-[12px] w-[120px]">
-                          <SelectValue placeholder="— select —" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {TRACK_DECISIONS[result.trackType].map(opt => (
-                            <SelectItem key={opt} value={opt} className="text-[12px]">{opt}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {decisions[idx] === 'Cut Bid' && (
-                        <div className="flex items-center gap-0.5">
-                          <Input
-                            type="number"
-                            min={1}
-                            max={99}
-                            className="h-7 w-14 text-[12px] font-mono-nums"
-                            value={cutBidPcts[idx] ?? 25}
-                            onChange={(e) => setCutBidPcts(prev => ({ ...prev, [idx]: parseInt(e.target.value) || 25 }))}
-                          />
-                          <span className="text-[11px] text-muted-foreground">%</span>
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+                        {suggestion.shortLabel}
+                      </button>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1.5">
+                        <Select
+                          value={decisions[idx] || ''}
+                          onValueChange={(val) => setDecisions(prev => ({ ...prev, [idx]: val }))}
+                        >
+                          <SelectTrigger className="h-7 text-[12px] w-[120px]">
+                            <SelectValue placeholder="— select —" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {getDecisionOptions().map(opt => (
+                              <SelectItem key={opt} value={opt} className="text-[12px]">{opt}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {decisions[idx] === 'Cut Bid' && (
+                          <div className="flex items-center gap-0.5">
+                            <Input
+                              type="number"
+                              min={1}
+                              max={99}
+                              className="h-7 w-14 text-[12px] font-mono-nums"
+                              value={cutBidPcts[idx] ?? 25}
+                              onChange={(e) => setCutBidPcts(prev => ({ ...prev, [idx]: parseInt(e.target.value) || 25 }))}
+                            />
+                            <span className="text-[11px] text-muted-foreground">%</span>
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
@@ -337,6 +390,10 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
             {decisionsMade} of {result.bleeders.length} decisions made
           </span>
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={onDownload} className="text-[11px] h-7 btn-press">
+              <Download className="w-3 h-3 mr-1" />
+              Download XLSX
+            </Button>
             <Button
               onClick={handleGenerateInline}
               disabled={decisionsMade === 0 || isGenerating}
