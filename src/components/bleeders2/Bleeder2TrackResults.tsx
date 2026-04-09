@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Download, CheckCircle2, Loader2, XCircle } from "lucide-react";
 import type { Bleeder2TrackResult, Bleeder2TrackType } from "@/lib/bleeder2TrackAnalyzer";
 import { DecisionFileDropzone } from "./DecisionFileDropzone";
+import { suggestDecision, getConfidenceStyle } from '@/lib/ui/suggestionEngine';
+import type { Suggestion } from '@/lib/ui/suggestionEngine';
 
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
