@@ -16,15 +16,17 @@ interface ThresholdConfigProps {
   thresholds: Bleeder2Thresholds;
   onChange: (thresholds: Bleeder2Thresholds) => void;
   onContinue: () => void;
+  clientName: string;
 }
 
 export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
-  thresholds, onChange, onContinue
+  thresholds, onChange, onContinue, clientName
 }) => {
   const { toast } = useToast();
   const [local, setLocal] = useState(thresholds);
   const [targetACOSRaw, setTargetACOSRaw] = useState<string>(String(thresholds.targetACOS ?? 35));
   const [fewerThanOrdersRaw, setFewerThanOrdersRaw] = useState<string>(String(thresholds.fewerThanOrders ?? 5));
+  const [showSaved, setShowSaved] = useState(false);
 
   const parsePercentOrUndefined = (s: string): number | undefined => {
     if (s.trim() === "") return undefined;
@@ -57,6 +59,8 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
     }
     const finalThresholds = { ...local, targetACOS: targetNum };
     onChange(finalThresholds);
+    setShowSaved(true);
+    setTimeout(() => setShowSaved(false), 2000);
     onContinue();
   };
 
@@ -130,6 +134,12 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
           >
             Save & Continue <ArrowRight className="w-4 h-4" />
           </button>
+          {showSaved && (
+            <div className="flex items-center gap-1.5 mt-3 text-[12px] text-[hsl(var(--green))] font-medium">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              Thresholds saved to {clientName} profile
+            </div>
+          )}
         </div>
 
         {/* Right column - Live preview (45%) */}
