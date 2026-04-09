@@ -413,6 +413,32 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
             </Button>
           </div>
         </div>
+      </div>
+
+      {/* Fallback dropzone */}
+      <div className="rounded-lg border border-dashed border-border/60 p-4 bg-muted/10">
+        <p className="text-[12px] text-muted-foreground mb-2">Or upload a decision file manually</p>
+        <DecisionFileDropzone
+          onFileUpload={(file) => onUploadDecision(result.trackType, file)}
+          disabled={!!amazonFile}
+          label={decisionFile ? 'Reupload Decision File' : 'Upload Decision File'}
+          variant="compact"
+        />
+      </div>
+    </div>
+  );
+};
+
+function StatCard({ label, value, danger }: { label: string; value: string; danger?: boolean }) {
+  return (
+    <div className="rounded-lg bg-secondary p-4">
+      <div className={`text-[22px] font-medium font-mono-nums ${danger ? 'text-destructive' : 'text-foreground'}`}>
+        {value}
+      </div>
+      <div className="text-[11px] text-[hsl(var(--text-tertiary))] mt-0.5">{label}</div>
+    </div>
+  );
+}
 
 function StepDot({ status }: { status: 'complete' | 'active' | 'pending' }) {
   if (status === 'complete') {
