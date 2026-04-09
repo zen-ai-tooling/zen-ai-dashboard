@@ -21,11 +21,11 @@ const TRACKS: { id: Bleeder2Track; label: string }[] = [
   { id: 'ACOS100', label: '>100% ACoS' },
 ];
 
-const MODULE_META: Record<string, { label: string; dot: string; borderActive: string; icon: typeof BarChart3 }> = {
-  bleeders_1: { label: 'Bleeders 1.0', dot: 'bg-red-500', borderActive: 'border-l-red-500', icon: BarChart3 },
-  bleeders_2: { label: 'Bleeders 2.0', dot: 'bg-amber-500', borderActive: 'border-l-amber-500', icon: Zap },
-  lifetime_bleeders: { label: 'Lifetime Audit', dot: 'bg-purple-500', borderActive: 'border-l-purple-500', icon: Shield },
-};
+const MODULES = [
+  { id: 'bleeders_1' as const, label: 'Bleeders 1.0', dot: '#EF4444' },
+  { id: 'bleeders_2' as const, label: 'Bleeders 2.0', dot: '#F59E0B' },
+  { id: 'lifetime_bleeders' as const, label: 'Lifetime Audit', dot: '#8B5CF6' },
+];
 
 export const AppSidebar: React.FC<AppSidebarProps> = ({
   activeModule,
@@ -37,55 +37,53 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   trackStatus = { SBSD: 'idle', SP: 'idle', SP_KEYWORDS: 'idle', ACOS100: 'idle' },
 }) => {
   return (
-    <aside className="w-[220px] flex-shrink-0 h-screen sticky top-0 flex flex-col border-r border-border bg-secondary/50">
+    <aside className="w-[220px] flex-shrink-0 h-screen sticky top-0 flex flex-col border-r border-border bg-[hsl(var(--sidebar-background))]">
       {/* Logo */}
-      <div className="px-4 pt-5 pb-3">
-        <div className="text-[14px] font-semibold text-foreground font-display tracking-tight">Zen AI</div>
-        <div className="text-[11px] text-muted-foreground mt-0.5">Amazon Ads Workflow</div>
+      <div className="px-4 pt-5 pb-4">
+        <div className="text-[15px] font-semibold text-foreground">Zen AI</div>
+        <div className="text-[11px] text-[hsl(var(--text-tertiary))] mt-0.5">Amazon Ads Workflow</div>
       </div>
-      <div className="border-b border-border/60 mx-3" />
+      <div className="border-b border-border mx-3" />
 
       {/* Modules */}
-      <div className="flex-1 overflow-y-auto px-2 pt-3">
-        <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 px-2 mb-2 font-medium">
+      <div className="flex-1 overflow-y-auto">
+        <div className="text-[10px] font-semibold tracking-[0.08em] uppercase text-[hsl(var(--text-tertiary))] px-4 pt-4 pb-1.5">
           Modules
         </div>
 
-        {(['bleeders_1', 'bleeders_2', 'lifetime_bleeders'] as const).map((mod) => {
-          const meta = MODULE_META[mod];
-          const isActive = activeModule === mod;
-          return (
-            <button
-              key={mod}
-              onClick={() => onSelectModule(isActive ? null : mod)}
-              className={`w-full flex items-center gap-2.5 px-2 py-2 rounded-lg text-[13px] mb-0.5 btn-press border-l-[3px] ${
-                isActive
-                  ? `bg-primary/[0.06] ${meta.borderActive} text-foreground font-medium pl-[5px]`
-                  : 'text-muted-foreground hover:text-foreground hover:bg-card/60 border-l-transparent pl-[5px]'
-              }`}
-              style={{ transition: 'all 150ms ease' }}
-            >
-              <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${meta.dot}`} />
-              <span className="font-display text-[13px]">{meta.label}</span>
-            </button>
-          );
-        })}
+        <div className="px-2">
+          {MODULES.map((mod) => {
+            const isActive = activeModule === mod.id;
+            return (
+              <button
+                key={mod.id}
+                onClick={() => onSelectModule(isActive ? null : mod.id)}
+                className={`w-full flex items-center gap-2.5 py-[7px] px-3 rounded-lg text-[13px] font-medium my-[1px] btn-press ${
+                  isActive
+                    ? 'bg-[hsl(var(--accent-blue-light))] text-[hsl(var(--accent-blue))] border-l-[3px] border-l-[hsl(var(--accent-blue))] pl-[9px]'
+                    : 'text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--border))/0.5] border-l-[3px] border-l-transparent pl-[9px]'
+                }`}
+              >
+                <span className="w-[7px] h-[7px] rounded-full flex-shrink-0" style={{ backgroundColor: mod.dot }} />
+                {mod.label}
+              </button>
+            );
+          })}
+        </div>
 
         {/* Tracks sub-nav */}
         {showTracks && activeModule === 'bleeders_2' && (
-          <div className="ml-3 mt-1.5 mb-2">
-            <div className="flex items-center justify-between px-2 mb-1.5">
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
+          <div className="px-2 mt-1.5 mb-2">
+            <div className="flex items-center justify-between px-3 mb-1">
+              <span className="text-[10px] font-semibold tracking-[0.08em] uppercase text-[hsl(var(--text-tertiary))]">
                 Tracks
               </span>
               {bleeder2ActiveTrack && onBackToTrackPicker && (
                 <button
                   onClick={onBackToTrackPicker}
-                  className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground btn-press"
-                  style={{ transition: 'color 150ms ease' }}
+                  className="flex items-center gap-1 text-[10px] text-[hsl(var(--text-tertiary))] hover:text-foreground btn-press"
                 >
-                  <ArrowLeft className="w-3 h-3" />
-                  Back
+                  <ArrowLeft className="w-3 h-3" /> Back
                 </button>
               )}
             </div>
@@ -93,25 +91,24 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
               const status = trackStatus[t.id];
               const isTrackActive = bleeder2ActiveTrack === t.id;
               const dotColor = isTrackActive
-                ? 'bg-primary'
+                ? 'hsl(var(--accent-blue))'
                 : status === 'done'
-                ? 'bg-success'
-                : 'bg-muted-foreground/30';
+                ? 'hsl(var(--green))'
+                : 'hsl(var(--text-tertiary))';
               return (
                 <button
                   key={t.id}
                   onClick={() => onSelectTrack(t.id)}
-                  className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-[12px] btn-press ${
+                  className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12px] my-[1px] btn-press ${
                     isTrackActive
-                      ? 'bg-primary/[0.06] text-foreground font-medium'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-card/40'
+                      ? 'bg-[hsl(var(--accent-blue-light))] text-foreground font-medium'
+                      : 'text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--border))/0.4]'
                   }`}
-                  style={{ transition: 'all 150ms ease' }}
                 >
-                  <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dotColor}`} />
+                  <span className="w-[5px] h-[5px] rounded-full flex-shrink-0" style={{ backgroundColor: dotColor }} />
                   {t.label}
                   {status === 'done' && !isTrackActive && (
-                    <span className="ml-auto text-[10px] text-success font-medium">✓</span>
+                    <span className="ml-auto text-[10px] text-[hsl(var(--green))] font-medium">✓</span>
                   )}
                 </button>
               );
@@ -121,12 +118,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       </div>
 
       {/* Client pill */}
-      <div className="p-3 border-t border-border/60">
-        <div className="flex items-center gap-2 px-2 py-2 rounded-lg bg-card/60 border border-border/40">
-          <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-[10px] font-medium text-primary-foreground font-display">
+      <div className="p-3 border-t border-border">
+        <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] bg-card border border-border">
+          <div className="w-7 h-7 rounded-full bg-[hsl(var(--accent-blue-light))] flex items-center justify-center text-[11px] font-semibold text-[hsl(var(--accent-blue))]">
             ZA
           </div>
-          <span className="text-[12px] text-foreground font-medium">Zen AI</span>
+          <span className="text-[12px] font-medium text-foreground">Zen AI</span>
         </div>
       </div>
     </aside>
