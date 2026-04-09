@@ -181,6 +181,7 @@ const Index = () => {
       SP_KEYWORDS: { file: null, isValidating: false, validationError: null, result: null, decisionFile: null, amazonFile: null },
       ACOS100: { file: null, isValidating: false, validationError: null, result: null, decisionFile: null, amazonFile: null },
     });
+    setTrackCompletionStatus({ SBSD: 'idle', SP: 'idle', SP_KEYWORDS: 'idle', ACOS100: 'idle' });
     setLifetimeStage("upload");
     setLifetimeResult(null);
     setLifetimeProcessing(false);
