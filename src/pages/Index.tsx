@@ -27,6 +27,7 @@ import { parseCommand } from "@/lib/commandParser";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { HomeScreen } from "@/components/layout/HomeScreen";
+import { SessionLogView } from "@/components/history/SessionLogView";
 import * as XLSX from "xlsx";
 
 interface Message {
@@ -111,6 +112,7 @@ const Index = () => {
     SP_KEYWORDS: 'idle',
     ACOS100: 'idle',
   });
+  const [showHistoryView, setShowHistoryView] = useState(false);
 
   const [bleeder2TrackState, setBleeder2TrackState] = useState<
     Record<
