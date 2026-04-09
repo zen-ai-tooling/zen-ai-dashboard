@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useClient } from "@/context/ClientContext";
+import { useHistory } from "@/context/HistoryContext";
 import { UploadCard } from "@/components/upload/UploadCard";
 import { ProcessorUploadPanel } from "@/components/upload/ProcessorUploadPanel";
 import { AnalysisResults } from "@/components/results/AnalysisResults";
@@ -97,6 +98,7 @@ const Index = () => {
   const [bleeder2ActiveTrack, setBleeder2ActiveTrack] = useState<Bleeder2Track | null>(null);
   const [bleeder2Stage, setBleeder2Stage] = useState<Bleeder2Stage>("picker");
   const { activeClient, updateClient } = useClient();
+  const { addEntry } = useHistory();
   const [bleeder2Thresholds, setBleeder2Thresholds] = useState<Bleeder2Thresholds>({
     targetACOS: activeClient.acosTarget,
     clickThreshold: 10,
@@ -306,6 +308,19 @@ const Index = () => {
         toast({ title: "Auto-repairs applied", description: `Fixed ${result.autoRepairs[0].count} typos in decisions` });
       }
       toast({ title: "Workflow Complete!", description: `Amazon file ready: ${result.summary.pausedCount} paused, ${result.summary.negativesCreated} negatives created` });
+      addEntry({
+        clientId: activeClient.id,
+        clientName: activeClient.name,
+        module: 'bleeders_2',
+        track: track,
+        fileName: file.name,
+        bleedersFound: bleeder2TrackState[track].result?.bleeders.length ?? 0,
+        atRiskSpend: bleeder2TrackState[track].result?.totalSpend ?? 0,
+        decisionsMode: 'inline',
+        pausedCount: result.summary.pausedCount,
+        negativesCreated: result.summary.negativesCreated,
+        bidsCutCount: result.summary.bidsCutCount,
+      });
     } catch (err: any) {
       toast({ title: "Decision processing failed", description: err.message, variant: "destructive" });
     }
