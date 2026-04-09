@@ -308,6 +308,19 @@ const Index = () => {
         toast({ title: "Auto-repairs applied", description: `Fixed ${result.autoRepairs[0].count} typos in decisions` });
       }
       toast({ title: "Workflow Complete!", description: `Amazon file ready: ${result.summary.pausedCount} paused, ${result.summary.negativesCreated} negatives created` });
+      addEntry({
+        clientId: activeClient.id,
+        clientName: activeClient.name,
+        module: 'bleeders_2',
+        track: track,
+        fileName: file.name,
+        bleedersFound: bleeder2TrackState[track].result?.bleeders.length ?? 0,
+        atRiskSpend: bleeder2TrackState[track].result?.totalSpend ?? 0,
+        decisionsMode: 'inline',
+        pausedCount: result.summary.pausedCount,
+        negativesCreated: result.summary.negativesCreated,
+        bidsCutCount: result.summary.bidsCutCount,
+      });
     } catch (err: any) {
       toast({ title: "Decision processing failed", description: err.message, variant: "destructive" });
     }
