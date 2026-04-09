@@ -27,6 +27,7 @@ import { parseCommand } from "@/lib/commandParser";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { HomeScreen } from "@/components/layout/HomeScreen";
+import { SessionLogView } from "@/components/history/SessionLogView";
 import * as XLSX from "xlsx";
 
 interface Message {
@@ -111,6 +112,7 @@ const Index = () => {
     SP_KEYWORDS: 'idle',
     ACOS100: 'idle',
   });
+  const [showHistoryView, setShowHistoryView] = useState(false);
 
   const [bleeder2TrackState, setBleeder2TrackState] = useState<
     Record<
@@ -748,7 +750,7 @@ const Index = () => {
     <div className="min-h-screen bg-background flex">
       <AppSidebar
         activeModule={activeModule}
-        onSelectModule={handleSidebarModuleSelect}
+        onSelectModule={(mod) => { setShowHistoryView(false); handleSidebarModuleSelect(mod); }}
         bleeder2ActiveTrack={bleeder2ActiveTrack}
         onSelectTrack={handleSelectTrack}
         showTracks={activeModule === 'bleeders_2'}
@@ -759,6 +761,8 @@ const Index = () => {
         trackStatus={trackStatus}
         trackCompletionStatus={trackCompletionStatus}
         onReset={handleReset}
+        showHistoryView={showHistoryView}
+        setShowHistoryView={setShowHistoryView}
       />
 
       <div className="flex-1 flex flex-col min-h-screen">
@@ -776,9 +780,14 @@ const Index = () => {
 
         <main className="flex-1 overflow-y-auto" style={{ padding: '28px 32px' }}>
           <div className="max-w-[960px]">
+            {/* SESSION LOG */}
+            {showHistoryView && (
+              <SessionLogView />
+            )}
+
             {/* HOME */}
-            {!activeModule && (
-              <HomeScreen onSelectModule={handleSidebarModuleSelect} />
+            {!activeModule && !showHistoryView && (
+              <HomeScreen onSelectModule={(mod) => { setShowHistoryView(false); handleSidebarModuleSelect(mod); }} />
             )}
 
             {/* BLEEDERS 1.0 */}

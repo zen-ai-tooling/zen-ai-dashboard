@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Clock } from 'lucide-react';
 import { useClient } from '@/context/ClientContext';
 import type { Bleeder2Track } from '@/components/bleeders2/TrackSelector';
 
@@ -15,6 +15,8 @@ interface AppSidebarProps {
   trackStatus?: Record<Bleeder2Track, 'idle' | 'active' | 'done'>;
   trackCompletionStatus?: Record<string, 'idle' | 'complete'>;
   onReset?: () => void;
+  showHistoryView?: boolean;
+  setShowHistoryView?: (v: boolean) => void;
 }
 
 const TRACKS: { id: Bleeder2Track; label: string }[] = [
@@ -40,6 +42,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   trackStatus = { SBSD: 'idle', SP: 'idle', SP_KEYWORDS: 'idle', ACOS100: 'idle' },
   trackCompletionStatus = { SBSD: 'idle', SP: 'idle', SP_KEYWORDS: 'idle', ACOS100: 'idle' },
   onReset,
+  showHistoryView = false,
+  setShowHistoryView,
 }) => {
   const { clients, activeClient, setActiveClient, addClient } = useClient();
   const [clientDropdownOpen, setClientDropdownOpen] = useState(false);
@@ -132,6 +136,24 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             })}
           </div>
         )}
+
+        {/* History */}
+        <div className="px-2 mt-3">
+          <div className="text-[10px] font-semibold tracking-[0.08em] uppercase text-[hsl(var(--text-tertiary))] px-3 pb-1.5">
+            History
+          </div>
+          <button
+            onClick={() => setShowHistoryView?.(true)}
+            className={`w-full flex items-center gap-2.5 py-[7px] px-3 rounded-lg text-[13px] font-medium my-[1px] btn-press ${
+              showHistoryView
+                ? 'bg-[hsl(var(--accent-blue-light))] text-[hsl(var(--accent-blue))] border-l-[3px] border-l-[hsl(var(--accent-blue))] pl-[9px]'
+                : 'text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--border))/0.5] border-l-[3px] border-l-transparent pl-[9px]'
+            }`}
+          >
+            <Clock className="w-[14px] h-[14px]" />
+            Session log
+          </button>
+        </div>
       </div>
 
       {/* Client pill */}
