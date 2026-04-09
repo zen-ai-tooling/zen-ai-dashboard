@@ -40,7 +40,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     <aside className="w-[220px] flex-shrink-0 h-screen sticky top-0 flex flex-col border-r border-border bg-secondary/50">
       {/* Logo */}
       <div className="px-4 pt-5 pb-3">
-        <div className="text-[14px] font-semibold text-foreground font-display tracking-tight">GNO Ad Ops</div>
+        <div className="text-[14px] font-semibold text-foreground font-display tracking-tight">Zen AI</div>
         <div className="text-[11px] text-muted-foreground mt-0.5">Amazon Ads Workflow</div>
       </div>
       <div className="border-b border-border/60 mx-3" />
@@ -124,9 +124,9 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       <div className="p-3 border-t border-border/60">
         <div className="flex items-center gap-2 px-2 py-2 rounded-lg bg-card/60 border border-border/40">
           <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-[10px] font-medium text-primary-foreground font-display">
-            GN
+            ZA
           </div>
-          <span className="text-[12px] text-foreground font-medium">GNO Partners</span>
+          <span className="text-[12px] text-foreground font-medium">Zen AI</span>
         </div>
       </div>
     </aside>

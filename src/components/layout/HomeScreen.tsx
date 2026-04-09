@@ -144,7 +144,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
       {/* Footer */}
       <div className="border-t border-border/40 py-4 flex items-center justify-between">
         <span className="text-[11px] text-muted-foreground/60">
-          GNO Ad Ops · Amazon Ads Workflow Tool
+          Zen AI · Amazon Ads Workflow Tool
         </span>
         <span className="text-[11px] text-muted-foreground/40">
           v2.0
