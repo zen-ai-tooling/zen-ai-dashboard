@@ -1,5 +1,6 @@
-import React from 'react';
-import { ArrowLeft, BarChart3, Zap, Shield } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { useClient } from '@/context/ClientContext';
 import type { Bleeder2Track } from '@/components/bleeders2/TrackSelector';
 
 type ActiveModule = 'bleeders_1' | 'bleeders_2' | 'lifetime_bleeders' | null;
@@ -12,6 +13,7 @@ interface AppSidebarProps {
   showTracks: boolean;
   onBackToTrackPicker?: () => void;
   trackStatus?: Record<Bleeder2Track, 'idle' | 'active' | 'done'>;
+  onReset?: () => void;
 }
 
 const TRACKS: { id: Bleeder2Track; label: string }[] = [
@@ -35,7 +37,14 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   showTracks,
   onBackToTrackPicker,
   trackStatus = { SBSD: 'idle', SP: 'idle', SP_KEYWORDS: 'idle', ACOS100: 'idle' },
+  onReset,
 }) => {
+  const { clients, activeClient, setActiveClient, addClient } = useClient();
+  const [clientDropdownOpen, setClientDropdownOpen] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newClientName, setNewClientName] = useState('');
+  const [newClientAcos, setNewClientAcos] = useState(35);
+
   return (
     <aside className="w-[220px] flex-shrink-0 h-screen sticky top-0 flex flex-col border-r border-border bg-[hsl(var(--sidebar-background))]">
       {/* Logo */}
@@ -118,13 +127,174 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       </div>
 
       {/* Client pill */}
-      <div className="p-3 border-t border-border">
-        <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] bg-card border border-border">
+      <div className="p-3 border-t border-border" style={{ position: 'relative' }}>
+        <div
+          onClick={() => setClientDropdownOpen(prev => !prev)}
+          className="flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] bg-card border border-border cursor-pointer hover:border-[hsl(var(--accent-blue))] transition-all"
+          style={{ transition: 'all 150ms ease' }}
+        >
           <div className="w-7 h-7 rounded-full bg-[hsl(var(--accent-blue-light))] flex items-center justify-center text-[11px] font-semibold text-[hsl(var(--accent-blue))]">
-            ZA
+            {activeClient.initials}
           </div>
-          <span className="text-[12px] font-medium text-foreground">Zen AI</span>
+          <span className="text-[12px] font-medium text-foreground">{activeClient.name}</span>
         </div>
+
+        {clientDropdownOpen && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '100%',
+              left: '12px',
+              right: '12px',
+              background: '#FFFFFF',
+              border: '1px solid #E4E6EA',
+              borderRadius: '10px',
+              overflow: 'hidden',
+              zIndex: 50,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+            }}
+          >
+            {clients.map(client => (
+              <div
+                key={client.id}
+                onClick={() => {
+                  setActiveClient(client);
+                  setClientDropdownOpen(false);
+                  if (client.id !== activeClient.id && onReset) onReset();
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 12px',
+                  cursor: 'pointer',
+                  background: client.id === activeClient.id ? '#EFF6FF' : 'transparent',
+                  fontSize: '13px',
+                  color: '#0F1115',
+                  transition: 'background 150ms ease',
+                }}
+                onMouseEnter={e => {
+                  if (client.id !== activeClient.id) (e.currentTarget as HTMLDivElement).style.background = '#F5F6F8';
+                }}
+                onMouseLeave={e => {
+                  if (client.id !== activeClient.id) (e.currentTarget as HTMLDivElement).style.background = 'transparent';
+                }}
+              >
+                <div
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    background: '#EFF6FF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '10px',
+                    fontWeight: '600',
+                    color: '#2563EB',
+                  }}
+                >
+                  {client.initials}
+                </div>
+                <span>{client.name}</span>
+                {client.id === activeClient.id && (
+                  <span style={{ marginLeft: 'auto', color: '#2563EB', fontSize: '14px' }}>✓</span>
+                )}
+              </div>
+            ))}
+
+            <div style={{ borderTop: '1px solid #E4E6EA' }} />
+
+            {!showAddForm ? (
+              <div
+                onClick={() => setShowAddForm(true)}
+                style={{
+                  padding: '10px 12px',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  color: '#2563EB',
+                  fontWeight: '500',
+                }}
+              >
+                + Add client
+              </div>
+            ) : (
+              <div style={{ padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <input
+                  placeholder="Client name"
+                  value={newClientName}
+                  onChange={e => setNewClientName(e.target.value)}
+                  style={{
+                    border: '1px solid #E4E6EA',
+                    borderRadius: '6px',
+                    padding: '6px 10px',
+                    fontSize: '13px',
+                    width: '100%',
+                    outline: 'none',
+                  }}
+                  autoFocus
+                />
+                <input
+                  type="number"
+                  placeholder="ACoS target %"
+                  value={newClientAcos}
+                  onChange={e => setNewClientAcos(Number(e.target.value))}
+                  style={{
+                    border: '1px solid #E4E6EA',
+                    borderRadius: '6px',
+                    padding: '6px 10px',
+                    fontSize: '13px',
+                    width: '100%',
+                    outline: 'none',
+                  }}
+                />
+                <div style={{ display: 'flex', gap: '6px', marginTop: '2px' }}>
+                  <button
+                    onClick={() => {
+                      if (!newClientName.trim()) return;
+                      addClient({
+                        name: newClientName.trim(),
+                        initials: newClientName.trim().slice(0, 2).toUpperCase(),
+                        acosTarget: newClientAcos,
+                        fewerThanOrders: 5,
+                        excludeRanking: true,
+                      });
+                      setNewClientName('');
+                      setNewClientAcos(35);
+                      setShowAddForm(false);
+                      setClientDropdownOpen(false);
+                    }}
+                    style={{
+                      background: '#2563EB',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '7px 12px',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Add client
+                  </button>
+                  <button
+                    onClick={() => { setShowAddForm(false); setNewClientName(''); }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#9BA3AF',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      padding: '2px',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </aside>
   );
