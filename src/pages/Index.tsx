@@ -726,6 +726,7 @@ const Index = () => {
           setBleeder2Stage('picker');
         }}
         trackStatus={trackStatus}
+        onReset={handleReset}
       />
 
       <div className="flex-1 flex flex-col min-h-screen">
