@@ -98,6 +98,7 @@ const Index = () => {
   const [bleeder2ActiveTrack, setBleeder2ActiveTrack] = useState<Bleeder2Track | null>(null);
   const [bleeder2Stage, setBleeder2Stage] = useState<Bleeder2Stage>("picker");
   const { activeClient, updateClient } = useClient();
+  const { addEntry } = useHistory();
   const [bleeder2Thresholds, setBleeder2Thresholds] = useState<Bleeder2Thresholds>({
     targetACOS: activeClient.acosTarget,
     clickThreshold: 10,
