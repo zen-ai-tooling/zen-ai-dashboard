@@ -757,6 +757,7 @@ const Index = () => {
           setBleeder2Stage('picker');
         }}
         trackStatus={trackStatus}
+        trackCompletionStatus={trackCompletionStatus}
         onReset={handleReset}
       />
 
@@ -851,9 +852,23 @@ const Index = () => {
                   <h2 className="text-[20px] font-semibold text-foreground">Select a Track</h2>
                   <p className="text-[13px] text-[hsl(var(--text-secondary))] mt-1">Choose which analysis to run.</p>
                 </div>
+                {Object.values(trackCompletionStatus).every(s => s === 'complete') ? (
+                  <div style={{
+                    background: '#F0FDF4', border: '1px solid #BBF7D0',
+                    borderRadius: '8px', padding: '10px 16px',
+                    fontSize: '13px', color: '#16A34A', fontWeight: '500',
+                    marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px'
+                  }}>
+                    <span>✓</span> All tracks complete — session ready to archive
+                  </div>
+                ) : (
+                  <p style={{fontSize: '12px', color: '#9BA3AF', marginBottom: '0px'}}>
+                    {Object.values(trackCompletionStatus).filter(s => s === 'complete').length} of 4 tracks complete
+                  </p>
+                )}
                 <div className="grid grid-cols-2 gap-3">
                   {TRACK_CARDS.map(t => {
-                    const isDone = trackStatus[t.id] === 'done';
+                    const isDone = trackCompletionStatus[t.id] === 'complete' || trackStatus[t.id] === 'done';
                     return (
                       <button
                         key={t.id}
@@ -861,9 +876,11 @@ const Index = () => {
                         className={`group text-left rounded-xl border border-border bg-card border-l-4 ${t.accent} card-hover btn-press relative p-5`}
                       >
                         {isDone && (
-                          <span className="absolute top-4 right-4 text-[10px] bg-[hsl(var(--green-light))] text-[hsl(var(--green))] border border-[hsl(var(--green-border))] font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <CheckCircle2 className="w-3 h-3" /> Done
-                          </span>
+                          <span className="absolute top-3 right-3" style={{
+                            background: '#F0FDF4', color: '#16A34A',
+                            border: '1px solid #BBF7D0', borderRadius: '99px',
+                            fontSize: '11px', fontWeight: '500', padding: '2px 8px'
+                          }}>Done</span>
                         )}
                         <div className="text-[15px] font-semibold text-foreground">{t.name}</div>
                         <div className="text-[13px] text-[hsl(var(--text-secondary))] mt-1">{t.desc}</div>
