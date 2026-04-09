@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Clock } from 'lucide-react';
 import { useClient } from '@/context/ClientContext';
 import type { Bleeder2Track } from '@/components/bleeders2/TrackSelector';
 
@@ -15,6 +15,8 @@ interface AppSidebarProps {
   trackStatus?: Record<Bleeder2Track, 'idle' | 'active' | 'done'>;
   trackCompletionStatus?: Record<string, 'idle' | 'complete'>;
   onReset?: () => void;
+  showHistoryView?: boolean;
+  setShowHistoryView?: (v: boolean) => void;
 }
 
 const TRACKS: { id: Bleeder2Track; label: string }[] = [
@@ -40,6 +42,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   trackStatus = { SBSD: 'idle', SP: 'idle', SP_KEYWORDS: 'idle', ACOS100: 'idle' },
   trackCompletionStatus = { SBSD: 'idle', SP: 'idle', SP_KEYWORDS: 'idle', ACOS100: 'idle' },
   onReset,
+  showHistoryView = false,
+  setShowHistoryView,
 }) => {
   const { clients, activeClient, setActiveClient, addClient } = useClient();
   const [clientDropdownOpen, setClientDropdownOpen] = useState(false);
