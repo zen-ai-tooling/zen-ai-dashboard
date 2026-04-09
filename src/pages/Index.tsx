@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useClient } from "@/context/ClientContext";
+import { useHistory } from "@/context/HistoryContext";
 import { UploadCard } from "@/components/upload/UploadCard";
 import { ProcessorUploadPanel } from "@/components/upload/ProcessorUploadPanel";
 import { AnalysisResults } from "@/components/results/AnalysisResults";
