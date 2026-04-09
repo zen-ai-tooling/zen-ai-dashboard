@@ -105,6 +105,12 @@ const Index = () => {
     fewerThanOrders: activeClient.fewerThanOrders,
     excludeRanking: activeClient.excludeRanking,
   });
+  const [trackCompletionStatus, setTrackCompletionStatus] = useState<Record<string, 'idle' | 'complete'>>({
+    SBSD: 'idle',
+    SP: 'idle',
+    SP_KEYWORDS: 'idle',
+    ACOS100: 'idle',
+  });
 
   const [bleeder2TrackState, setBleeder2TrackState] = useState<
     Record<
@@ -308,6 +314,7 @@ const Index = () => {
         toast({ title: "Auto-repairs applied", description: `Fixed ${result.autoRepairs[0].count} typos in decisions` });
       }
       toast({ title: "Workflow Complete!", description: `Amazon file ready: ${result.summary.pausedCount} paused, ${result.summary.negativesCreated} negatives created` });
+      setTrackCompletionStatus(prev => ({ ...prev, [track]: 'complete' }));
       addEntry({
         clientId: activeClient.id,
         clientName: activeClient.name,
