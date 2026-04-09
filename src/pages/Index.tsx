@@ -741,7 +741,7 @@ const Index = () => {
           onBack={getBackHandler()}
         />
 
-        <main className="flex-1 overflow-y-auto px-8 py-6">
+        <main className="flex-1 overflow-y-auto" style={{ padding: '28px 32px' }}>
           <div className="max-w-[960px]">
             {/* HOME */}
             {!activeModule && (
@@ -750,11 +750,13 @@ const Index = () => {
 
             {/* BLEEDERS 1.0 */}
             {activeModule === 'bleeders_1' && !analysisResults && !decisionResults && !validatorResults && (
-              <div className="pt-4">
-                <h2 className="text-[14px] font-medium text-foreground font-display mb-1">Upload File</h2>
-                <p className="text-[12px] text-muted-foreground mb-4">
-                  Amazon Ads → Campaign Manager → Bulk Operations → Create Spreadsheet (60-day range)
-                </p>
+              <div className="space-y-5">
+                <div>
+                  <h2 className="text-[20px] font-semibold text-foreground">Upload your bulk file</h2>
+                  <p className="text-[13px] text-[hsl(var(--text-secondary))] mt-1">
+                    Amazon Ads → Campaign Manager → Bulk Operations → Create Spreadsheet (60-day range)
+                  </p>
+                </div>
                 <UploadCard onFileUpload={handleFileUpload} isVisible={true} />
               </div>
             )}
@@ -812,9 +814,11 @@ const Index = () => {
 
             {/* BLEEDERS 2.0 — Track picker */}
             {bleeder2Stage === "picker" && activeModule === "bleeders_2" && (
-              <div className="pt-4">
-                <h2 className="text-[14px] font-medium text-foreground font-display mb-1">Select a Track</h2>
-                <p className="text-[12px] text-muted-foreground mb-5">Choose which analysis to run.</p>
+              <div className="space-y-5">
+                <div>
+                  <h2 className="text-[20px] font-semibold text-foreground">Select a Track</h2>
+                  <p className="text-[13px] text-[hsl(var(--text-secondary))] mt-1">Choose which analysis to run.</p>
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   {TRACK_CARDS.map(t => {
                     const isDone = trackStatus[t.id] === 'done';
@@ -822,16 +826,16 @@ const Index = () => {
                       <button
                         key={t.id}
                         onClick={() => handleSelectTrack(t.id)}
-                        className={`group text-left p-4 rounded-lg border border-border bg-card border-l-4 ${t.accent} card-hover btn-press relative`}
+                        className={`group text-left rounded-xl border border-border bg-card border-l-4 ${t.accent} card-hover btn-press relative p-5`}
                       >
                         {isDone && (
-                          <span className="absolute top-3 right-3 text-[10px] bg-success/10 text-success font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
+                          <span className="absolute top-4 right-4 text-[10px] bg-[hsl(var(--green-light))] text-[hsl(var(--green))] border border-[hsl(var(--green-border))] font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
                             <CheckCircle2 className="w-3 h-3" /> Done
                           </span>
                         )}
-                        <div className="text-[14px] font-medium text-foreground font-display">{t.name}</div>
-                        <div className="text-[12px] text-muted-foreground mt-1">{t.desc}</div>
-                        <ArrowRight className="w-3.5 h-3.5 text-muted-foreground mt-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="text-[15px] font-semibold text-foreground">{t.name}</div>
+                        <div className="text-[13px] text-[hsl(var(--text-secondary))] mt-1">{t.desc}</div>
+                        <ArrowRight className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))] mt-3 opacity-0 group-hover:opacity-100" style={{ transition: 'opacity 150ms ease' }} />
                       </button>
                     );
                   })}
