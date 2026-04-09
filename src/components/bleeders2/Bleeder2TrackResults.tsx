@@ -45,6 +45,24 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
 
   const hasBleeders = result.bleeders.length > 0;
 
+  const suggestions = useMemo(() => result.bleeders.map(bleeder =>
+    suggestDecision({
+      acos: bleeder.acos,
+      spend: bleeder.spend,
+      orders: bleeder.orders,
+      clicks: bleeder.clicks,
+      matchType: bleeder.matchType,
+      entity: bleeder.entity,
+      trackType: result.trackType,
+    })
+  ), [result.bleeders, result.trackType]);
+
+  const getDecisionOptions = () => {
+    if (result.trackType === 'ACOS100') return ['Pause', 'Cut Bid', 'Keep'];
+    if (result.trackType === 'SP') return ['Negative', 'Pause', 'Keep'];
+    return ['Negative', 'Pause', 'Cut Bid', 'Keep'];
+  };
+
   const decisionsMade = useMemo(() => {
     return Object.values(decisions).filter(d => d && d !== '').length;
   }, [decisions]);
