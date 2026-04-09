@@ -13,6 +13,7 @@ interface AppSidebarProps {
   showTracks: boolean;
   onBackToTrackPicker?: () => void;
   trackStatus?: Record<Bleeder2Track, 'idle' | 'active' | 'done'>;
+  trackCompletionStatus?: Record<string, 'idle' | 'complete'>;
   onReset?: () => void;
 }
 
@@ -37,6 +38,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   showTracks,
   onBackToTrackPicker,
   trackStatus = { SBSD: 'idle', SP: 'idle', SP_KEYWORDS: 'idle', ACOS100: 'idle' },
+  trackCompletionStatus = { SBSD: 'idle', SP: 'idle', SP_KEYWORDS: 'idle', ACOS100: 'idle' },
   onReset,
 }) => {
   const { clients, activeClient, setActiveClient, addClient } = useClient();
