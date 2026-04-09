@@ -3,10 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Download, CheckCircle2, Loader2 } from "lucide-react";
+import { Download, CheckCircle2, Loader2, XCircle } from "lucide-react";
 import type { Bleeder2TrackResult, Bleeder2TrackType } from "@/lib/bleeder2TrackAnalyzer";
 import { DecisionFileDropzone } from "./DecisionFileDropzone";
-import ExcelJS from 'exceljs';
 
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
@@ -27,17 +26,10 @@ const TRACK_LABELS: Record<Bleeder2TrackType, string> = {
 };
 
 const TRACK_DECISIONS: Record<Bleeder2TrackType, string[]> = {
-  'SBSD': ['Pause', 'Reduce Bid', 'Keep'],
-  'SP': ['Negative Exact', 'Give it another week', 'Keep'],
-  'SP_KEYWORDS': ['Pause', 'Reduce Bid', 'Keep'],
-  'ACOS100': ['Turn Off', 'Cut Bid', 'Keep'],
-};
-
-const SHEET_MAP: Record<Bleeder2TrackType, string> = {
-  'SP': 'Sponsored Products • Search Term',
-  'SP_KEYWORDS': 'Sponsored Products • Targeting',
-  'SBSD': 'Sponsored Brands • Keywords',
-  'ACOS100': 'Campaign • High ACOS',
+  'SBSD': ['Pause', 'Negative', 'Cut Bid', 'Keep'],
+  'SP': ['Pause', 'Negative', 'Cut Bid', 'Keep'],
+  'SP_KEYWORDS': ['Pause', 'Negative', 'Cut Bid', 'Keep'],
+  'ACOS100': ['Pause', 'Negative', 'Cut Bid', 'Keep'],
 };
 
 export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
@@ -45,7 +37,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
   decisionFile, amazonFile, onDownloadAmazon
 }) => {
   const [decisions, setDecisions] = useState<Record<number, string>>({});
-  const [cutBidValues, setCutBidValues] = useState<Record<number, number>>({});
+  const [cutBidPcts, setCutBidPcts] = useState<Record<number, number>>({});
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateDone, setGenerateDone] = useState(false);
 
@@ -61,47 +53,93 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
   }, [result.bleeders, hasBleeders]);
 
   const handleSetAllPause = () => {
-    const allPause: Record<number, string> = {};
-    result.bleeders.forEach((_, idx) => { allPause[idx] = 'Pause'; });
-    setDecisions(allPause);
+    const all: Record<number, string> = {};
+    result.bleeders.forEach((_, idx) => { all[idx] = 'Pause'; });
+    setDecisions(all);
   };
 
-  const handleGenerateAmazonFile = async () => {
+  const handleSetAllNegative = () => {
+    const all: Record<number, string> = {};
+    result.bleeders.forEach((_, idx) => { all[idx] = 'Negative'; });
+    setDecisions(all);
+  };
+
+  const handleClearAll = () => {
+    setDecisions({});
+    setCutBidPcts({});
+  };
+
+  const handleGenerateInline = async () => {
     setIsGenerating(true);
     setGenerateDone(false);
     try {
+      const ExcelJS = (await import('exceljs')).default;
       const wb = new ExcelJS.Workbook();
-      const sheetName = SHEET_MAP[result.trackType] || 'Decisions';
-      const ws = wb.addWorksheet(sheetName);
 
-      const headers = [
-        'Campaign Name', 'Ad Group Name',
-        result.trackType === 'SP' ? 'Customer Search Term' : 'Keyword Text',
-        'Match Type', 'Bid', 'Decision',
-        'Campaign Id', 'Ad Group Id', 'Keyword Id',
-        'Product Targeting Id', 'Targeting Id'
-      ];
-      ws.addRow(headers);
+      type BleederRow = (typeof result.bleeders)[number];
 
-      result.bleeders.forEach((b, idx) => {
-        const decision = decisions[idx];
-        if (!decision || decision === '' || decision === 'Keep') return;
-        let finalDecision = decision;
-        if (decision === 'Cut Bid' || decision === 'Reduce Bid') {
-          const pct = cutBidValues[idx] || 25;
-          finalDecision = `Cut Bid ${pct}%`;
+      const getSheetName = (bleeder: BleederRow): string => {
+        if (result.trackType === 'ACOS100') return 'Campaign • High ACOS';
+        if (result.trackType === 'SP') return 'Sponsored Products • Search Term';
+        if (result.trackType === 'SP_KEYWORDS') return 'Sponsored Products • Targeting';
+        if (result.trackType === 'SBSD') {
+          return (bleeder as any).source === 'SD'
+            ? 'Sponsored Display • Targeting'
+            : 'Sponsored Brands • Keywords';
         }
-        ws.addRow([
-          b.campaignName, b.adGroupName || '', b.entity, b.matchType || '', 0, finalDecision,
-          b.campaignId || '', b.adGroupId || '', b.keywordId || '',
-          b.productTargetingId || '', b.targetingId || '',
-        ]);
+        return 'Sponsored Products • Targeting';
+      };
+
+      const sheetRows: Record<string, Array<{ bleeder: BleederRow; decision: string; cutPct: number }>> = {};
+      result.bleeders.forEach((bleeder, idx) => {
+        const decision = decisions[idx];
+        if (!decision) return;
+        const sheetName = getSheetName(bleeder);
+        if (!sheetRows[sheetName]) sheetRows[sheetName] = [];
+        sheetRows[sheetName].push({
+          bleeder,
+          decision,
+          cutPct: cutBidPcts[idx] ?? 25,
+        });
       });
+
+      for (const [sheetName, rows] of Object.entries(sheetRows)) {
+        const ws = wb.addWorksheet(sheetName);
+        ws.addRow([
+          'Campaign Name', 'Ad Group Name', 'Keyword Text',
+          'Product Targeting Expression', 'Match Type', 'Bid',
+          'Decision', 'Source',
+          'Campaign Id', 'Ad Group Id', 'Keyword Id',
+          'Product Targeting Id', 'Targeting Id',
+        ]);
+        rows.forEach(({ bleeder, decision, cutPct }) => {
+          const isProductTargeting =
+            bleeder.entity?.toLowerCase().includes('asin=') ||
+            bleeder.entity?.toLowerCase().includes('category=');
+          ws.addRow([
+            bleeder.campaignName ?? '',
+            bleeder.adGroupName ?? '',
+            isProductTargeting ? '' : (bleeder.entity ?? ''),
+            isProductTargeting ? (bleeder.entity ?? '') : '',
+            bleeder.matchType ?? '',
+            decision === 'Cut Bid' ? (bleeder.spend ?? 0) : 0,
+            decision,
+            (bleeder as any).source ?? '',
+            bleeder.campaignId ?? '',
+            bleeder.adGroupId ?? '',
+            bleeder.keywordId ?? '',
+            bleeder.productTargetingId ?? '',
+            bleeder.targetingId ?? '',
+          ]);
+        });
+      }
 
       const buffer = await wb.xlsx.writeBuffer();
-      const file = new File([buffer], 'decisions.xlsx', {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      });
+      const file = new File(
+        [buffer],
+        'inline_decisions.xlsx',
+        { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
+      );
       onUploadDecision(result.trackType, file);
       setGenerateDone(true);
     } catch (err) {
@@ -190,14 +228,26 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleSetAllPause} className="text-[11px] h-7 btn-press">
-              Select all → Pause
-            </Button>
             <Button variant="outline" size="sm" onClick={onDownload} className="text-[11px] h-7 btn-press">
               <Download className="w-3 h-3 mr-1" />
               Download XLSX
             </Button>
           </div>
+        </div>
+
+        {/* Bulk action buttons */}
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/60 bg-muted/20">
+          <span className="text-[11px] text-muted-foreground mr-1">Bulk:</span>
+          <Button variant="outline" size="sm" onClick={handleSetAllPause} className="text-[11px] h-6 px-2.5 btn-press">
+            Select all → Pause
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleSetAllNegative} className="text-[11px] h-6 px-2.5 btn-press">
+            Select all → Negative
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleClearAll} className="text-[11px] h-6 px-2.5 btn-press text-muted-foreground">
+            <XCircle className="w-3 h-3 mr-1" />
+            Clear all
+          </Button>
         </div>
 
         {/* Table */}
@@ -215,7 +265,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Match Type</TableHead>
                 <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground text-right">Spend</TableHead>
                 <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground text-right">ACoS</TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground w-[180px]">Decision</TableHead>
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground w-[200px]">Decision</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -251,7 +301,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                         value={decisions[idx] || ''}
                         onValueChange={(val) => setDecisions(prev => ({ ...prev, [idx]: val }))}
                       >
-                        <SelectTrigger className="h-7 text-[12px] w-[130px]">
+                        <SelectTrigger className="h-7 text-[12px] w-[120px]">
                           <SelectValue placeholder="— select —" />
                         </SelectTrigger>
                         <SelectContent>
@@ -260,13 +310,15 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                           ))}
                         </SelectContent>
                       </Select>
-                      {(decisions[idx] === 'Cut Bid' || decisions[idx] === 'Reduce Bid') && (
+                      {decisions[idx] === 'Cut Bid' && (
                         <div className="flex items-center gap-0.5">
                           <Input
                             type="number"
+                            min={1}
+                            max={99}
                             className="h-7 w-14 text-[12px] font-mono-nums"
-                            value={cutBidValues[idx] ?? 25}
-                            onChange={(e) => setCutBidValues(prev => ({ ...prev, [idx]: parseInt(e.target.value) || 25 }))}
+                            value={cutBidPcts[idx] ?? 25}
+                            onChange={(e) => setCutBidPcts(prev => ({ ...prev, [idx]: parseInt(e.target.value) || 25 }))}
                           />
                           <span className="text-[11px] text-muted-foreground">%</span>
                         </div>
@@ -286,7 +338,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
           </span>
           <div className="flex items-center gap-2">
             <Button
-              onClick={handleGenerateAmazonFile}
+              onClick={handleGenerateInline}
               disabled={decisionsMade === 0 || isGenerating}
               size="sm"
               className="text-[13px] font-medium h-8 font-display btn-press min-w-[180px]"
