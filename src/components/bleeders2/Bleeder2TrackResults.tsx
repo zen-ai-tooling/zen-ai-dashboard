@@ -9,6 +9,8 @@ import { DecisionFileDropzone } from "./DecisionFileDropzone";
 import { suggestDecision, getConfidenceStyle } from '@/lib/ui/suggestionEngine';
 import type { Suggestion } from '@/lib/ui/suggestionEngine';
 import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
+import { WorkflowSteps } from "@/components/shared/WorkflowSteps";
+import { CompletionBanner } from "@/components/shared/CompletionBanner";
 
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
