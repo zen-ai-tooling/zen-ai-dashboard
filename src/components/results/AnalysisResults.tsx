@@ -511,7 +511,8 @@ export const AnalysisResults = ({
                   style={{ width: `${(decisionsMade / Math.max(allRows.length, 1)) * 100}%` }}
                 />
               </div>
-              <p className="text-[11px] text-[hsl(var(--text-tertiary))] mt-1.5">
+              <p className="text-[12px] text-[hsl(var(--muted-foreground))] mt-2 inline-flex items-center gap-1.5">
+                <Info className="w-3 h-3" />
                 Pause on search terms auto-converts to Negate (Exact)
               </p>
             </div>
