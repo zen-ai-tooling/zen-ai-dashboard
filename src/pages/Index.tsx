@@ -747,7 +747,7 @@ const Index = () => {
   // ── Render ──
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen flex">
       <AppSidebar
         activeModule={activeModule}
         onSelectModule={(mod) => { setShowHistoryView(false); handleSidebarModuleSelect(mod); }}
