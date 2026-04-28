@@ -30,12 +30,12 @@ const trackExpectedSheets: Record<Bleeder2Track, string[]> = {
 export const TrackUploader: React.FC<TrackUploaderProps> = ({ track, onUpload, error, uploadedFile, isValidating }) => {
   return (
     <div className="w-full space-y-5">
-      <BulkBreadcrumb />
-
       <div>
         <h2 className="text-[20px] font-semibold text-foreground tracking-tight">Upload your bulk file</h2>
         <p className="text-[13px] text-[hsl(var(--text-secondary))] mt-1">{trackTitles[track]}</p>
       </div>
+
+      <BulkBreadcrumb />
 
       {error && (
         <Alert variant="destructive">
