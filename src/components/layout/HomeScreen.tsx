@@ -97,7 +97,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
               <button
                 key={m.id}
                 onClick={() => onSelectModule(m.id)}
-                className="group text-left rounded-xl border border-border bg-card p-5 shadow-card btn-press card-hover-lift relative overflow-hidden"
+                className="group text-left rounded-xl border border-border bg-card p-5 shadow-card-lift btn-press card-hover-lift relative overflow-hidden"
               >
                 <div className="flex items-start justify-between mb-3">
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: m.dot }} />
@@ -196,13 +196,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
             ].map((q) => (
               <div
                 key={q.title}
-                className="rounded-xl border border-border bg-card p-4 shadow-card card-hover-lift flex items-start justify-between gap-3 cursor-pointer"
+                className="rounded-xl border border-border p-4 shadow-card card-hover-lift flex items-start justify-between gap-3 cursor-pointer"
+                style={{ background: '#FAFAFA' }}
               >
                 <div className="min-w-0">
                   <div className="text-[13px] font-semibold text-foreground tracking-tight">{q.title}</div>
                   <p className="text-[12px] text-[hsl(var(--text-secondary))] mt-1.5 leading-relaxed">{q.desc}</p>
                 </div>
-                <ChevronRight className="w-4 h-4 text-[hsl(var(--text-tertiary))] flex-shrink-0 mt-0.5" strokeWidth={1.8} />
+                <ChevronRight className="w-4 h-4 text-[#C7C7CC] flex-shrink-0 mt-0.5" strokeWidth={1.8} />
               </div>
             ))}
           </div>
