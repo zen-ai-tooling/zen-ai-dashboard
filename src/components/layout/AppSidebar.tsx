@@ -60,7 +60,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   const onHome = !activeModule && !showHistoryView;
 
   return (
-    <aside className="w-[224px] flex-shrink-0 h-screen sticky top-0 flex flex-col border-r border-sidebar-border bg-sidebar">
+    <aside className="w-[224px] flex-shrink-0 h-screen sticky top-0 flex flex-col border-r border-sidebar-border bg-sidebar shadow-sidebar relative z-10">
       {/* Brand */}
       <button
         onClick={() => { onSelectModule(null); setShowHistoryView?.(false); }}
@@ -89,10 +89,10 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
               <button
                 key={mod.id}
                 onClick={() => onSelectModule(isActive ? null : mod.id)}
-                className={`group w-full flex items-center gap-2.5 py-[7px] px-3 rounded-md text-[13px] my-[1px] btn-press ${
+                className={`group w-full flex items-center gap-2.5 py-[7px] px-3 rounded-md text-[14px] my-[1px] btn-press ${
                   isActive
-                    ? 'bg-card text-foreground font-semibold shadow-xs'
-                    : 'text-[hsl(var(--text-secondary))] font-medium hover:bg-card/60 hover:text-foreground'
+                    ? 'bg-secondary text-foreground font-semibold'
+                    : 'text-[hsl(var(--text-secondary))] font-medium hover:bg-secondary/70 hover:text-foreground'
                 }`}
               >
                 <span
@@ -162,10 +162,10 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         <div className="px-2">
           <button
             onClick={() => setShowHistoryView?.(true)}
-            className={`w-full flex items-center gap-2.5 py-[7px] px-3 rounded-md text-[13px] my-[1px] btn-press ${
+            className={`w-full flex items-center gap-2.5 py-[7px] px-3 rounded-md text-[14px] my-[1px] btn-press ${
               showHistoryView
-                ? 'bg-card text-foreground font-semibold shadow-xs'
-                : 'text-[hsl(var(--text-secondary))] font-medium hover:bg-card/60 hover:text-foreground'
+                ? 'bg-secondary text-foreground font-semibold'
+                : 'text-[hsl(var(--text-secondary))] font-medium hover:bg-secondary/70 hover:text-foreground'
             }`}
           >
             <Clock className="w-3.5 h-3.5 opacity-70" />
