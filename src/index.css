@@ -9,9 +9,9 @@
 
 @layer base {
   :root {
-    /* Surfaces — Apple warm grays (iOS system grouped) */
-    --background: 240 11% 96%;       /* #F2F2F7 — warmer iOS grouped bg */
-    --background-deep: 240 10% 94%;  /* gradient stop */
+    /* Surfaces — pure white content area, dark sidebar contrast */
+    --background: 0 0% 100%;         /* #FFFFFF — pure white content */
+    --background-deep: 0 0% 100%;    /* keep flat */
     --foreground: 240 6% 10%;        /* #1D1D1F */
 
     --card: 0 0% 100%;               /* #FFFFFF */
