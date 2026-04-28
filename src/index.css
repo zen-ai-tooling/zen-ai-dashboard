@@ -152,8 +152,7 @@
 
   body {
     @apply text-foreground;
-    background:
-      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background-deep)) 100%) fixed;
+    background: hsl(var(--background));
     letter-spacing: -0.005em;
   }
 
