@@ -97,6 +97,8 @@ export const AnalysisResults = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateDone, setGenerateDone] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [generatedFileName, setGeneratedFileName] = useState<string>('');
+  const lastDownloadRef = useRef<(() => void) | null>(null);
 
   const rowsBySheet = useMemo(() => {
     const grouped: Record<string, NormalizedRow[]> = {};
