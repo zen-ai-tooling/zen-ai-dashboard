@@ -194,30 +194,36 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* Stats row */}
-      <div className="grid grid-cols-3 gap-3">
-        <StatCard label="Bleeders Found" value={result.bleeders.length.toString()} />
-        <StatCard label="Total At-Risk Spend" value={`$${result.totalSpend.toFixed(2)}`} danger />
-        <StatCard label="Average ACoS" value={`${avgAcos.toFixed(1)}%`} danger />
+      {/* Stats row — standardized 3-up like Bleeders 1.0 */}
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
+        <div className="grid grid-cols-3 divide-x divide-border">
+          <StatCellV2
+            icon={<AlertTriangle className="w-3.5 h-3.5" strokeWidth={1.8} />}
+            value={result.bleeders.length.toLocaleString()}
+            label="Bleeders found"
+          />
+          <StatCellV2
+            icon={<DollarSign className="w-3.5 h-3.5" strokeWidth={1.8} />}
+            value={`$${result.totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
+            label="At-risk spend"
+          />
+          <StatCellV2
+            icon={<Percent className="w-3.5 h-3.5" strokeWidth={1.8} />}
+            value={`${avgAcos.toFixed(1)}%`}
+            label="Average ACoS"
+            danger={avgAcos > 100}
+          />
+        </div>
       </div>
 
-      {/* Step indicator */}
-      <div className="flex items-start gap-3 py-3 px-1">
-        <div className="flex flex-col items-center gap-0">
-          <StepDot status="complete" />
-          <div className="w-px h-5 bg-success" />
-          <StepDot status="active" />
-          <div className="w-px h-5 bg-border" />
-          <StepDot status={generateDone || amazonFile ? 'complete' : 'pending'} />
-        </div>
-        <div className="flex flex-col gap-3 pt-0.5">
-          <span className="text-[12px] text-success font-medium">File analyzed</span>
-          <span className="text-[12px] text-primary font-medium">Make decisions</span>
-          <span className={`text-[12px] font-medium ${generateDone || amazonFile ? 'text-success' : 'text-muted-foreground'}`}>
-            Generate Amazon file
-          </span>
-        </div>
-      </div>
+      {/* Horizontal stepper */}
+      <HorizontalStepper
+        steps={[
+          { label: 'File analyzed', status: 'complete' },
+          { label: 'Make decisions', status: (generateDone || amazonFile) ? 'complete' : 'active' },
+          { label: 'Generate Amazon file', status: (generateDone || amazonFile) ? 'complete' : 'pending' },
+        ]}
+      />
 
       {/* Amazon file ready banner */}
       {amazonFile && (
