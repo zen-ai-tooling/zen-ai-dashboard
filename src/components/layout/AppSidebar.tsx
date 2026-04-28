@@ -33,7 +33,7 @@ const MODULES: { id: Exclude<ActiveModule, null>; label: string; dot: string }[]
 ];
 
 const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="px-4 pt-4 pb-1.5 text-[11px] font-semibold uppercase text-[#6E6E73]" style={{ letterSpacing: '0.08em' }}>
+  <div className="px-4 mt-6 mb-2 text-[11px] font-semibold uppercase text-[#6E6E73]" style={{ letterSpacing: '0.1em' }}>
     {children}
   </div>
 );
