@@ -74,8 +74,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
   const recent = entries.slice(0, 3);
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-120px)]">
-      <div className="pt-4 pb-10 flex-1">
+    <div className="flex flex-col">
+      <div className="pt-4 pb-8">
         {/* Greeting */}
         <div className="mb-8">
           <p className="text-[12px] text-[hsl(var(--text-tertiary))] tracking-wide uppercase font-medium">{getTimeString()}</p>
@@ -125,10 +125,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
             Recent activity
           </p>
           {recent.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border bg-card/40 px-5 py-8 text-center">
+            <div className="rounded-xl border border-border bg-card shadow-card px-5 py-8 text-center">
               <Clock className="w-4 h-4 mx-auto text-[hsl(var(--text-tertiary))] opacity-60" strokeWidth={1.6} />
-              <p className="text-[12.5px] text-[hsl(var(--text-secondary))] mt-2">
-                No sessions yet — pick a workflow above to get started.
+              <p className="text-[13px] text-[hsl(var(--text-secondary))] mt-2 font-medium">
+                No sessions yet
+              </p>
+              <p className="text-[12px] text-[hsl(var(--text-tertiary))] mt-1">
+                Pick a workflow above to get started.
               </p>
             </div>
           ) : (
@@ -162,6 +165,28 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Quick start */}
+        <div className="mt-10">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-tertiary))] mb-3" style={{ letterSpacing: '0.5px' }}>
+            Quick start
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[
+              { title: 'What are bleeders?', desc: 'Targets with high spend and zero or near-zero conversions.' },
+              { title: 'How thresholds work', desc: 'SB/SD use Target ACoS + 10%. SP uses Target ACoS + 20%.' },
+              { title: 'Bulk file guide', desc: 'Export 60-day Bulk Operations from Campaign Manager.' },
+            ].map((q) => (
+              <div
+                key={q.title}
+                className="rounded-xl border border-border bg-card p-4 shadow-card card-hover"
+              >
+                <div className="text-[13px] font-semibold text-foreground tracking-tight">{q.title}</div>
+                <p className="text-[12px] text-[hsl(var(--text-secondary))] mt-1.5 leading-relaxed">{q.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
