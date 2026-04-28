@@ -747,7 +747,7 @@ const Index = () => {
   // ── Render ──
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen flex">
       <AppSidebar
         activeModule={activeModule}
         onSelectModule={(mod) => { setShowHistoryView(false); handleSidebarModuleSelect(mod); }}
@@ -778,8 +778,8 @@ const Index = () => {
           onBack={getBackHandler()}
         />
 
-        <main className="flex-1 overflow-y-auto" style={{ padding: '32px 40px' }}>
-          <div className="max-w-[960px] mx-auto page-enter" key={`${activeModule ?? 'home'}-${bleeder2Stage}-${bleeder2ActiveTrack ?? ''}-${showHistoryView}`}>
+        <main className="flex-1 overflow-y-auto" style={{ padding: '24px 32px 40px' }}>
+          <div className="max-w-[1240px] mx-auto page-enter" key={`${activeModule ?? 'home'}-${bleeder2Stage}-${bleeder2ActiveTrack ?? ''}-${showHistoryView}`}>
             {/* SESSION LOG */}
             {showHistoryView && (
               <SessionLogView />
@@ -792,8 +792,8 @@ const Index = () => {
 
             {/* BLEEDERS 1.0 — UPLOAD (centered hero) */}
             {activeModule === 'bleeders_1' && !analysisResults && !decisionResults && !validatorResults && (
-              <div className="min-h-[calc(100vh-160px)] flex flex-col justify-center max-w-[640px] mx-auto">
-                <div className="mb-6">
+              <div className="max-w-[640px] mx-auto pt-4">
+                <div className="mb-5">
                   <h2 className="text-[22px] font-semibold text-foreground tracking-tight">Upload your bulk file</h2>
                   <p className="text-[13px] text-[hsl(var(--text-secondary))] mt-1.5">
                     Bleeders 1.0 — find high-spend, zero-conversion targets across all campaigns.

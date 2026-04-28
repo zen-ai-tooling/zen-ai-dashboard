@@ -73,7 +73,7 @@ export const UploadCard = ({ onFileUpload, isVisible }: UploadCardProps) => {
               background: isDragging
                 ? 'linear-gradient(180deg, hsl(var(--primary) / 0.06), hsl(var(--background)))'
                 : 'linear-gradient(180deg, hsl(var(--secondary)), hsl(var(--background)))',
-              minHeight: 260,
+              minHeight: 220,
             }}
           >
             <input
@@ -109,7 +109,7 @@ export const UploadCard = ({ onFileUpload, isVisible }: UploadCardProps) => {
           </div>
 
           {/* Validation checklist */}
-          <div className="mt-6">
+          <div className="mt-4">
             <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-tertiary))] mb-2">
               Expected sheets
             </p>
