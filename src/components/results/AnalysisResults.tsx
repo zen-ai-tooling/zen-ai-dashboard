@@ -233,7 +233,7 @@ export const AnalysisResults = ({
             label="Bleeders found"
           />
           <StatCell
-            icon={<span className="text-[10px] font-mono-nums">$</span>}
+            icon={<DollarSign className="w-3.5 h-3.5" strokeWidth={1.8} />}
             value={`$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
             label="At-risk spend"
           />
@@ -243,34 +243,42 @@ export const AnalysisResults = ({
             label="Sheets processed"
           />
         </div>
-
-        {/* Top spenders inline row */}
-        {topSpenders.length > 0 && (
-          <div className="border-t border-border bg-secondary/40 px-5 py-2.5 flex items-center gap-3 flex-wrap">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-tertiary))]">
-              Top spenders
-            </span>
-            <div className="flex items-center gap-4 flex-wrap">
-              {topSpenders.slice(0, 3).map((s, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span
-                    className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-semibold text-card"
-                    style={{ backgroundColor: RANK_COLORS[i] }}
-                  >
-                    {i + 1}
-                  </span>
-                  <span className="text-[12.5px] text-foreground max-w-[180px] truncate" title={s.term}>
-                    {s.term}
-                  </span>
-                  <span className="text-[12px] font-mono-nums text-[hsl(var(--text-secondary))]">
-                    ${s.spend.toFixed(2)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Insights — collapsible top spenders */}
+      {topSpenders.length > 0 && (
+        <details className="group rounded-xl border border-border bg-card shadow-card overflow-hidden">
+          <summary className="flex items-center justify-between px-5 py-3 cursor-pointer list-none select-none hover:bg-secondary/40 transition-colors">
+            <div className="flex items-center gap-2">
+              <ChevronDown className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))] transition-transform duration-200 group-open:rotate-180" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-secondary))]">
+                Insights · Top spenders
+              </span>
+            </div>
+            <span className="text-[11px] text-[hsl(var(--text-tertiary))]">
+              {topSpenders.length} terms ranked by spend
+            </span>
+          </summary>
+          <div className="px-5 py-3 border-t border-border bg-secondary/30 flex items-center gap-5 flex-wrap">
+            {topSpenders.slice(0, 5).map((s, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span
+                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-semibold text-white"
+                  style={{ backgroundColor: RANK_COLORS[i] ?? 'hsl(var(--text-tertiary))' }}
+                >
+                  {i + 1}
+                </span>
+                <span className="text-[12.5px] text-foreground max-w-[200px] truncate" title={s.term}>
+                  {s.term}
+                </span>
+                <span className="text-[12px] font-mono-nums text-[hsl(var(--text-secondary))]">
+                  ${s.spend.toFixed(2)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
 
       {/* Decision table */}
       {sheetNames.length > 0 && (
