@@ -387,69 +387,127 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         </div>
 
         {/* Table footer */}
-        <div className="flex items-center justify-between p-4 border-t border-border bg-muted/30">
-          <span className="text-[12px] text-muted-foreground font-mono-nums">
-            {decisionsMade} of {result.bleeders.length} decisions made
-          </span>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={onDownload} className="text-[11px] h-7 btn-press">
-              <Download className="w-3 h-3 mr-1" />
-              Download XLSX
-            </Button>
-            <Button
-              onClick={handleGenerateInline}
-              disabled={decisionsMade === 0 || isGenerating}
-              size="sm"
-              className="text-[13px] font-medium h-8 font-display btn-press min-w-[180px]"
-            >
-              {isGenerating ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : generateDone ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 mr-1.5" />
-                  File ready
-                </>
-              ) : (
-                'Generate Amazon file →'
-              )}
-            </Button>
+        <div className="p-4 border-t border-border bg-muted/30 space-y-2">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-[14px] font-semibold text-foreground font-mono-nums">
+                  {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{result.bleeders.length}</span>
+                </span>
+                <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions made</span>
+              </div>
+              <div className="mt-2 h-1 w-full max-w-[280px] rounded-full bg-secondary overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-300"
+                  style={{ width: `${(decisionsMade / Math.max(result.bleeders.length, 1)) * 100}%` }}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Button variant="outline" size="sm" onClick={onDownload} className="text-[11px] h-9 btn-press">
+                <Download className="w-3 h-3 mr-1" />
+                Download XLSX
+              </Button>
+              <Button
+                onClick={async () => {
+                  await handleGenerateInline();
+                  toast.success('Amazon file ready', {
+                    description: `${decisionsMade} decisions exported`,
+                    duration: 3000,
+                  });
+                  setTimeout(() => setGenerateDone(false), 3000);
+                }}
+                disabled={decisionsMade === 0 || isGenerating}
+                className="text-[14px] font-semibold h-11 rounded-[10px] btn-press"
+                style={{ maxWidth: 240, minWidth: 200 }}
+              >
+                {isGenerating ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : generateDone ? (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                    File ready
+                  </>
+                ) : (
+                  'Generate Amazon file →'
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Fallback dropzone */}
-      <div className="rounded-lg border border-dashed border-border/60 p-4 bg-muted/10">
-        <p className="text-[12px] text-muted-foreground mb-2">Or upload a decision file manually</p>
-        <DecisionFileDropzone
-          onFileUpload={(file) => onUploadDecision(result.trackType, file)}
-          disabled={!!amazonFile}
-          label={decisionFile ? 'Reupload Decision File' : 'Upload Decision File'}
-          variant="compact"
-        />
-      </div>
+      {/* Advanced — collapsed manual upload */}
+      <details className="group">
+        <summary className="list-none select-none cursor-pointer inline-flex items-center gap-1.5 text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground transition-colors">
+          <ChevronDown className="w-3 h-3 transition-transform duration-200 group-open:rotate-180" />
+          Or upload a decision file manually
+        </summary>
+        <div className="mt-3 max-w-[480px]">
+          <DecisionFileDropzone
+            onFileUpload={(file) => onUploadDecision(result.trackType, file)}
+            disabled={!!amazonFile}
+            label={decisionFile ? 'Reupload Decision File' : 'Upload Decision File'}
+            variant="compact"
+          />
+        </div>
+      </details>
     </div>
   );
 };
 
-function StatCard({ label, value, danger }: { label: string; value: string; danger?: boolean }) {
+function StatCellV2({ icon, value, label, danger }: { icon: React.ReactNode; value: string; label: string; danger?: boolean }) {
   return (
-    <div className="rounded-lg bg-secondary p-4">
-      <div className={`text-[22px] font-medium font-mono-nums ${danger ? 'text-destructive' : 'text-foreground'}`}>
+    <div className="px-5 py-4">
+      <div className="flex items-center gap-1.5 text-[hsl(var(--text-tertiary))] mb-1.5">
+        {icon}
+        <span className="text-[11px] font-semibold uppercase" style={{ letterSpacing: '0.08em' }}>{label}</span>
+      </div>
+      <div className={`text-[28px] font-semibold leading-none font-mono-nums tracking-tight ${danger ? 'text-destructive' : 'text-foreground'}`}>
         {value}
       </div>
-      <div className="text-[11px] text-[hsl(var(--text-tertiary))] mt-0.5">{label}</div>
     </div>
   );
 }
 
-function StepDot({ status }: { status: 'complete' | 'active' | 'pending' }) {
-  if (status === 'complete') {
-    return <div className="w-4 h-4 rounded-full bg-success flex items-center justify-center">
-      <CheckCircle2 className="w-3 h-3 text-white" />
-    </div>;
-  }
-  if (status === 'active') {
-    return <div className="w-4 h-4 rounded-full bg-primary border-2 border-primary" />;
-  }
-  return <div className="w-4 h-4 rounded-full border-2 border-border bg-background" />;
+interface StepperStep { label: string; status: 'complete' | 'active' | 'pending'; }
+
+function HorizontalStepper({ steps }: { steps: StepperStep[] }) {
+  return (
+    <div className="rounded-xl border border-border bg-card shadow-card px-6 py-4">
+      <div className="flex items-center">
+        {steps.map((step, i) => {
+          const isLast = i === steps.length - 1;
+          const dotEl = step.status === 'complete' ? (
+            <div className="w-5 h-5 rounded-full bg-success flex items-center justify-center flex-shrink-0">
+              <CheckCircle2 className="w-3 h-3 text-white" />
+            </div>
+          ) : step.status === 'active' ? (
+            <div className="w-5 h-5 rounded-full bg-primary flex-shrink-0 step-pulse" />
+          ) : (
+            <div className="w-5 h-5 rounded-full border-2 border-border bg-card flex-shrink-0" />
+          );
+          return (
+            <React.Fragment key={i}>
+              <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                {dotEl}
+                <span className={`text-[11px] font-medium whitespace-nowrap ${
+                  step.status === 'complete' ? 'text-success'
+                    : step.status === 'active' ? 'text-primary'
+                    : 'text-[hsl(var(--text-tertiary))]'
+                }`}>
+                  {step.label}
+                </span>
+              </div>
+              {!isLast && (
+                <div className={`flex-1 h-px mx-3 mb-5 ${
+                  step.status === 'complete' ? 'bg-success' : 'bg-border'
+                }`} />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
