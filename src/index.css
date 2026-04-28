@@ -230,6 +230,15 @@
 
   /* Stagger helper */
   .row-enter { animation: row-enter 240ms ease-out both; }
+
+  /* Step dot pulse for active step in horizontal stepper */
+  .step-pulse {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.45);
+    animation: step-pulse 1.6s ease-out infinite;
+  }
+
+  /* Number transition (for live computed thresholds) */
+  .num-transition { transition: color 200ms ease, transform 200ms ease; }
 }
 
 /* ── keyframes ── */
