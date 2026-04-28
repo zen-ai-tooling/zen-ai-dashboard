@@ -203,8 +203,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* Stats row — standardized 3-up like Bleeders 1.0 */}
-      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
+      {/* Stats row — standardized 3-up like Bleeders 1.0, amber-tinted for B2.0 */}
+      <div className="rounded-xl border border-border shadow-card overflow-hidden stat-accent-amber">
         <div className="grid grid-cols-3 divide-x divide-border">
           <StatCellV2
             icon={<AlertTriangle className="w-3.5 h-3.5" strokeWidth={1.8} />}

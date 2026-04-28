@@ -258,8 +258,8 @@ export const AnalysisResults = ({
         </div>
       )}
 
-      {/* Stats bar — single horizontal row */}
-      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
+      {/* Stats bar — single horizontal row, module-tinted */}
+      <div className={`rounded-xl border border-border shadow-card overflow-hidden ${mode === 'lifetime' ? 'stat-accent-purple' : 'stat-accent-red'}`}>
         <div className="grid grid-cols-3 divide-x divide-border">
           <StatCell
             icon={<AlertTriangle className="w-3.5 h-3.5" strokeWidth={1.8} />}
