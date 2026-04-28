@@ -320,22 +320,22 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Campaign</TableHead>
-                {result.trackType === 'SBSD' && (
-                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Ad Group</TableHead>
+              <TableRow className="hover:bg-transparent border-b border-border">
+                <TableHead style={{ letterSpacing: '0.08em' }}>Campaign</TableHead>
+                {showAdGroup && (
+                  <TableHead style={{ letterSpacing: '0.08em' }}>Ad Group</TableHead>
                 )}
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">
+                <TableHead style={{ letterSpacing: '0.08em' }}>
                   {result.trackType === 'SP' ? 'Search Term' : 'Entity'}
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Match</TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground text-right">Spend</TableHead>
+                <TableHead style={{ letterSpacing: '0.08em' }}>Match</TableHead>
+                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Spend</TableHead>
                 {result.trackType !== 'ACOS100' && (
-                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground text-right">Orders</TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Orders</TableHead>
                 )}
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground text-right">ACoS</TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Suggestion</TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground w-[200px]">Decision</TableHead>
+                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>ACoS</TableHead>
+                <TableHead style={{ letterSpacing: '0.08em' }}>Suggestion</TableHead>
+                <TableHead className="w-[200px]" style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
