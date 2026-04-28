@@ -307,8 +307,10 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
               {result.bleeders.map((bleeder, idx) => {
                 const suggestion = suggestions[idx];
                 const confStyle = getConfidenceStyle(suggestion.confidence);
+                const decision = decisions[idx];
+                const indicatorClass = decisionRowClass(decision);
                 return (
-                  <TableRow key={idx} className="hover:bg-secondary/50 transition-colors">
+                  <TableRow key={idx} className={`hover:bg-secondary/50 transition-colors ${indicatorClass}`}>
                     <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.campaignName}>
                       {bleeder.campaignName}
                     </TableCell>
@@ -324,7 +326,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                       {bleeder.matchType || '—'}
                     </TableCell>
                     <TableCell className="text-right">
-                      <span className="text-[13px] font-mono-nums text-destructive">
+                      <span className="text-[13px] font-mono-nums text-foreground">
                         ${bleeder.spend.toFixed(2)}
                       </span>
                     </TableCell>
@@ -356,19 +358,12 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1.5">
-                        <Select
-                          value={decisions[idx] || ''}
-                          onValueChange={(val) => setDecisions(prev => ({ ...prev, [idx]: val }))}
-                        >
-                          <SelectTrigger className="h-7 text-[12px] w-[120px]">
-                            <SelectValue placeholder="— select —" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {getDecisionOptions().map(opt => (
-                              <SelectItem key={opt} value={opt} className="text-[12px]">{opt}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <DecisionSelect
+                          value={decision}
+                          onChange={(val) => setDecisions(prev => ({ ...prev, [idx]: val }))}
+                          options={getDecisionOptions()}
+                          width="128px"
+                        />
                         {decisions[idx] === 'Cut Bid' && (
                           <div className="flex items-center gap-0.5">
                             <Input
