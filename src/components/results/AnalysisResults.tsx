@@ -443,7 +443,7 @@ export const AnalysisResults = ({
                   return (
                     <TableRow
                       key={rowIdx}
-                      className={`row-enter cursor-pointer ${rowIdx % 2 === 1 ? 'bg-secondary/30' : ''} ${indicatorClass}`}
+                      className={`row-enter cursor-pointer hover:bg-[#F9F9FB] transition-colors ${rowIdx % 2 === 1 ? 'bg-secondary/30' : ''} ${indicatorClass}`}
                       style={{ animationDelay: `${Math.min(rowIdx * 12, 240)}ms` }}
                     >
                       <TableCell className="truncate font-medium" title={row.campaign}>
