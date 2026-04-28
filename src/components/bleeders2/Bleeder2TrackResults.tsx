@@ -345,12 +345,12 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 const decision = decisions[idx];
                 const indicatorClass = decisionRowClass(decision);
                 return (
-                  <TableRow key={idx} className={`hover:bg-secondary/50 transition-colors ${indicatorClass}`}>
+                  <TableRow key={idx} className={`hover:bg-[#F9F9FB] transition-colors ${indicatorClass}`}>
                     <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.campaignName}>
                       {bleeder.campaignName}
                     </TableCell>
-                    {result.trackType === 'SBSD' && (
-                      <TableCell className="text-[13px] max-w-[120px] truncate" title={bleeder.adGroupName}>
+                    {showAdGroup && (
+                      <TableCell className="text-[13px] max-w-[120px] truncate text-[hsl(var(--text-secondary))]" title={bleeder.adGroupName}>
                         {bleeder.adGroupName || '—'}
                       </TableCell>
                     )}
