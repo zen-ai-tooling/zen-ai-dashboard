@@ -72,8 +72,8 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
         <p className="text-[13px] text-[hsl(var(--text-secondary))] mt-1">Set your campaign performance parameters.</p>
       </div>
 
-      <div className="grid grid-cols-5 gap-6">
-        {/* Left column - Form (55%) */}
+      <div className="grid grid-cols-5 gap-4">
+        {/* Left column - Form (60%) */}
         <div className="col-span-3 rounded-xl border border-border bg-card p-6 space-y-5">
           <div className="space-y-1.5">
             <Label htmlFor="targetACOS" className="text-[12px] font-medium text-foreground">
@@ -91,7 +91,7 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
                 if (n === undefined && targetACOSRaw.trim() !== "") { setTargetACOSRaw("35"); handleUpdate('targetACOS', 35); }
                 else if (n !== undefined) { const c = Math.max(0, Math.min(300, n)); setTargetACOSRaw(String(c)); handleUpdate('targetACOS', c); }
               }}
-              className="max-w-[200px] h-10 rounded-lg border-border"
+              className="w-full h-10 rounded-lg border-border"
             />
             <p className="text-[12px] text-[hsl(var(--text-tertiary))]">Your break-even ACoS (e.g., 35% means your profit margin is 35%)</p>
           </div>
@@ -112,7 +112,7 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
                 const n = parseInt(fewerThanOrdersRaw || "5", 10);
                 handleUpdate('fewerThanOrders', isNaN(n) ? 5 : n);
               }}
-              className="max-w-[200px] h-10 rounded-lg border-border"
+              className="w-full h-10 rounded-lg border-border"
             />
             <p className="text-[12px] text-[hsl(var(--text-tertiary))]">Flag items with orders ≤ {local.fewerThanOrders}</p>
           </div>
@@ -128,22 +128,24 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
             </Label>
           </div>
 
-          <button
-            onClick={handleContinue}
-            className="w-full h-11 rounded-lg bg-[hsl(var(--accent-blue))] text-white text-[14px] font-medium btn-press hover:opacity-90 flex items-center justify-center gap-2 mt-4"
-            style={{ transition: 'opacity 150ms ease' }}
-          >
-            Save & Continue <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="flex justify-end pt-2">
+            <button
+              onClick={handleContinue}
+              className="h-11 rounded-[10px] bg-[hsl(var(--accent-blue))] text-white text-[14px] font-semibold btn-press hover:opacity-90 flex items-center justify-center gap-2 px-6"
+              style={{ maxWidth: 280, minWidth: 200 }}
+            >
+              Save & Continue <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
           {showSaved && (
-            <div className="flex items-center gap-1.5 mt-3 text-[12px] text-[hsl(var(--green))] font-medium">
+            <div className="flex items-center gap-1.5 mt-1 text-[12px] text-[hsl(var(--green))] font-medium justify-end">
               <CheckCircle2 className="w-3.5 h-3.5" />
               Thresholds saved to {clientName} profile
             </div>
           )}
         </div>
 
-        {/* Right column - Live preview (45%) */}
+        {/* Right column - Live preview (40%) — tighter gap so it feels unified */}
         <div className="col-span-2">
           <div className="rounded-xl border border-border bg-card p-5 sticky top-20">
             <h3 className="text-[12px] font-medium uppercase tracking-[0.06em] text-[hsl(var(--text-secondary))] mb-5">
@@ -153,7 +155,10 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
             <div className="space-y-4">
               <div>
                 <div className="text-[11px] text-[hsl(var(--text-tertiary))] mb-0.5">SB/SD Threshold</div>
-                <div className="text-[28px] font-medium font-mono-nums text-[hsl(var(--accent-blue))]">
+                <div
+                  key={`sbsd-${sbsdThreshold}`}
+                  className="text-[28px] font-medium font-mono-nums text-[hsl(var(--accent-blue))] num-transition animate-fade-in"
+                >
                   {sbsdThreshold}%
                 </div>
                 <div className="text-[11px] text-[hsl(var(--text-tertiary))]">ACoS · {targetACOSNum}% + 10%</div>
@@ -161,7 +166,10 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
 
               <div className="border-t border-border pt-4">
                 <div className="text-[11px] text-[hsl(var(--text-tertiary))] mb-0.5">SP Threshold</div>
-                <div className="text-[28px] font-medium font-mono-nums text-[hsl(var(--accent-blue))]">
+                <div
+                  key={`sp-${spThreshold}`}
+                  className="text-[28px] font-medium font-mono-nums text-[hsl(var(--accent-blue))] num-transition animate-fade-in"
+                >
                   {spThreshold}%
                 </div>
                 <div className="text-[11px] text-[hsl(var(--text-tertiary))]">ACoS · {targetACOSNum}% + 20%</div>
