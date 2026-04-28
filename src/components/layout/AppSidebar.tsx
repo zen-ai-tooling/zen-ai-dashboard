@@ -196,7 +196,15 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         </button>
 
         {clientDropdownOpen && (
-          <div className="absolute bottom-[calc(100%-4px)] left-3 right-3 bg-popover border border-border rounded-lg overflow-hidden z-50 shadow-pop animate-scale-in">
+          <div
+            className="absolute bottom-[calc(100%-4px)] left-4 right-4 overflow-hidden z-50 animate-scale-in"
+            style={{
+              background: '#2C2C2E',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '12px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+            }}
+          >
             {clients.map(client => {
               const isActive = client.id === activeClient.id;
               return (
@@ -207,11 +215,11 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                     setClientDropdownOpen(false);
                     if (client.id !== activeClient.id && onReset) onReset();
                   }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left transition-colors ${
-                    isActive ? 'bg-primary/5 text-foreground' : 'text-foreground hover:bg-secondary'
+                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-[13px] text-left transition-colors ${
+                    isActive ? 'bg-white/[0.06] text-white' : 'text-white hover:bg-white/[0.08]'
                   }`}
                 >
-                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-semibold text-primary">
+                  <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-semibold text-white">
                     {client.initials}
                   </div>
                   <span className="truncate flex-1">{client.name}</span>
@@ -220,12 +228,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
               );
             })}
 
-            <div className="border-t border-border" />
+            <div className="border-t border-white/[0.08]" />
 
             {!showAddForm ? (
               <button
                 onClick={() => setShowAddForm(true)}
-                className="w-full flex items-center gap-1.5 px-3 py-2 text-[13px] text-primary hover:bg-primary/5 font-medium transition-colors"
+                className="w-full flex items-center gap-1.5 px-3 py-2.5 text-[13px] text-primary hover:bg-white/[0.06] font-medium transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Add client
@@ -236,7 +244,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                   placeholder="Client name"
                   value={newClientName}
                   onChange={e => setNewClientName(e.target.value)}
-                  className="h-8 px-2.5 text-[12px] rounded-md border border-border bg-card outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                  className="h-8 px-2.5 text-[12px] rounded-md border border-white/10 bg-white/[0.05] text-white placeholder:text-white/40 outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   autoFocus
                 />
                 <input
@@ -244,7 +252,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                   placeholder="ACoS target %"
                   value={newClientAcos}
                   onChange={e => setNewClientAcos(Number(e.target.value))}
-                  className="h-8 px-2.5 text-[12px] rounded-md border border-border bg-card outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                  className="h-8 px-2.5 text-[12px] rounded-md border border-white/10 bg-white/[0.05] text-white placeholder:text-white/40 outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
                 <div className="flex gap-1.5 mt-0.5">
                   <button
@@ -268,7 +276,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                   </button>
                   <button
                     onClick={() => { setShowAddForm(false); setNewClientName(''); }}
-                    className="h-7 px-2.5 rounded-md text-[12px] text-[hsl(var(--text-tertiary))] hover:text-foreground btn-press"
+                    className="h-7 px-2.5 rounded-md text-[12px] text-white/60 hover:text-white btn-press"
                   >
                     Cancel
                   </button>
