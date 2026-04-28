@@ -549,19 +549,52 @@ export const AnalysisResults = ({
               <button
                 onClick={handleGenerateDecisionFile}
                 disabled={decisionsMade === 0 || isGenerating}
-                className="h-9 px-5 rounded-md bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 btn-press hover:bg-primary/92 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs"
+                className={`h-9 px-5 rounded-md text-[13px] font-semibold flex items-center gap-2 btn-press disabled:opacity-50 disabled:cursor-not-allowed shadow-xs ${
+                  generateDone
+                    ? 'bg-success text-white hover:bg-success/90'
+                    : 'bg-primary text-primary-foreground hover:bg-primary/92'
+                }`}
                 style={{ minWidth: 200 }}
               >
                 {isGenerating ? (
                   <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Generating…</>
                 ) : generateDone ? (
-                  <><CheckCircle2 className="w-3.5 h-3.5" /> File downloaded</>
+                  <><CheckCircle2 className="w-3.5 h-3.5" /> Downloaded ✓</>
                 ) : (
                   <><Download className="w-3.5 h-3.5" /> Generate decision file</>
                 )}
               </button>
             </div>
           </div>
+
+          {/* Manual decision upload — collapsed for parity with Bleeders 2.0 */}
+          <details className="group mt-4 pt-4 border-t border-border">
+            <summary className="list-none select-none cursor-pointer inline-flex items-center gap-1.5 text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground transition-colors">
+              <ChevronDown className="w-3 h-3 transition-transform duration-200 group-open:rotate-180" />
+              Or upload a decision file manually
+            </summary>
+            <div className="mt-3 max-w-[480px]">
+              <label
+                htmlFor="manual-decision-upload-b1"
+                className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-4 py-3 cursor-pointer hover:border-primary/60 btn-press"
+              >
+                <Upload className="w-4 h-4 text-[hsl(var(--text-tertiary))]" />
+                <span className="text-[12.5px] text-[hsl(var(--text-secondary))]">
+                  Drop or click to upload a pre-made decision file (.xlsx)
+                </span>
+                <input
+                  id="manual-decision-upload-b1"
+                  type="file"
+                  accept=".xlsx,.xls,.csv"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleManualDecisionUpload(f);
+                  }}
+                />
+              </label>
+            </div>
+          </details>
         </div>
       )}
     </div>
