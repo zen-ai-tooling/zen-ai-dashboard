@@ -778,8 +778,8 @@ const Index = () => {
           onBack={getBackHandler()}
         />
 
-        <main className="flex-1 overflow-y-auto" style={{ padding: '28px 32px' }}>
-          <div className="max-w-[960px]">
+        <main className="flex-1 overflow-y-auto" style={{ padding: '32px 40px' }}>
+          <div className="max-w-[960px] mx-auto page-enter" key={`${activeModule ?? 'home'}-${bleeder2Stage}-${bleeder2ActiveTrack ?? ''}-${showHistoryView}`}>
             {/* SESSION LOG */}
             {showHistoryView && (
               <SessionLogView />
@@ -790,13 +790,13 @@ const Index = () => {
               <HomeScreen onSelectModule={(mod) => { setShowHistoryView(false); handleSidebarModuleSelect(mod); }} />
             )}
 
-            {/* BLEEDERS 1.0 */}
+            {/* BLEEDERS 1.0 — UPLOAD (centered hero) */}
             {activeModule === 'bleeders_1' && !analysisResults && !decisionResults && !validatorResults && (
-              <div className="space-y-5">
-                <div>
-                  <h2 className="text-[20px] font-semibold text-foreground">Upload your bulk file</h2>
-                  <p className="text-[13px] text-[hsl(var(--text-secondary))] mt-1">
-                    Amazon Ads → Campaign Manager → Bulk Operations → Create Spreadsheet (60-day range)
+              <div className="min-h-[calc(100vh-160px)] flex flex-col justify-center max-w-[640px] mx-auto">
+                <div className="mb-6">
+                  <h2 className="text-[22px] font-semibold text-foreground tracking-tight">Upload your bulk file</h2>
+                  <p className="text-[13px] text-[hsl(var(--text-secondary))] mt-1.5">
+                    Bleeders 1.0 — find high-spend, zero-conversion targets across all campaigns.
                   </p>
                 </div>
                 <UploadCard onFileUpload={handleFileUpload} isVisible={true} />
