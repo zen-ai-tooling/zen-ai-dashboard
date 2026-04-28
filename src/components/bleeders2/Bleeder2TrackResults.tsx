@@ -75,6 +75,13 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
     return result.bleeders.reduce((s, b) => s + b.acos, 0) / result.bleeders.length;
   }, [result.bleeders, hasBleeders]);
 
+  const topAcos = useMemo(() => {
+    return [...result.bleeders].sort((a, b) => b.acos - a.acos).slice(0, 3);
+  }, [result.bleeders]);
+
+  const showAdGroup = result.trackType === 'SBSD' || result.trackType === 'SP_KEYWORDS';
+  const RANK_COLORS = ['hsl(45 90% 50%)', 'hsl(220 8% 60%)', 'hsl(28 60% 45%)'];
+
   const handleSetAllPause = () => {
     const all: Record<number, string> = {};
     result.bleeders.forEach((_, idx) => { all[idx] = 'Pause'; });
