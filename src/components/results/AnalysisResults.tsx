@@ -308,7 +308,7 @@ export const AnalysisResults = ({
                         : 'text-[hsl(var(--text-secondary))] font-medium hover:text-foreground'
                     }`}
                   >
-                    {name}
+                    {shortTabLabel(name)}
                     <span
                       className={`text-[10.5px] font-mono-nums px-1.5 py-px rounded ${
                         isActive ? 'bg-primary/10 text-primary' : 'bg-secondary text-[hsl(var(--text-tertiary))]'
@@ -325,20 +325,31 @@ export const AnalysisResults = ({
             </div>
           </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
-            <Table>
+          {/* Table — fixed layout, no horizontal scroll on standard widths */}
+          <div className="w-full">
+            <Table className="table-fixed w-full">
+              <colgroup>
+                <col style={{ width: '22%' }} />
+                <col style={{ width: '18%' }} />
+                <col style={{ width: '14%' }} />
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '7%' }} />
+                <col style={{ width: '9%' }} />
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '7%' }} />
+                <col style={{ width: '13%' }} />
+              </colgroup>
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-b border-border">
-                  <TableHead className="sticky left-0 bg-card z-10">Campaign</TableHead>
-                  <TableHead>Ad Group</TableHead>
-                  <TableHead>Entity</TableHead>
-                  <TableHead>Match</TableHead>
-                  <TableHead className="text-right">Clicks</TableHead>
-                  <TableHead className="text-right">Spend</TableHead>
-                  <TableHead className="text-right">Sales</TableHead>
-                  <TableHead className="text-right">ACoS</TableHead>
-                  <TableHead className="w-[150px]">Decision</TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>Campaign</TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>Ad Group</TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>Entity</TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>Match</TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Clicks</TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Spend</TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Sales</TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>ACoS</TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -351,19 +362,19 @@ export const AnalysisResults = ({
                   return (
                     <TableRow
                       key={rowIdx}
-                      className={`row-enter ${rowIdx % 2 === 1 ? 'bg-secondary/30' : ''} ${indicatorClass}`}
+                      className={`row-enter cursor-pointer ${rowIdx % 2 === 1 ? 'bg-secondary/30' : ''} ${indicatorClass}`}
                       style={{ animationDelay: `${Math.min(rowIdx * 12, 240)}ms` }}
                     >
-                      <TableCell className="sticky left-0 z-10 max-w-[180px] truncate font-medium" title={row.campaign}>
-                        <span className={rowIdx % 2 === 1 ? 'bg-secondary/0' : ''}>{row.campaign || '—'}</span>
+                      <TableCell className="truncate font-medium" title={row.campaign}>
+                        {row.campaign || '—'}
                       </TableCell>
-                      <TableCell className="max-w-[140px] truncate text-[hsl(var(--text-secondary))]" title={row.ad_group}>
+                      <TableCell className="truncate text-[hsl(var(--text-secondary))]" title={row.ad_group}>
                         {row.ad_group || '—'}
                       </TableCell>
-                      <TableCell className="max-w-[200px] truncate" title={entityDisplay}>
+                      <TableCell className="truncate" title={entityDisplay}>
                         {entityDisplay}
                       </TableCell>
-                      <TableCell className="text-[hsl(var(--text-tertiary))] text-[12px]">
+                      <TableCell className="text-[hsl(var(--text-tertiary))] text-[12px] truncate">
                         {row.match_type || '—'}
                       </TableCell>
                       <TableCell className="text-right font-mono-nums text-[12.5px]">{row.clicks}</TableCell>
@@ -384,17 +395,29 @@ export const AnalysisResults = ({
                           <span className="text-[13px] text-[hsl(var(--border-strong))]">—</span>
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="px-2">
                         <Select
                           value={decision || ''}
                           onValueChange={(val) => setDecisions(prev => ({ ...prev, [key]: val }))}
                         >
-                          <SelectTrigger className="h-7 w-[140px] text-[12px] rounded-md">
-                            <SelectValue placeholder="Action" />
+                          <SelectTrigger className="h-7 w-full text-[12px] rounded-md px-2">
+                            {decision ? (
+                              <span className="flex items-center gap-1.5 truncate">
+                                <span className="decision-dot flex-shrink-0" style={{ background: decisionDotColor(decision) }} />
+                                <span className="truncate">{decision}</span>
+                              </span>
+                            ) : (
+                              <SelectValue placeholder="Action" />
+                            )}
                           </SelectTrigger>
                           <SelectContent>
                             {decisionOptions.map(opt => (
-                              <SelectItem key={opt} value={opt} className="text-[12.5px]">{opt}</SelectItem>
+                              <SelectItem key={opt} value={opt} className="text-[12.5px]">
+                                <span className="flex items-center gap-2">
+                                  <span className="decision-dot" style={{ background: decisionDotColor(opt) }} />
+                                  {opt}
+                                </span>
+                              </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
