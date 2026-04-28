@@ -1,7 +1,8 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, Loader2, CheckCircle2, MoreHorizontal, AlertTriangle, FileSpreadsheet, Layers } from "lucide-react";
+import { Download, Loader2, CheckCircle2, MoreHorizontal, AlertTriangle, FileSpreadsheet, Layers, ChevronDown, Percent, DollarSign } from "lucide-react";
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
+import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
 
 interface TopSpender {
   term: string;
@@ -73,24 +74,6 @@ function getDecisionOptions(sheetName: string): string[] {
   if (lower.includes('search term')) return SEARCH_TERM_DECISIONS;
   if (lower.includes('campaign')) return CAMPAIGN_DECISIONS;
   return DEFAULT_DECISIONS;
-}
-
-function decisionRowClass(d: string | undefined): string {
-  if (!d) return '';
-  if (d === 'Keep') return 'row-decision-keep';
-  if (d === 'Pause') return 'row-decision-pause';
-  if (d.startsWith('Cut')) return 'row-decision-cut';
-  if (d.startsWith('Negate')) return 'row-decision-negate';
-    return '';
-}
-
-function decisionDotColor(d: string | undefined): string {
-  if (!d) return 'transparent';
-  if (d === 'Keep') return 'hsl(var(--success))';
-  if (d === 'Pause') return 'hsl(var(--destructive))';
-  if (d.startsWith('Cut')) return 'hsl(var(--amber))';
-  if (d.startsWith('Negate')) return 'hsl(var(--destructive))';
-  return 'transparent';
 }
 
 function shortTabLabel(name: string): string {
@@ -216,8 +199,15 @@ export const AnalysisResults = ({
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       setGenerateDone(true);
+      toast.success('Decision file downloaded', {
+        description: `${decisionsMade} decisions exported`,
+        duration: 3000,
+      });
+      // Auto-revert button label after the toast lifetime
+      setTimeout(() => setGenerateDone(false), 3000);
     } catch (err) {
       console.error('[Generate Decision File] Failed:', err);
+      toast.error('Failed to generate decision file');
     } finally {
       setIsGenerating(false);
     }
@@ -250,7 +240,7 @@ export const AnalysisResults = ({
             label="Bleeders found"
           />
           <StatCell
-            icon={<span className="text-[10px] font-mono-nums">$</span>}
+            icon={<DollarSign className="w-3.5 h-3.5" strokeWidth={1.8} />}
             value={`$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
             label="At-risk spend"
           />
@@ -260,34 +250,42 @@ export const AnalysisResults = ({
             label="Sheets processed"
           />
         </div>
-
-        {/* Top spenders inline row */}
-        {topSpenders.length > 0 && (
-          <div className="border-t border-border bg-secondary/40 px-5 py-2.5 flex items-center gap-3 flex-wrap">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-tertiary))]">
-              Top spenders
-            </span>
-            <div className="flex items-center gap-4 flex-wrap">
-              {topSpenders.slice(0, 3).map((s, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span
-                    className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-semibold text-card"
-                    style={{ backgroundColor: RANK_COLORS[i] }}
-                  >
-                    {i + 1}
-                  </span>
-                  <span className="text-[12.5px] text-foreground max-w-[180px] truncate" title={s.term}>
-                    {s.term}
-                  </span>
-                  <span className="text-[12px] font-mono-nums text-[hsl(var(--text-secondary))]">
-                    ${s.spend.toFixed(2)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Insights — collapsible top spenders */}
+      {topSpenders.length > 0 && (
+        <details className="group rounded-xl border border-border bg-card shadow-card overflow-hidden">
+          <summary className="flex items-center justify-between px-5 py-3 cursor-pointer list-none select-none hover:bg-secondary/40 transition-colors">
+            <div className="flex items-center gap-2">
+              <ChevronDown className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))] transition-transform duration-200 group-open:rotate-180" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-secondary))]">
+                Insights · Top spenders
+              </span>
+            </div>
+            <span className="text-[11px] text-[hsl(var(--text-tertiary))]">
+              {topSpenders.length} terms ranked by spend
+            </span>
+          </summary>
+          <div className="px-5 py-3 border-t border-border bg-secondary/30 flex items-center gap-5 flex-wrap">
+            {topSpenders.slice(0, 5).map((s, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span
+                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-semibold text-white"
+                  style={{ backgroundColor: RANK_COLORS[i] ?? 'hsl(var(--text-tertiary))' }}
+                >
+                  {i + 1}
+                </span>
+                <span className="text-[12.5px] text-foreground max-w-[200px] truncate" title={s.term}>
+                  {s.term}
+                </span>
+                <span className="text-[12px] font-mono-nums text-[hsl(var(--text-secondary))]">
+                  ${s.spend.toFixed(2)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
 
       {/* Decision table */}
       {sheetNames.length > 0 && (
@@ -396,31 +394,12 @@ export const AnalysisResults = ({
                         )}
                       </TableCell>
                       <TableCell className="px-2">
-                        <Select
-                          value={decision || ''}
-                          onValueChange={(val) => setDecisions(prev => ({ ...prev, [key]: val }))}
-                        >
-                          <SelectTrigger className="h-7 w-full text-[12px] rounded-md px-2">
-                            {decision ? (
-                              <span className="flex items-center gap-1.5 truncate">
-                                <span className="decision-dot flex-shrink-0" style={{ background: decisionDotColor(decision) }} />
-                                <span className="truncate">{decision}</span>
-                              </span>
-                            ) : (
-                              <SelectValue placeholder="Action" />
-                            )}
-                          </SelectTrigger>
-                          <SelectContent>
-                            {decisionOptions.map(opt => (
-                              <SelectItem key={opt} value={opt} className="text-[12.5px]">
-                                <span className="flex items-center gap-2">
-                                  <span className="decision-dot" style={{ background: decisionDotColor(opt) }} />
-                                  {opt}
-                                </span>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <DecisionSelect
+                          value={decision}
+                          onChange={(val) => setDecisions(prev => ({ ...prev, [key]: val }))}
+                          options={decisionOptions}
+                          width="100%"
+                        />
                       </TableCell>
                     </TableRow>
                   );
@@ -509,7 +488,7 @@ const StatCell: React.FC<{ icon: React.ReactNode; value: string; label: string }
   <div className="px-5 py-4">
     <div className="flex items-center gap-1.5 text-[hsl(var(--text-tertiary))] mb-1.5">
       {icon}
-      <span className="text-[10px] font-semibold uppercase tracking-[0.08em]">{label}</span>
+      <span className="text-[11px] font-semibold uppercase" style={{ letterSpacing: '0.08em' }}>{label}</span>
     </div>
     <div className="text-[28px] font-semibold leading-none text-foreground font-mono-nums tracking-tight">
       {value}
