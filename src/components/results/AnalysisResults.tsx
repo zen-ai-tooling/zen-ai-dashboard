@@ -199,8 +199,15 @@ export const AnalysisResults = ({
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       setGenerateDone(true);
+      toast.success('Decision file downloaded', {
+        description: `${decisionsMade} decisions exported`,
+        duration: 3000,
+      });
+      // Auto-revert button label after the toast lifetime
+      setTimeout(() => setGenerateDone(false), 3000);
     } catch (err) {
       console.error('[Generate Decision File] Failed:', err);
+      toast.error('Failed to generate decision file');
     } finally {
       setIsGenerating(false);
     }
