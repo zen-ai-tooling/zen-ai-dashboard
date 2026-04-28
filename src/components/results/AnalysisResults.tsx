@@ -294,7 +294,7 @@ export const AnalysisResults = ({
         <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
           {/* Tab segmented control */}
           <div className="border-b border-border px-3 pt-3">
-            <div className="flex items-end gap-0.5 overflow-x-auto -mb-px">
+            <div className="flex items-end gap-0.5 overflow-x-auto -mb-px tab-scroll-fade text-[14px]">
               {sheetNames.map((name) => {
                 const count = rowsBySheet[name]?.length || 0;
                 const isActive = name === currentSheet;
@@ -302,10 +302,10 @@ export const AnalysisResults = ({
                   <button
                     key={name}
                     onClick={() => setActiveSheet(name)}
-                    className={`group relative flex items-center gap-1.5 px-3 pb-2.5 pt-1 text-[12.5px] whitespace-nowrap btn-press transition-colors ${
+                    className={`group relative flex items-center gap-1.5 px-3 pb-2.5 pt-1 text-[14px] whitespace-nowrap btn-press transition-colors ${
                       isActive
-                        ? 'text-foreground font-semibold'
-                        : 'text-[hsl(var(--text-secondary))] font-medium hover:text-foreground'
+                        ? 'text-foreground font-medium'
+                        : 'text-[hsl(var(--text-secondary))] font-normal hover:text-foreground'
                     }`}
                   >
                     {shortTabLabel(name)}
