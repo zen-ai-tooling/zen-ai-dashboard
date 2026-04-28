@@ -368,6 +368,44 @@ export const AnalysisResults = ({
             </div>
           </div>
 
+          {/* Bulk action bar */}
+          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-secondary/30">
+            <span className="text-[11px] text-[hsl(var(--text-tertiary))] mr-1 font-semibold uppercase tracking-[0.06em]">Bulk:</span>
+            <button
+              onClick={() => {
+                const next = { ...decisions };
+                currentRows.forEach((_, idx) => { next[`${currentSheet}-ROWINDEX-${idx}`] = decisionOptions.find(o => o === 'Pause') || decisionOptions[0]; });
+                setDecisions(next);
+              }}
+              className="text-[11px] h-6 px-2.5 rounded-md border border-border bg-card hover:bg-secondary btn-press inline-flex items-center gap-1.5"
+            >
+              <span className="decision-dot" style={{ background: 'hsl(var(--destructive))' }} />
+              Select all → Pause
+            </button>
+            <button
+              onClick={() => {
+                const next = { ...decisions };
+                currentRows.forEach((_, idx) => { next[`${currentSheet}-ROWINDEX-${idx}`] = 'Keep'; });
+                setDecisions(next);
+              }}
+              className="text-[11px] h-6 px-2.5 rounded-md border border-border bg-card hover:bg-secondary btn-press inline-flex items-center gap-1.5"
+            >
+              <span className="decision-dot" style={{ background: 'hsl(var(--success))' }} />
+              Select all → Keep
+            </button>
+            <button
+              onClick={() => {
+                const next = { ...decisions };
+                currentRows.forEach((_, idx) => { delete next[`${currentSheet}-ROWINDEX-${idx}`]; });
+                setDecisions(next);
+              }}
+              className="text-[11px] h-6 px-2.5 rounded-md text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press inline-flex items-center gap-1"
+            >
+              <XCircle className="w-3 h-3" />
+              Clear all
+            </button>
+          </div>
+
           {/* Table — fixed layout, no horizontal scroll on standard widths */}
           <div className="w-full">
             <Table className="table-fixed w-full">
