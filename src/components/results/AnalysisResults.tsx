@@ -197,24 +197,47 @@ export const AnalysisResults = ({
       const link = document.createElement('a');
       link.href = url;
       const date = new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles', month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-');
-      link.download = `Bleeders_1_Decisions_${date}_PT.xlsx`;
+      const fileName = `Bleeders_1_Decisions_${date}_PT.xlsx`;
+      link.download = fileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      setGeneratedFileName(fileName);
       setGenerateDone(true);
+      // Persistent re-download handler for the completion banner
+      lastDownloadRef.current = () => {
+        const blob2 = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const u2 = URL.createObjectURL(blob2);
+        const a2 = document.createElement('a');
+        a2.href = u2;
+        a2.download = fileName;
+        document.body.appendChild(a2);
+        a2.click();
+        document.body.removeChild(a2);
+        URL.revokeObjectURL(u2);
+      };
       toast.success('Decision file downloaded', {
         description: `${decisionsMade} decisions exported`,
         duration: 3000,
       });
-      // Auto-revert button label after the toast lifetime
-      setTimeout(() => setGenerateDone(false), 3000);
     } catch (err) {
       console.error('[Generate Decision File] Failed:', err);
       toast.error('Failed to generate decision file');
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleStartNew = () => {
+    setDecisions({});
+    setGenerateDone(false);
+    setGeneratedFileName('');
+    lastDownloadRef.current = null;
+  };
+
+  const handleManualDecisionUpload = (file: File) => {
+    toast.success(`Decision file received: ${file.name}`);
   };
 
   const sheetsCount = [...new Set(allRows.map(r => r.sheet))].length;
