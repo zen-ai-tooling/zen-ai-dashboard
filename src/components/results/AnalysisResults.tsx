@@ -76,24 +76,6 @@ function getDecisionOptions(sheetName: string): string[] {
   return DEFAULT_DECISIONS;
 }
 
-function decisionRowClass(d: string | undefined): string {
-  if (!d) return '';
-  if (d === 'Keep') return 'row-decision-keep';
-  if (d === 'Pause') return 'row-decision-pause';
-  if (d.startsWith('Cut')) return 'row-decision-cut';
-  if (d.startsWith('Negate')) return 'row-decision-negate';
-    return '';
-}
-
-function decisionDotColor(d: string | undefined): string {
-  if (!d) return 'transparent';
-  if (d === 'Keep') return 'hsl(var(--success))';
-  if (d === 'Pause') return 'hsl(var(--destructive))';
-  if (d.startsWith('Cut')) return 'hsl(var(--amber))';
-  if (d.startsWith('Negate')) return 'hsl(var(--destructive))';
-  return 'transparent';
-}
-
 function shortTabLabel(name: string): string {
   return name
     .replace(/Sponsored Products/i, 'SP')
