@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, Loader2, CheckCircle2 } from "lucide-react";
+import { Download, Loader2, CheckCircle2, MoreHorizontal, AlertTriangle, FileSpreadsheet, Layers } from "lucide-react";
 import { useState, useMemo } from "react";
 
 interface TopSpender {
@@ -75,6 +75,17 @@ function getDecisionOptions(sheetName: string): string[] {
   return DEFAULT_DECISIONS;
 }
 
+function decisionRowClass(d: string | undefined): string {
+  if (!d) return '';
+  if (d === 'Keep') return 'row-decision-keep';
+  if (d === 'Pause') return 'row-decision-pause';
+  if (d.startsWith('Cut')) return 'row-decision-cut';
+  if (d.startsWith('Negate')) return 'row-decision-negate';
+  return '';
+}
+
+const RANK_COLORS = ['hsl(45 90% 50%)', 'hsl(220 8% 60%)', 'hsl(28 60% 45%)']; // gold/silver/bronze
+
 export const AnalysisResults = ({
   summary, tables, csvData, brandName, validation, topSpenders, allRows,
   onProceedToProcessor, formattedWorkbook, diagnostics, mode = 'standard'
@@ -82,6 +93,7 @@ export const AnalysisResults = ({
   const [decisions, setDecisions] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateDone, setGenerateDone] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   const rowsBySheet = useMemo(() => {
     const grouped: Record<string, NormalizedRow[]> = {};
@@ -99,19 +111,15 @@ export const AnalysisResults = ({
   const currentRows = rowsBySheet[currentSheet] || [];
   const decisionOptions = getDecisionOptions(currentSheet);
 
-  const decisionsMade = useMemo(() => {
-    return Object.values(decisions).filter(d => d && d !== '').length;
-  }, [decisions]);
+  const decisionsMade = useMemo(
+    () => Object.values(decisions).filter(d => d && d !== '').length,
+    [decisions]
+  );
 
-  const totalSpend = useMemo(() => {
-    return allRows.reduce((s, r) => s + (r.spend || 0), 0);
-  }, [allRows]);
-
-  const enhancedTables = useMemo(() => {
-    return Object.fromEntries(
-      Object.entries(tables).map(([key, value]) => [key, value])
-    );
-  }, [tables]);
+  const totalSpend = useMemo(
+    () => allRows.reduce((s, r) => s + (r.spend || 0), 0),
+    [allRows]
+  );
 
   const handleDownload = () => {
     if (formattedWorkbook) {
@@ -197,62 +205,78 @@ export const AnalysisResults = ({
     }
   };
 
+  const sheetsCount = [...new Set(allRows.map(r => r.sheet))].length;
+  const decisionThresholdSpend = totalSpend / Math.max(allRows.length, 1) * 1.5; // highlight only above 1.5x mean
+
   return (
-    <div className="space-y-3">
-      {/* Lifetime Mode Notice */}
+    <div className="space-y-5">
+      {/* Lifetime mode notice */}
       {mode === 'lifetime' && (
-        <div className="rounded-xl border border-[hsl(var(--amber-border))] bg-[hsl(var(--amber-light))] p-4">
-          <p className="text-[13px] font-medium text-[hsl(var(--amber))]">Lifetime Mode</p>
-          <p className="text-[12px] text-[hsl(var(--text-secondary))] mt-1">
-            Analysis uses lifetime performance data for deeper trend detection.
-          </p>
+        <div className="rounded-lg border border-[hsl(var(--amber-border))] bg-[hsl(var(--amber-light))] px-4 py-3 flex items-start gap-2.5">
+          <AlertTriangle className="w-4 h-4 text-[hsl(var(--amber))] flex-shrink-0 mt-px" strokeWidth={1.8} />
+          <div>
+            <p className="text-[12.5px] font-semibold text-foreground">Lifetime Mode</p>
+            <p className="text-[12px] text-[hsl(var(--text-secondary))] mt-0.5">
+              Analysis uses lifetime performance data for deeper trend detection.
+            </p>
+          </div>
         </div>
       )}
 
-      {/* Section A — Summary stat cards */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-card border border-border rounded-xl p-5">
-          <div className="font-mono-nums text-[32px] font-medium leading-none text-destructive">
-            {allRows.length}
-          </div>
-          <div className="text-[12px] text-muted-foreground mt-1.5 font-medium">bleeders found</div>
+      {/* Stats bar — single horizontal row */}
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
+        <div className="grid grid-cols-3 divide-x divide-border">
+          <StatCell
+            icon={<AlertTriangle className="w-3.5 h-3.5" strokeWidth={1.8} />}
+            value={allRows.length.toLocaleString()}
+            label="Bleeders found"
+          />
+          <StatCell
+            icon={<span className="text-[10px] font-mono-nums">$</span>}
+            value={`$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
+            label="At-risk spend"
+          />
+          <StatCell
+            icon={<Layers className="w-3.5 h-3.5" strokeWidth={1.8} />}
+            value={String(sheetsCount)}
+            label="Sheets processed"
+          />
         </div>
-        <div className="bg-card border border-border rounded-xl p-5">
-          <div className="font-mono-nums text-[32px] font-medium leading-none text-destructive">
-            ${totalSpend.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+
+        {/* Top spenders inline row */}
+        {topSpenders.length > 0 && (
+          <div className="border-t border-border bg-secondary/40 px-5 py-2.5 flex items-center gap-3 flex-wrap">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-tertiary))]">
+              Top spenders
+            </span>
+            <div className="flex items-center gap-4 flex-wrap">
+              {topSpenders.slice(0, 3).map((s, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span
+                    className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-semibold text-card"
+                    style={{ backgroundColor: RANK_COLORS[i] }}
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="text-[12.5px] text-foreground max-w-[180px] truncate" title={s.term}>
+                    {s.term}
+                  </span>
+                  <span className="text-[12px] font-mono-nums text-[hsl(var(--text-secondary))]">
+                    ${s.spend.toFixed(2)}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="text-[12px] text-muted-foreground mt-1.5 font-medium">at-risk spend</div>
-        </div>
-        <div className="bg-card border border-border rounded-xl p-5">
-          <div className="text-[32px] font-semibold leading-none text-foreground">
-            {[...new Set(allRows.map(r => r.sheet))].length}
-          </div>
-          <div className="text-[12px] text-muted-foreground mt-1.5 font-medium">sheets processed</div>
-        </div>
+        )}
       </div>
 
-      {/* Section B — Top spenders strip */}
-      {topSpenders.length > 0 && (
-        <div className="bg-card border border-border rounded-xl py-3.5 px-6 flex items-center gap-2 flex-wrap">
-          <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.06em] mr-2">Top spenders</span>
-          {topSpenders.slice(0, 3).map((s, i) => (
-            <span key={i} className="text-[13px] text-muted-foreground">
-              {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
-              {' '}{s.term}{' '}
-              <span className="font-mono-nums text-destructive font-medium">${s.spend.toFixed(2)}</span>
-              {i < Math.min(topSpenders.length, 3) - 1 && <span className="mx-2 text-border">·</span>}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* Section C — Inline decision table */}
+      {/* Decision table */}
       {sheetNames.length > 0 && (
-        <div className="bg-card border border-border rounded-xl overflow-hidden">
-          {/* Tab bar */}
-          <div className="flex items-center border-b border-border overflow-x-auto">
-            <span className="text-[14px] font-semibold text-foreground px-5 py-3 flex-shrink-0">Bleeders</span>
-            <div className="flex items-center gap-0.5 px-2">
+        <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
+          {/* Tab segmented control */}
+          <div className="border-b border-border px-3 pt-3">
+            <div className="flex items-end gap-0.5 overflow-x-auto -mb-px">
               {sheetNames.map((name) => {
                 const count = rowsBySheet[name]?.length || 0;
                 const isActive = name === currentSheet;
@@ -260,18 +284,23 @@ export const AnalysisResults = ({
                   <button
                     key={name}
                     onClick={() => setActiveSheet(name)}
-                    className={`text-[12px] px-3 py-2 rounded-md whitespace-nowrap flex items-center gap-1.5 transition-colors ${
+                    className={`group relative flex items-center gap-1.5 px-3 pb-2.5 pt-1 text-[12.5px] whitespace-nowrap btn-press transition-colors ${
                       isActive
-                        ? 'bg-primary/10 text-primary font-medium'
-                        : 'text-muted-foreground hover:bg-secondary'
+                        ? 'text-foreground font-semibold'
+                        : 'text-[hsl(var(--text-secondary))] font-medium hover:text-foreground'
                     }`}
                   >
                     {name}
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono-nums ${
-                      isActive ? 'bg-primary/15 text-primary' : 'bg-secondary text-muted-foreground'
-                    }`}>
+                    <span
+                      className={`text-[10.5px] font-mono-nums px-1.5 py-px rounded ${
+                        isActive ? 'bg-primary/10 text-primary' : 'bg-secondary text-[hsl(var(--text-tertiary))]'
+                      }`}
+                    >
                       {count}
                     </span>
+                    {isActive && (
+                      <span className="absolute left-2 right-2 -bottom-px h-[2px] rounded-full bg-primary" />
+                    )}
                   </button>
                 );
               })}
@@ -282,53 +311,72 @@ export const AnalysisResults = ({
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground px-4 py-2.5">Campaign</TableHead>
-                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground px-4 py-2.5">Ad Group</TableHead>
-                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground px-4 py-2.5">Entity</TableHead>
-                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground px-4 py-2.5">Match</TableHead>
-                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground px-4 py-2.5 text-right">Clicks</TableHead>
-                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground px-4 py-2.5 text-right">Spend</TableHead>
-                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground px-4 py-2.5 text-right">Sales</TableHead>
-                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground px-4 py-2.5 text-right">ACoS</TableHead>
-                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground px-4 py-2.5 w-[140px]">Decision</TableHead>
+                <TableRow className="hover:bg-transparent border-b border-border">
+                  <TableHead className="sticky left-0 bg-card z-10">Campaign</TableHead>
+                  <TableHead>Ad Group</TableHead>
+                  <TableHead>Entity</TableHead>
+                  <TableHead>Match</TableHead>
+                  <TableHead className="text-right">Clicks</TableHead>
+                  <TableHead className="text-right">Spend</TableHead>
+                  <TableHead className="text-right">Sales</TableHead>
+                  <TableHead className="text-right">ACoS</TableHead>
+                  <TableHead className="w-[150px]">Decision</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {currentRows.map((row, rowIdx) => {
                   const key = `${currentSheet}-ROWINDEX-${rowIdx}`;
                   const entityDisplay = row.customer_search_term || row.keyword_text || row.product_targeting || row.entity || '—';
+                  const decision = decisions[key];
+                  const indicatorClass = decisionRowClass(decision);
+                  const isHighSpend = row.spend > decisionThresholdSpend;
                   return (
-                    <TableRow key={rowIdx} className="hover:bg-muted/30 transition-colors">
-                      <TableCell className="text-[13px] max-w-[160px] truncate px-4 py-2.5" title={row.campaign}>{row.campaign || '—'}</TableCell>
-                      <TableCell className="text-[13px] max-w-[120px] truncate px-4 py-2.5" title={row.ad_group}>{row.ad_group || '—'}</TableCell>
-                      <TableCell className="text-[13px] max-w-[160px] truncate px-4 py-2.5" title={entityDisplay}>{entityDisplay}</TableCell>
-                      <TableCell className="text-[13px] text-muted-foreground px-4 py-2.5">{row.match_type || '—'}</TableCell>
-                      <TableCell className="text-right text-[13px] font-mono-nums px-4 py-2.5">{row.clicks}</TableCell>
-                      <TableCell className="text-right px-4 py-2.5">
-                        <span className="text-[13px] font-mono-nums text-destructive">${row.spend.toFixed(2)}</span>
+                    <TableRow
+                      key={rowIdx}
+                      className={`row-enter ${rowIdx % 2 === 1 ? 'bg-secondary/30' : ''} ${indicatorClass}`}
+                      style={{ animationDelay: `${Math.min(rowIdx * 12, 240)}ms` }}
+                    >
+                      <TableCell className="sticky left-0 z-10 max-w-[180px] truncate font-medium" title={row.campaign}>
+                        <span className={rowIdx % 2 === 1 ? 'bg-secondary/0' : ''}>{row.campaign || '—'}</span>
                       </TableCell>
-                      <TableCell className="text-right text-[13px] font-mono-nums px-4 py-2.5">${row.sales.toFixed(2)}</TableCell>
-                      <TableCell className="text-right px-4 py-2.5">
+                      <TableCell className="max-w-[140px] truncate text-[hsl(var(--text-secondary))]" title={row.ad_group}>
+                        {row.ad_group || '—'}
+                      </TableCell>
+                      <TableCell className="max-w-[200px] truncate" title={entityDisplay}>
+                        {entityDisplay}
+                      </TableCell>
+                      <TableCell className="text-[hsl(var(--text-tertiary))] text-[12px]">
+                        {row.match_type || '—'}
+                      </TableCell>
+                      <TableCell className="text-right font-mono-nums text-[12.5px]">{row.clicks}</TableCell>
+                      <TableCell className="text-right font-mono-nums text-[12.5px]">
+                        <span className={isHighSpend ? 'text-destructive font-medium' : 'text-foreground'}>
+                          ${row.spend.toFixed(2)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right font-mono-nums text-[12.5px] text-[hsl(var(--text-secondary))]">
+                        ${row.sales.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-right">
                         {row.acos && row.acos !== '0' && row.acos !== '0%' ? (
-                          <span className="inline-block text-[11px] font-mono-nums px-1.5 py-0.5 rounded-full bg-destructive/10 text-destructive border border-destructive/20 font-medium">
+                          <span className="inline-block text-[11px] font-mono-nums px-1.5 py-px rounded-md bg-destructive/10 text-destructive font-medium">
                             {row.acos}
                           </span>
                         ) : (
-                          <span className="text-[13px] text-muted-foreground">—</span>
+                          <span className="text-[13px] text-[hsl(var(--border-strong))]">—</span>
                         )}
                       </TableCell>
-                      <TableCell className="px-4 py-2.5">
+                      <TableCell>
                         <Select
-                          value={decisions[key] || ''}
+                          value={decision || ''}
                           onValueChange={(val) => setDecisions(prev => ({ ...prev, [key]: val }))}
                         >
-                          <SelectTrigger className="h-7 text-[12px] w-[130px] rounded-md border-border">
-                            <SelectValue placeholder="— select —" />
+                          <SelectTrigger className="h-7 w-[140px] text-[12px] rounded-md">
+                            <SelectValue placeholder="Action" />
                           </SelectTrigger>
                           <SelectContent>
                             {decisionOptions.map(opt => (
-                              <SelectItem key={opt} value={opt} className="text-[12px]">{opt}</SelectItem>
+                              <SelectItem key={opt} value={opt} className="text-[12.5px]">{opt}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -342,52 +390,88 @@ export const AnalysisResults = ({
         </div>
       )}
 
-      {/* Section D — Actions bar */}
-      <div className="bg-card border border-border rounded-xl p-5">
-        {allRows.length > 0 && (
-          <>
-            <button
-              onClick={handleGenerateDecisionFile}
-              disabled={decisionsMade === 0 || isGenerating}
-              className="w-full h-11 rounded-lg bg-primary text-primary-foreground text-[14px] font-semibold flex items-center justify-center gap-2 transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isGenerating ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : generateDone ? (
-                <><CheckCircle2 className="w-4 h-4" /> Decision File Downloaded</>
-              ) : (
-                <><Download className="w-4 h-4" /> Generate Decision File</>
+      {/* Action bar */}
+      {allRows.length > 0 && (
+        <div className="rounded-xl border border-border bg-card shadow-card p-5">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            {/* Progress indicator */}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-[14px] font-semibold text-foreground font-mono-nums">
+                  {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{allRows.length}</span>
+                </span>
+                <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions made</span>
+              </div>
+              <div className="mt-2 h-1 w-full max-w-[280px] rounded-full bg-secondary overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-300"
+                  style={{ width: `${(decisionsMade / Math.max(allRows.length, 1)) * 100}%` }}
+                />
+              </div>
+              <p className="text-[11px] text-[hsl(var(--text-tertiary))] mt-1.5">
+                Pause on search terms auto-converts to Negate (Exact)
+              </p>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex items-center gap-2 flex-shrink-0 relative">
+              <button
+                onClick={() => setMoreOpen(o => !o)}
+                className="h-9 w-9 rounded-md border border-border bg-card text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press flex items-center justify-center"
+                aria-label="More actions"
+              >
+                <MoreHorizontal className="w-4 h-4" />
+              </button>
+              {moreOpen && (
+                <div className="absolute right-0 top-11 min-w-[240px] rounded-lg border border-border bg-popover shadow-pop p-1 z-20 animate-scale-in">
+                  <button
+                    onClick={() => { handleDownload(); setMoreOpen(false); }}
+                    className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
+                  >
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))]" />
+                    {formattedWorkbook ? 'Download formatted Excel' : 'Download combined CSV'}
+                    <span className="ml-auto text-[10px] text-[hsl(var(--text-tertiary))]">legacy</span>
+                  </button>
+                  {onProceedToProcessor && (
+                    <button
+                      onClick={() => { onProceedToProcessor(); setMoreOpen(false); }}
+                      className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
+                    >
+                      Proceed to Decision Processor →
+                    </button>
+                  )}
+                </div>
               )}
-            </button>
-
-            <p className="text-[12px] text-muted-foreground text-center mt-2 font-mono-nums">
-              {decisionsMade} decisions made across {allRows.length} rows
-            </p>
-
-            <div className="border-t border-border my-4" />
-          </>
-        )}
-
-        <button
-          onClick={handleDownload}
-          className="w-full h-10 rounded-lg bg-transparent text-muted-foreground border border-border text-[13px] font-medium transition-colors hover:bg-secondary"
-        >
-          {formattedWorkbook ? 'Download Formatted Excel (legacy workflow)' : 'Download Combined CSV'}
-        </button>
-
-        <p className="text-[11px] text-muted-foreground font-mono-nums mt-1.5">
-          Pause on search terms auto-converts to Negate (Exact)
-        </p>
-
-        {onProceedToProcessor && (
-          <button
-            onClick={onProceedToProcessor}
-            className="w-full text-[13px] text-primary font-medium hover:underline py-2 mt-2 transition-colors"
-          >
-            Proceed to Decision Processor →
-          </button>
-        )}
-      </div>
+              <button
+                onClick={handleGenerateDecisionFile}
+                disabled={decisionsMade === 0 || isGenerating}
+                className="h-9 px-5 rounded-md bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 btn-press hover:bg-primary/92 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs"
+                style={{ minWidth: 200 }}
+              >
+                {isGenerating ? (
+                  <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Generating…</>
+                ) : generateDone ? (
+                  <><CheckCircle2 className="w-3.5 h-3.5" /> File downloaded</>
+                ) : (
+                  <><Download className="w-3.5 h-3.5" /> Generate decision file</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+const StatCell: React.FC<{ icon: React.ReactNode; value: string; label: string }> = ({ icon, value, label }) => (
+  <div className="px-5 py-4">
+    <div className="flex items-center gap-1.5 text-[hsl(var(--text-tertiary))] mb-1.5">
+      {icon}
+      <span className="text-[10px] font-semibold uppercase tracking-[0.08em]">{label}</span>
+    </div>
+    <div className="text-[28px] font-semibold leading-none text-foreground font-mono-nums tracking-tight">
+      {value}
+    </div>
+  </div>
+);
