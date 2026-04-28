@@ -81,7 +81,25 @@ function decisionRowClass(d: string | undefined): string {
   if (d === 'Pause') return 'row-decision-pause';
   if (d.startsWith('Cut')) return 'row-decision-cut';
   if (d.startsWith('Negate')) return 'row-decision-negate';
-  return '';
+    return '';
+}
+
+function decisionDotColor(d: string | undefined): string {
+  if (!d) return 'transparent';
+  if (d === 'Keep') return 'hsl(var(--success))';
+  if (d === 'Pause') return 'hsl(var(--destructive))';
+  if (d.startsWith('Cut')) return 'hsl(var(--amber))';
+  if (d.startsWith('Negate')) return 'hsl(var(--destructive))';
+  return 'transparent';
+}
+
+function shortTabLabel(name: string): string {
+  return name
+    .replace(/Sponsored Products/i, 'SP')
+    .replace(/Sponsored Brands/i, 'SB')
+    .replace(/Sponsored Display/i, 'SD')
+    .replace(/Search Term Report/i, 'Search Terms')
+    .replace(/Campaigns$/i, 'Campaigns');
 }
 
 const RANK_COLORS = ['hsl(45 90% 50%)', 'hsl(220 8% 60%)', 'hsl(28 60% 45%)']; // gold/silver/bronze
