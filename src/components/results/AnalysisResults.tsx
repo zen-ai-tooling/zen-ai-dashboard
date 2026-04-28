@@ -1,7 +1,8 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, Loader2, CheckCircle2, MoreHorizontal, AlertTriangle, FileSpreadsheet, Layers } from "lucide-react";
+import { Download, Loader2, CheckCircle2, MoreHorizontal, AlertTriangle, FileSpreadsheet, Layers, ChevronDown, Percent, DollarSign } from "lucide-react";
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
+import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
 
 interface TopSpender {
   term: string;
