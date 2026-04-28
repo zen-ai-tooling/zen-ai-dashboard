@@ -1,8 +1,10 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, Loader2, CheckCircle2, MoreHorizontal, AlertTriangle, FileSpreadsheet, Layers, ChevronDown, Percent, DollarSign } from "lucide-react";
-import { useState, useMemo } from "react";
+import { Download, Loader2, CheckCircle2, MoreHorizontal, AlertTriangle, FileSpreadsheet, Layers, ChevronDown, Percent, DollarSign, Info, XCircle, Upload } from "lucide-react";
+import { useState, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
+import { WorkflowSteps } from "@/components/shared/WorkflowSteps";
+import { CompletionBanner } from "@/components/shared/CompletionBanner";
 
 interface TopSpender {
   term: string;
