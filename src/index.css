@@ -9,9 +9,9 @@
 
 @layer base {
   :root {
-    /* Surfaces — Apple warm grays */
-    --background: 240 6% 96%;        /* #F5F5F7 main (sits behind cards) */
-    --background-deep: 240 5% 94%;   /* #EFEFF1 lower gradient stop */
+    /* Surfaces — Apple warm grays (iOS system grouped) */
+    --background: 240 11% 96%;       /* #F2F2F7 — warmer iOS grouped bg */
+    --background-deep: 240 10% 94%;  /* gradient stop */
     --foreground: 240 6% 10%;        /* #1D1D1F */
 
     --card: 0 0% 100%;               /* #FFFFFF */
@@ -204,11 +204,44 @@
 
   .shadow-card {
     box-shadow:
-      0 1px 4px rgba(0, 0, 0, 0.06),
+      0 1px 3px rgba(0, 0, 0, 0.08),
       0 0 0 1px rgba(0, 0, 0, 0.02);
   }
   .shadow-pop { box-shadow: var(--shadow-pop); }
-  .shadow-sidebar { box-shadow: 1px 0 4px rgba(0, 0, 0, 0.04); }
+  .shadow-sidebar { box-shadow: 1px 0 6px rgba(0, 0, 0, 0.04); }
+
+  /* Primary action button — standardized across modules */
+  .btn-primary-action {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    height: 44px;
+    min-width: 200px;
+    max-width: 280px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 18px;
+  }
+  .btn-primary-action:hover:not(:disabled) { background: hsl(211 100% 42%); }
+  .btn-primary-action:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary-action.is-done {
+    background: hsl(var(--success));
+    color: #fff;
+  }
+  .btn-primary-action.is-done:hover { background: hsl(142 71% 44%); }
+
+  /* Card hover elevation */
+  .card-hover-lift {
+    transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  }
+  .card-hover-lift:hover {
+    border-color: #C7C7CC;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+  }
 
   /* Decision pill dot */
   .decision-dot { width: 6px; height: 6px; border-radius: 999px; display: inline-block; }
