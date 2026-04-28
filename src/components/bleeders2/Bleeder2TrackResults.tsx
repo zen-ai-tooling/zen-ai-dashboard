@@ -9,6 +9,8 @@ import { DecisionFileDropzone } from "./DecisionFileDropzone";
 import { suggestDecision, getConfidenceStyle } from '@/lib/ui/suggestionEngine';
 import type { Suggestion } from '@/lib/ui/suggestionEngine';
 import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
+import { WorkflowSteps } from "@/components/shared/WorkflowSteps";
+import { CompletionBanner } from "@/components/shared/CompletionBanner";
 
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
@@ -72,6 +74,13 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
     if (!hasBleeders) return 0;
     return result.bleeders.reduce((s, b) => s + b.acos, 0) / result.bleeders.length;
   }, [result.bleeders, hasBleeders]);
+
+  const topAcos = useMemo(() => {
+    return [...result.bleeders].sort((a, b) => b.acos - a.acos).slice(0, 3);
+  }, [result.bleeders]);
+
+  const showAdGroup = result.trackType === 'SBSD' || result.trackType === 'SP_KEYWORDS';
+  const RANK_COLORS = ['hsl(45 90% 50%)', 'hsl(220 8% 60%)', 'hsl(28 60% 45%)'];
 
   const handleSetAllPause = () => {
     const all: Record<number, string> = {};
@@ -216,8 +225,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         </div>
       </div>
 
-      {/* Horizontal stepper */}
-      <HorizontalStepper
+      {/* Workflow stepper (shared) */}
+      <WorkflowSteps
         steps={[
           { label: 'File analyzed', status: 'complete' },
           { label: 'Make decisions', status: (generateDone || amazonFile) ? 'complete' : 'active' },
@@ -225,25 +234,51 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         ]}
       />
 
-      {/* Amazon file ready banner */}
+      {/* Workflow complete banner */}
       {amazonFile && (
-        <div className="rounded-lg border border-success/30 bg-success/5 p-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-success" />
-            <div>
-              <div className="text-[13px] font-medium text-foreground font-display">Amazon Bulk File Ready</div>
-              <div className="text-[11px] text-muted-foreground">{amazonFile.fileName}</div>
+        <CompletionBanner
+          fileName={amazonFile.fileName}
+          onDownload={onDownloadAmazon}
+        />
+      )}
+
+      {/* Insights — Highest ACoS */}
+      {topAcos.length > 0 && (
+        <details className="group rounded-xl border border-border bg-card shadow-card overflow-hidden">
+          <summary className="flex items-center justify-between px-5 py-3 cursor-pointer list-none select-none hover:bg-secondary/40 transition-colors">
+            <div className="flex items-center gap-2">
+              <ChevronDown className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))] transition-transform duration-200 group-open:rotate-180" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-secondary))]">
+                Insights · Highest ACoS
+              </span>
             </div>
+            <span className="text-[11px] text-[hsl(var(--text-tertiary))]">
+              Top {topAcos.length} ranked by ACoS
+            </span>
+          </summary>
+          <div className="px-5 py-3 border-t border-border bg-secondary/30 flex items-center gap-5 flex-wrap">
+            {topAcos.map((b, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span
+                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-semibold text-white"
+                  style={{ backgroundColor: RANK_COLORS[i] ?? 'hsl(var(--text-tertiary))' }}
+                >
+                  {i + 1}
+                </span>
+                <span className="text-[12.5px] text-foreground max-w-[200px] truncate" title={b.entity}>
+                  {b.entity || b.campaignName}
+                </span>
+                <span className="text-[12px] font-mono-nums text-destructive font-medium">
+                  {b.acos.toFixed(1)}%
+                </span>
+              </div>
+            ))}
           </div>
-          <Button size="sm" onClick={onDownloadAmazon} className="text-[12px] btn-press">
-            <Download className="w-3.5 h-3.5 mr-1.5" />
-            Download
-          </Button>
-        </div>
+        </details>
       )}
 
       {/* Decision table */}
-      <div className="rounded-lg border border-border bg-card card-hover">
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
         {/* Card header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div>
@@ -285,22 +320,22 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Campaign</TableHead>
-                {result.trackType === 'SBSD' && (
-                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Ad Group</TableHead>
+              <TableRow className="hover:bg-transparent border-b border-border">
+                <TableHead style={{ letterSpacing: '0.08em' }}>Campaign</TableHead>
+                {showAdGroup && (
+                  <TableHead style={{ letterSpacing: '0.08em' }}>Ad Group</TableHead>
                 )}
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">
+                <TableHead style={{ letterSpacing: '0.08em' }}>
                   {result.trackType === 'SP' ? 'Search Term' : 'Entity'}
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Match</TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground text-right">Spend</TableHead>
+                <TableHead style={{ letterSpacing: '0.08em' }}>Match</TableHead>
+                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Spend</TableHead>
                 {result.trackType !== 'ACOS100' && (
-                  <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground text-right">Orders</TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Orders</TableHead>
                 )}
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground text-right">ACoS</TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">Suggestion</TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground w-[200px]">Decision</TableHead>
+                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>ACoS</TableHead>
+                <TableHead style={{ letterSpacing: '0.08em' }}>Suggestion</TableHead>
+                <TableHead className="w-[200px]" style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -310,12 +345,12 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 const decision = decisions[idx];
                 const indicatorClass = decisionRowClass(decision);
                 return (
-                  <TableRow key={idx} className={`hover:bg-secondary/50 transition-colors ${indicatorClass}`}>
+                  <TableRow key={idx} className={`hover:bg-[#F9F9FB] transition-colors ${indicatorClass}`}>
                     <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.campaignName}>
                       {bleeder.campaignName}
                     </TableCell>
-                    {result.trackType === 'SBSD' && (
-                      <TableCell className="text-[13px] max-w-[120px] truncate" title={bleeder.adGroupName}>
+                    {showAdGroup && (
+                      <TableCell className="text-[13px] max-w-[120px] truncate text-[hsl(var(--text-secondary))]" title={bleeder.adGroupName}>
                         {bleeder.adGroupName || '—'}
                       </TableCell>
                     )}
@@ -470,44 +505,3 @@ function StatCellV2({ icon, value, label, danger }: { icon: React.ReactNode; val
   );
 }
 
-interface StepperStep { label: string; status: 'complete' | 'active' | 'pending'; }
-
-function HorizontalStepper({ steps }: { steps: StepperStep[] }) {
-  return (
-    <div className="rounded-xl border border-border bg-card shadow-card px-6 py-4">
-      <div className="flex items-center">
-        {steps.map((step, i) => {
-          const isLast = i === steps.length - 1;
-          const dotEl = step.status === 'complete' ? (
-            <div className="w-5 h-5 rounded-full bg-success flex items-center justify-center flex-shrink-0">
-              <CheckCircle2 className="w-3 h-3 text-white" />
-            </div>
-          ) : step.status === 'active' ? (
-            <div className="w-5 h-5 rounded-full bg-primary flex-shrink-0 step-pulse" />
-          ) : (
-            <div className="w-5 h-5 rounded-full border-2 border-border bg-card flex-shrink-0" />
-          );
-          return (
-            <React.Fragment key={i}>
-              <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
-                {dotEl}
-                <span className={`text-[11px] font-medium whitespace-nowrap ${
-                  step.status === 'complete' ? 'text-success'
-                    : step.status === 'active' ? 'text-primary'
-                    : 'text-[hsl(var(--text-tertiary))]'
-                }`}>
-                  {step.label}
-                </span>
-              </div>
-              {!isLast && (
-                <div className={`flex-1 h-px mx-3 mb-5 ${
-                  step.status === 'complete' ? 'bg-success' : 'bg-border'
-                }`} />
-              )}
-            </React.Fragment>
-          );
-        })}
-      </div>
-    </div>
-  );
-}

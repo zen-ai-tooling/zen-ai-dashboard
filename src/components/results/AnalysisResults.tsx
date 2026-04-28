@@ -1,8 +1,10 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, Loader2, CheckCircle2, MoreHorizontal, AlertTriangle, FileSpreadsheet, Layers, ChevronDown, Percent, DollarSign } from "lucide-react";
-import { useState, useMemo } from "react";
+import { Download, Loader2, CheckCircle2, MoreHorizontal, AlertTriangle, FileSpreadsheet, Layers, ChevronDown, Percent, DollarSign, Info, XCircle, Upload } from "lucide-react";
+import { useState, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
+import { WorkflowSteps } from "@/components/shared/WorkflowSteps";
+import { CompletionBanner } from "@/components/shared/CompletionBanner";
 
 interface TopSpender {
   term: string;
@@ -95,6 +97,8 @@ export const AnalysisResults = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateDone, setGenerateDone] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [generatedFileName, setGeneratedFileName] = useState<string>('');
+  const lastDownloadRef = useRef<(() => void) | null>(null);
 
   const rowsBySheet = useMemo(() => {
     const grouped: Record<string, NormalizedRow[]> = {};
@@ -193,24 +197,47 @@ export const AnalysisResults = ({
       const link = document.createElement('a');
       link.href = url;
       const date = new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles', month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-');
-      link.download = `Bleeders_1_Decisions_${date}_PT.xlsx`;
+      const fileName = `Bleeders_1_Decisions_${date}_PT.xlsx`;
+      link.download = fileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      setGeneratedFileName(fileName);
       setGenerateDone(true);
+      // Persistent re-download handler for the completion banner
+      lastDownloadRef.current = () => {
+        const blob2 = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const u2 = URL.createObjectURL(blob2);
+        const a2 = document.createElement('a');
+        a2.href = u2;
+        a2.download = fileName;
+        document.body.appendChild(a2);
+        a2.click();
+        document.body.removeChild(a2);
+        URL.revokeObjectURL(u2);
+      };
       toast.success('Decision file downloaded', {
         description: `${decisionsMade} decisions exported`,
         duration: 3000,
       });
-      // Auto-revert button label after the toast lifetime
-      setTimeout(() => setGenerateDone(false), 3000);
     } catch (err) {
       console.error('[Generate Decision File] Failed:', err);
       toast.error('Failed to generate decision file');
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleStartNew = () => {
+    setDecisions({});
+    setGenerateDone(false);
+    setGeneratedFileName('');
+    lastDownloadRef.current = null;
+  };
+
+  const handleManualDecisionUpload = (file: File) => {
+    toast.success(`Decision file received: ${file.name}`);
   };
 
   const sheetsCount = [...new Set(allRows.map(r => r.sheet))].length;
@@ -251,6 +278,24 @@ export const AnalysisResults = ({
           />
         </div>
       </div>
+
+      {/* Workflow stepper */}
+      <WorkflowSteps
+        steps={[
+          { label: 'File analyzed', status: 'complete' },
+          { label: 'Make decisions', status: generateDone ? 'complete' : 'active' },
+          { label: 'Generate decision file', status: generateDone ? 'complete' : 'pending' },
+        ]}
+      />
+
+      {/* Completion banner */}
+      {generateDone && generatedFileName && (
+        <CompletionBanner
+          fileName={generatedFileName}
+          onDownload={() => lastDownloadRef.current?.()}
+          onStartNew={handleStartNew}
+        />
+      )}
 
       {/* Insights — collapsible top spenders */}
       {topSpenders.length > 0 && (
@@ -323,6 +368,44 @@ export const AnalysisResults = ({
             </div>
           </div>
 
+          {/* Bulk action bar */}
+          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-secondary/30">
+            <span className="text-[11px] text-[hsl(var(--text-tertiary))] mr-1 font-semibold uppercase tracking-[0.06em]">Bulk:</span>
+            <button
+              onClick={() => {
+                const next = { ...decisions };
+                currentRows.forEach((_, idx) => { next[`${currentSheet}-ROWINDEX-${idx}`] = decisionOptions.find(o => o === 'Pause') || decisionOptions[0]; });
+                setDecisions(next);
+              }}
+              className="text-[11px] h-6 px-2.5 rounded-md border border-border bg-card hover:bg-secondary btn-press inline-flex items-center gap-1.5"
+            >
+              <span className="decision-dot" style={{ background: 'hsl(var(--destructive))' }} />
+              Select all → Pause
+            </button>
+            <button
+              onClick={() => {
+                const next = { ...decisions };
+                currentRows.forEach((_, idx) => { next[`${currentSheet}-ROWINDEX-${idx}`] = 'Keep'; });
+                setDecisions(next);
+              }}
+              className="text-[11px] h-6 px-2.5 rounded-md border border-border bg-card hover:bg-secondary btn-press inline-flex items-center gap-1.5"
+            >
+              <span className="decision-dot" style={{ background: 'hsl(var(--success))' }} />
+              Select all → Keep
+            </button>
+            <button
+              onClick={() => {
+                const next = { ...decisions };
+                currentRows.forEach((_, idx) => { delete next[`${currentSheet}-ROWINDEX-${idx}`]; });
+                setDecisions(next);
+              }}
+              className="text-[11px] h-6 px-2.5 rounded-md text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press inline-flex items-center gap-1"
+            >
+              <XCircle className="w-3 h-3" />
+              Clear all
+            </button>
+          </div>
+
           {/* Table — fixed layout, no horizontal scroll on standard widths */}
           <div className="w-full">
             <Table className="table-fixed w-full">
@@ -360,7 +443,7 @@ export const AnalysisResults = ({
                   return (
                     <TableRow
                       key={rowIdx}
-                      className={`row-enter cursor-pointer ${rowIdx % 2 === 1 ? 'bg-secondary/30' : ''} ${indicatorClass}`}
+                      className={`row-enter cursor-pointer hover:bg-[#F9F9FB] transition-colors ${rowIdx % 2 === 1 ? 'bg-secondary/30' : ''} ${indicatorClass}`}
                       style={{ animationDelay: `${Math.min(rowIdx * 12, 240)}ms` }}
                     >
                       <TableCell className="truncate font-medium" title={row.campaign}>
@@ -428,7 +511,8 @@ export const AnalysisResults = ({
                   style={{ width: `${(decisionsMade / Math.max(allRows.length, 1)) * 100}%` }}
                 />
               </div>
-              <p className="text-[11px] text-[hsl(var(--text-tertiary))] mt-1.5">
+              <p className="text-[12px] text-[hsl(var(--muted-foreground))] mt-2 inline-flex items-center gap-1.5">
+                <Info className="w-3 h-3" />
                 Pause on search terms auto-converts to Negate (Exact)
               </p>
             </div>
@@ -465,19 +549,52 @@ export const AnalysisResults = ({
               <button
                 onClick={handleGenerateDecisionFile}
                 disabled={decisionsMade === 0 || isGenerating}
-                className="h-9 px-5 rounded-md bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 btn-press hover:bg-primary/92 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs"
+                className={`h-9 px-5 rounded-md text-[13px] font-semibold flex items-center gap-2 btn-press disabled:opacity-50 disabled:cursor-not-allowed shadow-xs ${
+                  generateDone
+                    ? 'bg-success text-white hover:bg-success/90'
+                    : 'bg-primary text-primary-foreground hover:bg-primary/92'
+                }`}
                 style={{ minWidth: 200 }}
               >
                 {isGenerating ? (
                   <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Generating…</>
                 ) : generateDone ? (
-                  <><CheckCircle2 className="w-3.5 h-3.5" /> File downloaded</>
+                  <><CheckCircle2 className="w-3.5 h-3.5" /> Downloaded ✓</>
                 ) : (
                   <><Download className="w-3.5 h-3.5" /> Generate decision file</>
                 )}
               </button>
             </div>
           </div>
+
+          {/* Manual decision upload — collapsed for parity with Bleeders 2.0 */}
+          <details className="group mt-4 pt-4 border-t border-border">
+            <summary className="list-none select-none cursor-pointer inline-flex items-center gap-1.5 text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground transition-colors">
+              <ChevronDown className="w-3 h-3 transition-transform duration-200 group-open:rotate-180" />
+              Or upload a decision file manually
+            </summary>
+            <div className="mt-3 max-w-[480px]">
+              <label
+                htmlFor="manual-decision-upload-b1"
+                className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-4 py-3 cursor-pointer hover:border-primary/60 btn-press"
+              >
+                <Upload className="w-4 h-4 text-[hsl(var(--text-tertiary))]" />
+                <span className="text-[12.5px] text-[hsl(var(--text-secondary))]">
+                  Drop or click to upload a pre-made decision file (.xlsx)
+                </span>
+                <input
+                  id="manual-decision-upload-b1"
+                  type="file"
+                  accept=".xlsx,.xls,.csv"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleManualDecisionUpload(f);
+                  }}
+                />
+              </label>
+            </div>
+          </details>
         </div>
       )}
     </div>
