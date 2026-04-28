@@ -1,13 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Download, CheckCircle2, Loader2, XCircle } from "lucide-react";
+import { Download, CheckCircle2, Loader2, XCircle, ChevronDown, AlertTriangle, DollarSign, Percent } from "lucide-react";
+import { toast } from "sonner";
 import type { Bleeder2TrackResult, Bleeder2TrackType } from "@/lib/bleeder2TrackAnalyzer";
 import { DecisionFileDropzone } from "./DecisionFileDropzone";
 import { suggestDecision, getConfidenceStyle } from '@/lib/ui/suggestionEngine';
 import type { Suggestion } from '@/lib/ui/suggestionEngine';
+import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
 
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
