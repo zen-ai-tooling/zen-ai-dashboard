@@ -85,7 +85,7 @@ export const TrackSelector: React.FC<TrackSelectorProps> = ({
               key={track.id}
               htmlFor={`track-${track.id}`}
               className={`relative rounded-xl border bg-card p-4 cursor-pointer btn-press card-hover transition-all ${
-                selected ? 'border-border-strong' : 'border-border opacity-90'
+                selected ? 'border-border' : 'border-border opacity-80'
               }`}
               style={{ minHeight: 100 }}
             >
