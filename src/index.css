@@ -48,16 +48,16 @@
     --text-secondary: 240 3% 44%;    /* #6E6E73 */
     --text-tertiary: 240 3% 56%;     /* #86868B */
 
-    /* Sidebar — pure white, lifted with right border + shadow */
-    --sidebar-background: 0 0% 100%;    /* #FFFFFF */
-    --sidebar-foreground: 240 6% 10%;
-    --sidebar-primary: 211 100% 45%;
+    /* Sidebar — dark Linear/Raycast treatment */
+    --sidebar-background: 240 6% 12%;       /* #1D1D1F */
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 211 100% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 100%;
-    --sidebar-accent-foreground: 240 6% 10%;
-    --sidebar-border: 240 6% 88%;
-    --sidebar-ring: 211 100% 45%;
-    --sidebar-active-bg: 211 100% 96%;
+    --sidebar-accent: 240 6% 16%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 240 6% 18%;
+    --sidebar-ring: 211 100% 55%;
+    --sidebar-active-bg: 0 0% 100% / 0.08;
 
     --spend: 4 100% 59%;
 
@@ -204,9 +204,25 @@
 
   .shadow-card {
     box-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.08),
-      0 0 0 1px rgba(0, 0, 0, 0.02);
+      0 1px 4px rgba(0, 0, 0, 0.08),
+      0 0 1px rgba(0, 0, 0, 0.06);
   }
+  .shadow-card-lift {
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.06),
+      0 0 1px rgba(0, 0, 0, 0.06);
+  }
+  .shadow-card-lift:hover {
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.10),
+      0 0 1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+  }
+
+  /* Module-tinted stat cards */
+  .stat-accent-red    { border-top: 2px solid hsl(var(--destructive)); background: rgba(255, 59, 48, 0.02); }
+  .stat-accent-amber  { border-top: 2px solid hsl(var(--amber));       background: rgba(255, 149, 0, 0.025); }
+  .stat-accent-purple { border-top: 2px solid hsl(265 70% 60%);        background: rgba(168, 85, 247, 0.025); }
   .shadow-pop { box-shadow: var(--shadow-pop); }
   .shadow-sidebar { box-shadow: 1px 0 6px rgba(0, 0, 0, 0.04); }
 
