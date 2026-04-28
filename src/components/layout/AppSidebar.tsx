@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Clock } from 'lucide-react';
+import { ArrowLeft, Clock, Plus, Check } from 'lucide-react';
 import { useClient } from '@/context/ClientContext';
 import type { Bleeder2Track } from '@/components/bleeders2/TrackSelector';
 
@@ -26,11 +26,17 @@ const TRACKS: { id: Bleeder2Track; label: string }[] = [
   { id: 'ACOS100', label: '>100% ACoS' },
 ];
 
-const MODULES = [
-  { id: 'bleeders_1' as const, label: 'Bleeders 1.0', dot: '#EF4444' },
-  { id: 'bleeders_2' as const, label: 'Bleeders 2.0', dot: '#F59E0B' },
-  { id: 'lifetime_bleeders' as const, label: 'Lifetime Audit', dot: '#8B5CF6' },
+const MODULES: { id: Exclude<ActiveModule, null>; label: string; dot: string }[] = [
+  { id: 'bleeders_1', label: 'Bleeders 1.0', dot: 'hsl(var(--destructive))' },
+  { id: 'bleeders_2', label: 'Bleeders 2.0', dot: 'hsl(var(--amber))' },
+  { id: 'lifetime_bleeders', label: 'Lifetime Audit', dot: 'hsl(265 70% 60%)' },
 ];
+
+const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="px-4 pt-4 pb-1.5 text-[10px] font-semibold tracking-[0.08em] uppercase text-[hsl(var(--text-tertiary))]">
+    {children}
+  </div>
+);
 
 export const AppSidebar: React.FC<AppSidebarProps> = ({
   activeModule,
@@ -51,36 +57,49 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   const [newClientName, setNewClientName] = useState('');
   const [newClientAcos, setNewClientAcos] = useState(35);
 
+  const onHome = !activeModule && !showHistoryView;
+
   return (
-    <aside className="w-[220px] flex-shrink-0 h-screen sticky top-0 flex flex-col border-r border-border bg-[hsl(var(--sidebar-background))]">
-      {/* Logo */}
-      <div className="px-4 pt-5 pb-4">
-        <div className="text-[15px] font-semibold text-foreground">Zen AI</div>
-        <div className="text-[11px] text-[hsl(var(--text-tertiary))] mt-0.5">Amazon Ads Workflow</div>
-      </div>
-      <div className="border-b border-border mx-3" />
+    <aside className="w-[224px] flex-shrink-0 h-screen sticky top-0 flex flex-col border-r border-sidebar-border bg-sidebar">
+      {/* Brand */}
+      <button
+        onClick={() => { onSelectModule(null); setShowHistoryView?.(false); }}
+        className="px-4 pt-5 pb-4 text-left btn-press"
+      >
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-md bg-foreground text-background flex items-center justify-center text-[11px] font-semibold">
+            Z
+          </div>
+          <div>
+            <div className={`text-[14px] font-semibold leading-tight ${onHome ? 'text-foreground' : 'text-foreground'}`}>Zen AI</div>
+            <div className="text-[10.5px] text-[hsl(var(--text-tertiary))] mt-px tracking-wide">Amazon Ads Workflow</div>
+          </div>
+        </div>
+      </button>
+      <div className="border-b border-sidebar-border mx-3" />
 
       {/* Modules */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="text-[10px] font-semibold tracking-[0.08em] uppercase text-[hsl(var(--text-tertiary))] px-4 pt-4 pb-1.5">
-          Modules
-        </div>
+      <nav className="flex-1 overflow-y-auto pb-2">
+        <SectionLabel>Modules</SectionLabel>
 
         <div className="px-2">
           {MODULES.map((mod) => {
-            const isActive = activeModule === mod.id;
+            const isActive = activeModule === mod.id && !showHistoryView;
             return (
               <button
                 key={mod.id}
                 onClick={() => onSelectModule(isActive ? null : mod.id)}
-                className={`w-full flex items-center gap-2.5 py-[7px] px-3 rounded-lg text-[13px] font-medium my-[1px] btn-press ${
+                className={`group w-full flex items-center gap-2.5 py-[7px] px-3 rounded-md text-[13px] my-[1px] btn-press ${
                   isActive
-                    ? 'bg-[hsl(var(--accent-blue-light))] text-[hsl(var(--accent-blue))] border-l-[3px] border-l-[hsl(var(--accent-blue))] pl-[9px]'
-                    : 'text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--border))/0.5] border-l-[3px] border-l-transparent pl-[9px]'
+                    ? 'bg-card text-foreground font-semibold shadow-xs'
+                    : 'text-[hsl(var(--text-secondary))] font-medium hover:bg-card/60 hover:text-foreground'
                 }`}
               >
-                <span className="w-[7px] h-[7px] rounded-full flex-shrink-0" style={{ backgroundColor: mod.dot }} />
-                {mod.label}
+                <span
+                  className="w-[7px] h-[7px] rounded-full flex-shrink-0"
+                  style={{ backgroundColor: mod.dot }}
+                />
+                <span className="truncate">{mod.label}</span>
               </button>
             );
           })}
@@ -88,7 +107,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
         {/* Tracks sub-nav */}
         {showTracks && activeModule === 'bleeders_2' && (
-          <div className="px-2 mt-1.5 mb-2">
+          <div className="px-2 mt-2">
             <div className="flex items-center justify-between px-3 mb-1">
               <span className="text-[10px] font-semibold tracking-[0.08em] uppercase text-[hsl(var(--text-tertiary))]">
                 Tracks
@@ -110,27 +129,28 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                 <button
                   key={t.id}
                   onClick={() => onSelectTrack(t.id)}
-                  className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12px] my-[1px] btn-press ${
+                  className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-[12px] my-[1px] btn-press ${
                     isTrackActive
-                      ? 'bg-[hsl(var(--accent-blue-light))] text-foreground font-medium'
-                      : 'text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--border))/0.4]'
+                      ? 'bg-card text-foreground font-medium shadow-xs'
+                      : 'text-[hsl(var(--text-secondary))] hover:bg-card/60 hover:text-foreground'
                   }`}
                 >
                   {isComplete ? (
-                    <span style={{
-                      width: '14px', height: '14px', borderRadius: '50%',
-                      background: '#F0FDF4', border: '1px solid #BBF7D0',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '9px', color: '#16A34A', flexShrink: 0
-                    }}>✓</span>
+                    <span className="w-3.5 h-3.5 rounded-full bg-success/15 text-success flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2.5 h-2.5" />
+                    </span>
                   ) : (
-                    <span style={{
-                      width: '6px', height: '6px', borderRadius: '50%',
-                      background: isTrackActive ? '#2563EB' : status === 'done' ? '#16A34A' : '#E4E6EA',
-                      flexShrink: 0, display: 'inline-block'
-                    }} />
+                    <span
+                      className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                      style={{
+                        backgroundColor:
+                          isTrackActive ? 'hsl(var(--primary))' :
+                          status === 'done' ? 'hsl(var(--success))' :
+                          'hsl(var(--border-strong))',
+                      }}
+                    />
                   )}
-                  {t.label}
+                  <span className="truncate">{t.label}</span>
                 </button>
               );
             })}
@@ -138,130 +158,79 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         )}
 
         {/* History */}
-        <div className="px-2 mt-3">
-          <div className="text-[10px] font-semibold tracking-[0.08em] uppercase text-[hsl(var(--text-tertiary))] px-3 pb-1.5">
-            History
-          </div>
+        <SectionLabel>History</SectionLabel>
+        <div className="px-2">
           <button
             onClick={() => setShowHistoryView?.(true)}
-            className={`w-full flex items-center gap-2.5 py-[7px] px-3 rounded-lg text-[13px] font-medium my-[1px] btn-press ${
+            className={`w-full flex items-center gap-2.5 py-[7px] px-3 rounded-md text-[13px] my-[1px] btn-press ${
               showHistoryView
-                ? 'bg-[hsl(var(--accent-blue-light))] text-[hsl(var(--accent-blue))] border-l-[3px] border-l-[hsl(var(--accent-blue))] pl-[9px]'
-                : 'text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--border))/0.5] border-l-[3px] border-l-transparent pl-[9px]'
+                ? 'bg-card text-foreground font-semibold shadow-xs'
+                : 'text-[hsl(var(--text-secondary))] font-medium hover:bg-card/60 hover:text-foreground'
             }`}
           >
-            <Clock className="w-[14px] h-[14px]" />
+            <Clock className="w-3.5 h-3.5 opacity-70" />
             Session log
           </button>
         </div>
-      </div>
+      </nav>
 
-      {/* Client pill */}
-      <div className="p-3 border-t border-border" style={{ position: 'relative' }}>
-        <div
+      {/* Client switcher */}
+      <div className="p-3 border-t border-sidebar-border relative">
+        <button
           onClick={() => setClientDropdownOpen(prev => !prev)}
-          className="flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] bg-card border border-border cursor-pointer hover:border-[hsl(var(--accent-blue))] transition-all"
-          style={{ transition: 'all 150ms ease' }}
+          className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md bg-card border border-border hover:border-[hsl(var(--border-strong))] btn-press"
         >
-          <div className="w-7 h-7 rounded-full bg-[hsl(var(--accent-blue-light))] flex items-center justify-center text-[11px] font-semibold text-[hsl(var(--accent-blue))]">
+          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[11px] font-semibold text-primary">
             {activeClient.initials}
           </div>
-          <span className="text-[12px] font-medium text-foreground">{activeClient.name}</span>
-        </div>
+          <div className="text-left min-w-0 flex-1">
+            <div className="text-[12px] font-medium text-foreground truncate leading-tight">{activeClient.name}</div>
+            <div className="text-[10px] text-[hsl(var(--text-tertiary))]">Active client</div>
+          </div>
+        </button>
 
         {clientDropdownOpen && (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '100%',
-              left: '12px',
-              right: '12px',
-              background: '#FFFFFF',
-              border: '1px solid #E4E6EA',
-              borderRadius: '10px',
-              overflow: 'hidden',
-              zIndex: 50,
-              boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-            }}
-          >
-            {clients.map(client => (
-              <div
-                key={client.id}
-                onClick={() => {
-                  setActiveClient(client);
-                  setClientDropdownOpen(false);
-                  if (client.id !== activeClient.id && onReset) onReset();
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '10px 12px',
-                  cursor: 'pointer',
-                  background: client.id === activeClient.id ? '#EFF6FF' : 'transparent',
-                  fontSize: '13px',
-                  color: '#0F1115',
-                  transition: 'background 150ms ease',
-                }}
-                onMouseEnter={e => {
-                  if (client.id !== activeClient.id) (e.currentTarget as HTMLDivElement).style.background = '#F5F6F8';
-                }}
-                onMouseLeave={e => {
-                  if (client.id !== activeClient.id) (e.currentTarget as HTMLDivElement).style.background = 'transparent';
-                }}
-              >
-                <div
-                  style={{
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '50%',
-                    background: '#EFF6FF',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '10px',
-                    fontWeight: '600',
-                    color: '#2563EB',
+          <div className="absolute bottom-[calc(100%-4px)] left-3 right-3 bg-popover border border-border rounded-lg overflow-hidden z-50 shadow-pop animate-scale-in">
+            {clients.map(client => {
+              const isActive = client.id === activeClient.id;
+              return (
+                <button
+                  key={client.id}
+                  onClick={() => {
+                    setActiveClient(client);
+                    setClientDropdownOpen(false);
+                    if (client.id !== activeClient.id && onReset) onReset();
                   }}
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left transition-colors ${
+                    isActive ? 'bg-primary/5 text-foreground' : 'text-foreground hover:bg-secondary'
+                  }`}
                 >
-                  {client.initials}
-                </div>
-                <span>{client.name}</span>
-                {client.id === activeClient.id && (
-                  <span style={{ marginLeft: 'auto', color: '#2563EB', fontSize: '14px' }}>✓</span>
-                )}
-              </div>
-            ))}
+                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-semibold text-primary">
+                    {client.initials}
+                  </div>
+                  <span className="truncate flex-1">{client.name}</span>
+                  {isActive && <Check className="w-3.5 h-3.5 text-primary" />}
+                </button>
+              );
+            })}
 
-            <div style={{ borderTop: '1px solid #E4E6EA' }} />
+            <div className="border-t border-border" />
 
             {!showAddForm ? (
-              <div
+              <button
                 onClick={() => setShowAddForm(true)}
-                style={{
-                  padding: '10px 12px',
-                  cursor: 'pointer',
-                  fontSize: '13px',
-                  color: '#2563EB',
-                  fontWeight: '500',
-                }}
+                className="w-full flex items-center gap-1.5 px-3 py-2 text-[13px] text-primary hover:bg-primary/5 font-medium transition-colors"
               >
-                + Add client
-              </div>
+                <Plus className="w-3.5 h-3.5" />
+                Add client
+              </button>
             ) : (
-              <div style={{ padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div className="p-2.5 flex flex-col gap-1.5">
                 <input
                   placeholder="Client name"
                   value={newClientName}
                   onChange={e => setNewClientName(e.target.value)}
-                  style={{
-                    border: '1px solid #E4E6EA',
-                    borderRadius: '6px',
-                    padding: '6px 10px',
-                    fontSize: '13px',
-                    width: '100%',
-                    outline: 'none',
-                  }}
+                  className="h-8 px-2.5 text-[12px] rounded-md border border-border bg-card outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                   autoFocus
                 />
                 <input
@@ -269,16 +238,9 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                   placeholder="ACoS target %"
                   value={newClientAcos}
                   onChange={e => setNewClientAcos(Number(e.target.value))}
-                  style={{
-                    border: '1px solid #E4E6EA',
-                    borderRadius: '6px',
-                    padding: '6px 10px',
-                    fontSize: '13px',
-                    width: '100%',
-                    outline: 'none',
-                  }}
+                  className="h-8 px-2.5 text-[12px] rounded-md border border-border bg-card outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                 />
-                <div style={{ display: 'flex', gap: '6px', marginTop: '2px' }}>
+                <div className="flex gap-1.5 mt-0.5">
                   <button
                     onClick={() => {
                       if (!newClientName.trim()) return;
@@ -294,29 +256,13 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                       setShowAddForm(false);
                       setClientDropdownOpen(false);
                     }}
-                    style={{
-                      background: '#2563EB',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '6px',
-                      padding: '7px 12px',
-                      fontSize: '13px',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                    }}
+                    className="flex-1 h-7 rounded-md bg-primary text-primary-foreground text-[12px] font-medium btn-press hover:opacity-92"
                   >
-                    Add client
+                    Add
                   </button>
                   <button
                     onClick={() => { setShowAddForm(false); setNewClientName(''); }}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#9BA3AF',
-                      fontSize: '12px',
-                      cursor: 'pointer',
-                      padding: '2px',
-                    }}
+                    className="h-7 px-2.5 rounded-md text-[12px] text-[hsl(var(--text-tertiary))] hover:text-foreground btn-press"
                   >
                     Cancel
                   </button>
