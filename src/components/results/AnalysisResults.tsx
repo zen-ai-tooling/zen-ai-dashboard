@@ -379,31 +379,12 @@ export const AnalysisResults = ({
                         )}
                       </TableCell>
                       <TableCell className="px-2">
-                        <Select
-                          value={decision || ''}
-                          onValueChange={(val) => setDecisions(prev => ({ ...prev, [key]: val }))}
-                        >
-                          <SelectTrigger className="h-7 w-full text-[12px] rounded-md px-2">
-                            {decision ? (
-                              <span className="flex items-center gap-1.5 truncate">
-                                <span className="decision-dot flex-shrink-0" style={{ background: decisionDotColor(decision) }} />
-                                <span className="truncate">{decision}</span>
-                              </span>
-                            ) : (
-                              <SelectValue placeholder="Action" />
-                            )}
-                          </SelectTrigger>
-                          <SelectContent>
-                            {decisionOptions.map(opt => (
-                              <SelectItem key={opt} value={opt} className="text-[12.5px]">
-                                <span className="flex items-center gap-2">
-                                  <span className="decision-dot" style={{ background: decisionDotColor(opt) }} />
-                                  {opt}
-                                </span>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <DecisionSelect
+                          value={decision}
+                          onChange={(val) => setDecisions(prev => ({ ...prev, [key]: val }))}
+                          options={decisionOptions}
+                          width="100%"
+                        />
                       </TableCell>
                     </TableRow>
                   );
