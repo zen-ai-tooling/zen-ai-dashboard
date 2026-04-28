@@ -225,8 +225,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         </div>
       </div>
 
-      {/* Horizontal stepper */}
-      <HorizontalStepper
+      {/* Workflow stepper (shared) */}
+      <WorkflowSteps
         steps={[
           { label: 'File analyzed', status: 'complete' },
           { label: 'Make decisions', status: (generateDone || amazonFile) ? 'complete' : 'active' },
@@ -234,25 +234,51 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         ]}
       />
 
-      {/* Amazon file ready banner */}
+      {/* Workflow complete banner */}
       {amazonFile && (
-        <div className="rounded-lg border border-success/30 bg-success/5 p-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-success" />
-            <div>
-              <div className="text-[13px] font-medium text-foreground font-display">Amazon Bulk File Ready</div>
-              <div className="text-[11px] text-muted-foreground">{amazonFile.fileName}</div>
+        <CompletionBanner
+          fileName={amazonFile.fileName}
+          onDownload={onDownloadAmazon}
+        />
+      )}
+
+      {/* Insights — Highest ACoS */}
+      {topAcos.length > 0 && (
+        <details className="group rounded-xl border border-border bg-card shadow-card overflow-hidden">
+          <summary className="flex items-center justify-between px-5 py-3 cursor-pointer list-none select-none hover:bg-secondary/40 transition-colors">
+            <div className="flex items-center gap-2">
+              <ChevronDown className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))] transition-transform duration-200 group-open:rotate-180" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-secondary))]">
+                Insights · Highest ACoS
+              </span>
             </div>
+            <span className="text-[11px] text-[hsl(var(--text-tertiary))]">
+              Top {topAcos.length} ranked by ACoS
+            </span>
+          </summary>
+          <div className="px-5 py-3 border-t border-border bg-secondary/30 flex items-center gap-5 flex-wrap">
+            {topAcos.map((b, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span
+                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-semibold text-white"
+                  style={{ backgroundColor: RANK_COLORS[i] ?? 'hsl(var(--text-tertiary))' }}
+                >
+                  {i + 1}
+                </span>
+                <span className="text-[12.5px] text-foreground max-w-[200px] truncate" title={b.entity}>
+                  {b.entity || b.campaignName}
+                </span>
+                <span className="text-[12px] font-mono-nums text-destructive font-medium">
+                  {b.acos.toFixed(1)}%
+                </span>
+              </div>
+            ))}
           </div>
-          <Button size="sm" onClick={onDownloadAmazon} className="text-[12px] btn-press">
-            <Download className="w-3.5 h-3.5 mr-1.5" />
-            Download
-          </Button>
-        </div>
+        </details>
       )}
 
       {/* Decision table */}
-      <div className="rounded-lg border border-border bg-card card-hover">
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
         {/* Card header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div>
