@@ -28,56 +28,66 @@ export const Topbar: React.FC<TopbarProps> = ({
   onBack,
 }) => {
   return (
-    <div className="h-12 border-b border-border flex items-center justify-between px-5 bg-background/80 backdrop-blur-md flex-shrink-0 sticky top-0 z-30">
-      <div className="flex items-center gap-1.5 min-w-0">
+    <div
+      className="flex items-center justify-between px-6 flex-shrink-0 sticky top-0 z-30"
+      style={{ height: '52px', background: '#FFFFFF', borderBottom: '1px solid #E5E5EA' }}
+    >
+      {/* Left: back + breadcrumb */}
+      <div className="flex items-center gap-2 min-w-0 flex-1">
         {onBack && (
           <button
             onClick={onBack}
-            className="flex items-center gap-1.5 h-7 pl-1.5 pr-2.5 rounded-md text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press mr-1"
+            className="flex items-center gap-1.5 h-8 pl-2 pr-3 rounded-md text-[13px] text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F5F5F7] btn-press"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back</span>
           </button>
         )}
-        <span className="text-[13px] font-semibold text-foreground whitespace-nowrap tracking-tight">{title}</span>
+        <span className="text-[14px] font-semibold text-[#1D1D1F] whitespace-nowrap tracking-tight">{title}</span>
         {breadcrumbs && breadcrumbs.length > 0 && breadcrumbs.map((seg, idx) => (
           <React.Fragment key={idx}>
-            <ChevronRight className="w-3 h-3 text-[hsl(var(--text-tertiary))] flex-shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 text-[#C7C7CC] flex-shrink-0" />
             {seg.onClick ? (
               <button
                 onClick={seg.onClick}
-                className="text-[12.5px] text-[hsl(var(--text-secondary))] hover:text-foreground btn-press whitespace-nowrap"
+                className="text-[13px] text-[#6E6E73] hover:text-[#1D1D1F] btn-press whitespace-nowrap"
               >
                 {seg.label}
               </button>
             ) : (
-              <span className="text-[12.5px] text-foreground whitespace-nowrap">{seg.label}</span>
+              <span className="text-[13px] text-[#1D1D1F] font-medium whitespace-nowrap">{seg.label}</span>
             )}
           </React.Fragment>
         ))}
+      </div>
+
+      {/* Center: status badge */}
+      <div className="flex items-center justify-center flex-shrink-0">
         {statusBadge && (
           <span
-            className={`text-[11px] px-2 py-0.5 rounded-md font-medium font-mono-nums ml-2 ${
+            className={`text-[12px] px-2.5 py-1 rounded-md font-medium font-mono-nums ${
               statusBadge.variant === 'danger'
                 ? 'bg-destructive/10 text-destructive'
-                : 'bg-secondary text-[hsl(var(--text-secondary))]'
+                : 'bg-[#F5F5F7] text-[#6E6E73]'
             }`}
           >
             {statusBadge.label}
           </span>
         )}
       </div>
-      <div className="flex items-center gap-1">
+
+      {/* Right: actions */}
+      <div className="flex items-center gap-1 flex-1 justify-end">
         <button
           onClick={onHelp}
-          className="flex items-center gap-1.5 h-7 px-2.5 rounded-md text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press"
+          className="flex items-center gap-1.5 h-8 px-3 rounded-md text-[13px] text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F5F5F7] btn-press"
         >
           <HelpCircle className="w-3.5 h-3.5" /> Help
         </button>
         {showNewFile && onNewFile && (
           <button
             onClick={onNewFile}
-            className="flex items-center gap-1.5 h-7 px-2.5 rounded-md text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press"
+            className="flex items-center gap-1.5 h-8 px-3 rounded-md text-[13px] text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F5F5F7] btn-press"
           >
             <RefreshCw className="w-3.5 h-3.5" /> New
           </button>

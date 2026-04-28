@@ -33,7 +33,7 @@ const MODULES: { id: Exclude<ActiveModule, null>; label: string; dot: string }[]
 ];
 
 const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="px-4 pt-4 pb-1.5 text-[11px] font-semibold uppercase text-[#6E6E73]" style={{ letterSpacing: '0.08em' }}>
+  <div className="px-4 mt-6 mb-2 text-[11px] font-semibold uppercase text-[#6E6E73]" style={{ letterSpacing: '0.1em' }}>
     {children}
   </div>
 );
@@ -60,49 +60,49 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   const onHome = !activeModule && !showHistoryView;
 
   return (
-    <aside className="w-[224px] flex-shrink-0 h-screen sticky top-0 flex flex-col bg-sidebar text-sidebar-foreground relative z-10">
+    <aside className="w-[240px] flex-shrink-0 h-screen sticky top-0 flex flex-col bg-sidebar text-sidebar-foreground relative z-10">
       {/* Brand */}
       <button
         onClick={() => { onSelectModule(null); setShowHistoryView?.(false); }}
-        className="px-4 pt-5 pb-4 text-left btn-press"
+        className="px-6 pt-6 pb-6 text-left btn-press"
       >
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-white text-[#1D1D1F] flex items-center justify-center text-[11px] font-semibold">
+        <div className="flex items-center gap-3">
+          <div className="w-7 h-7 rounded-md bg-white text-[#1D1D1F] flex items-center justify-center text-[12px] font-semibold">
             Z
           </div>
           <div>
-            <div className="text-[16px] font-semibold leading-tight text-white">Zen AI</div>
-            <div className="text-[11px] text-[#86868B] mt-px tracking-wide">Amazon Ads Workflow</div>
+            <div className="text-[18px] font-semibold leading-tight text-white tracking-tight">Zen AI</div>
+            <div className="text-[12px] text-[#86868B] mt-0.5">Amazon Ads Workflow</div>
           </div>
         </div>
       </button>
-      <div className="border-b border-white/10 mx-3" />
+      <div className="border-b border-white/[0.08] mx-4" />
 
       {/* Modules */}
       <nav className="flex-1 overflow-y-auto pb-2">
         <SectionLabel>Modules</SectionLabel>
 
-        <div className="px-2">
+        <div className="px-3">
           {MODULES.map((mod) => {
             const isActive = activeModule === mod.id && !showHistoryView;
             return (
               <button
                 key={mod.id}
                 onClick={() => onSelectModule(isActive ? null : mod.id)}
-                className={`group relative w-full flex items-center gap-2.5 py-[7px] pl-3 pr-3 rounded-md text-[14px] my-[1px] btn-press ${
+                className={`group relative w-full flex items-center gap-3 h-10 pl-4 pr-3 rounded-lg text-[14px] my-[1px] btn-press transition-colors ${
                   isActive
-                    ? 'bg-white/[0.08] text-white font-semibold'
-                    : 'text-[#E5E5EA] font-normal hover:bg-white/[0.05] hover:text-white'
+                    ? 'bg-white/[0.10] text-white font-semibold'
+                    : 'text-[#E5E5EA] font-medium hover:bg-white/[0.05] hover:text-white'
                 }`}
               >
                 {isActive && (
                   <span
-                    className="absolute left-0 top-1.5 bottom-1.5 w-[2px] rounded-r"
+                    className="absolute left-0 top-2 bottom-2 w-[2px] rounded-r"
                     style={{ backgroundColor: mod.dot }}
                   />
                 )}
                 <span
-                  className="w-[7px] h-[7px] rounded-full flex-shrink-0"
+                  className="w-2 h-2 rounded-full flex-shrink-0"
                   style={{ backgroundColor: mod.dot }}
                 />
                 <span className="truncate">{mod.label}</span>
@@ -113,9 +113,9 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
         {/* Tracks sub-nav */}
         {showTracks && activeModule === 'bleeders_2' && (
-          <div className="px-2 mt-2">
-            <div className="flex items-center justify-between px-3 mb-1">
-              <span className="text-[10px] font-semibold uppercase text-[#6E6E73]" style={{ letterSpacing: '0.08em' }}>
+          <div className="px-3 mt-2">
+            <div className="flex items-center justify-between px-3 mb-1.5">
+              <span className="text-[10px] font-semibold uppercase text-[#6E6E73]" style={{ letterSpacing: '0.1em' }}>
                 Tracks
               </span>
               {bleeder2ActiveTrack && onBackToTrackPicker && (
@@ -135,7 +135,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                 <button
                   key={t.id}
                   onClick={() => onSelectTrack(t.id)}
-                  className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-[12px] my-[1px] btn-press ${
+                  className={`w-full flex items-center gap-2.5 px-3 h-8 rounded-md text-[13px] my-[1px] btn-press transition-colors ${
                     isTrackActive
                       ? 'bg-white/[0.08] text-white font-medium'
                       : 'text-[#E5E5EA] hover:bg-white/[0.05] hover:text-white'
@@ -165,13 +165,13 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
         {/* History */}
         <SectionLabel>History</SectionLabel>
-        <div className="px-2">
+        <div className="px-3">
           <button
             onClick={() => setShowHistoryView?.(true)}
-            className={`w-full flex items-center gap-2.5 py-[7px] px-3 rounded-md text-[14px] my-[1px] btn-press ${
+            className={`w-full flex items-center gap-3 h-10 px-4 rounded-lg text-[14px] my-[1px] btn-press transition-colors ${
               showHistoryView
-                ? 'bg-white/[0.08] text-white font-semibold'
-                : 'text-[#E5E5EA] font-normal hover:bg-white/[0.05] hover:text-white'
+                ? 'bg-white/[0.10] text-white font-semibold'
+                : 'text-[#E5E5EA] font-medium hover:bg-white/[0.05] hover:text-white'
             }`}
           >
             <Clock className="w-3.5 h-3.5 opacity-70" />
@@ -180,23 +180,31 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         </div>
       </nav>
 
-      {/* Client switcher */}
-      <div className="p-3 border-t border-white/10 relative">
+      {/* Client switcher — distinct footer zone */}
+      <div className="p-4 border-t border-white/[0.08] relative">
         <button
           onClick={() => setClientDropdownOpen(prev => !prev)}
-          className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md bg-white/[0.05] border border-white/10 hover:bg-white/[0.08] hover:border-white/15 btn-press"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/[0.05] border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/[0.15] btn-press"
         >
-          <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-[11px] font-semibold text-white">
+          <div className="w-8 h-8 rounded-full bg-primary/25 flex items-center justify-center text-[12px] font-semibold text-white">
             {activeClient.initials}
           </div>
           <div className="text-left min-w-0 flex-1">
-            <div className="text-[12px] font-medium text-[#E5E5EA] truncate leading-tight">{activeClient.name}</div>
-            <div className="text-[10px] text-[#6E6E73]">Active client</div>
+            <div className="text-[14px] font-semibold text-white truncate leading-tight">{activeClient.name}</div>
+            <div className="text-[12px] text-[#86868B] mt-0.5">Active client</div>
           </div>
         </button>
 
         {clientDropdownOpen && (
-          <div className="absolute bottom-[calc(100%-4px)] left-3 right-3 bg-popover border border-border rounded-lg overflow-hidden z-50 shadow-pop animate-scale-in">
+          <div
+            className="absolute bottom-[calc(100%-4px)] left-4 right-4 overflow-hidden z-50 animate-scale-in"
+            style={{
+              background: '#2C2C2E',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '12px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+            }}
+          >
             {clients.map(client => {
               const isActive = client.id === activeClient.id;
               return (
@@ -207,11 +215,11 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                     setClientDropdownOpen(false);
                     if (client.id !== activeClient.id && onReset) onReset();
                   }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left transition-colors ${
-                    isActive ? 'bg-primary/5 text-foreground' : 'text-foreground hover:bg-secondary'
+                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-[13px] text-left transition-colors ${
+                    isActive ? 'bg-white/[0.06] text-white' : 'text-white hover:bg-white/[0.08]'
                   }`}
                 >
-                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-semibold text-primary">
+                  <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-semibold text-white">
                     {client.initials}
                   </div>
                   <span className="truncate flex-1">{client.name}</span>
@@ -220,12 +228,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
               );
             })}
 
-            <div className="border-t border-border" />
+            <div className="border-t border-white/[0.08]" />
 
             {!showAddForm ? (
               <button
                 onClick={() => setShowAddForm(true)}
-                className="w-full flex items-center gap-1.5 px-3 py-2 text-[13px] text-primary hover:bg-primary/5 font-medium transition-colors"
+                className="w-full flex items-center gap-1.5 px-3 py-2.5 text-[13px] text-primary hover:bg-white/[0.06] font-medium transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Add client
@@ -236,7 +244,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                   placeholder="Client name"
                   value={newClientName}
                   onChange={e => setNewClientName(e.target.value)}
-                  className="h-8 px-2.5 text-[12px] rounded-md border border-border bg-card outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                  className="h-8 px-2.5 text-[12px] rounded-md border border-white/10 bg-white/[0.05] text-white placeholder:text-white/40 outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   autoFocus
                 />
                 <input
@@ -244,7 +252,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                   placeholder="ACoS target %"
                   value={newClientAcos}
                   onChange={e => setNewClientAcos(Number(e.target.value))}
-                  className="h-8 px-2.5 text-[12px] rounded-md border border-border bg-card outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                  className="h-8 px-2.5 text-[12px] rounded-md border border-white/10 bg-white/[0.05] text-white placeholder:text-white/40 outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
                 <div className="flex gap-1.5 mt-0.5">
                   <button
@@ -268,7 +276,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                   </button>
                   <button
                     onClick={() => { setShowAddForm(false); setNewClientName(''); }}
-                    className="h-7 px-2.5 rounded-md text-[12px] text-[hsl(var(--text-tertiary))] hover:text-foreground btn-press"
+                    className="h-7 px-2.5 rounded-md text-[12px] text-white/60 hover:text-white btn-press"
                   >
                     Cancel
                   </button>

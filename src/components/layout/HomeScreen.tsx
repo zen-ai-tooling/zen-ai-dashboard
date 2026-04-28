@@ -75,21 +75,19 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
 
   return (
     <div className="flex flex-col">
-      <div className="pt-4 pb-8">
-        {/* Greeting */}
-        <div className="mb-8">
-          <p className="text-[12px] text-[hsl(var(--text-tertiary))] tracking-wide uppercase font-medium">{getTimeString()}</p>
-          <h1 className="text-[28px] font-semibold text-foreground tracking-tight mt-1">{getGreeting()}, operator</h1>
-          <p className="text-[14px] text-[hsl(var(--text-secondary))] mt-2 max-w-md">
+      <div className="pt-12 pb-10">
+        {/* Greeting — make it a moment */}
+        <div className="mb-12">
+          <p className="type-eyebrow">{getTimeString()}</p>
+          <h1 className="type-page-title mt-2">{getGreeting()}, operator</h1>
+          <p className="type-page-sub mt-3 max-w-md">
             Pick a workflow below to start a new session.
           </p>
         </div>
 
         {/* Module cards */}
-        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-tertiary))] mb-3" style={{ letterSpacing: '0.5px' }}>
-          Workflows
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <p className="type-section-eyebrow mb-4">Workflows</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {MODULES.map((m) => {
             const lastRun = lastRunByModule[m.historyKey];
             const isRecommended = m.tag === 'Recommended';
@@ -97,32 +95,44 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
               <button
                 key={m.id}
                 onClick={() => onSelectModule(m.id)}
-                className="group text-left rounded-xl border border-border bg-card p-5 shadow-card-lift btn-press card-hover-lift relative overflow-hidden"
+                className="group text-left rounded-xl border border-[#E5E5EA] bg-white p-6 btn-press tile-hover relative overflow-hidden flex flex-col"
+                style={{
+                  minHeight: '180px',
+                  boxShadow: isRecommended
+                    ? '0 4px 16px rgba(0,0,0,0.08)'
+                    : '0 1px 3px rgba(0,0,0,0.04)',
+                }}
               >
-                <div className="flex items-start justify-between mb-3">
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: m.dot }} />
+                <div className="flex items-start justify-between mb-4">
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: m.dot }} />
                   {isRecommended ? (
                     <span
-                      className="text-[9.5px] font-semibold uppercase tracking-wider text-white px-2 py-0.5 rounded-full"
-                      style={{ background: 'hsl(var(--amber))', letterSpacing: '0.06em' }}
+                      className="text-[10px] font-semibold uppercase text-white px-2.5 py-1 rounded-full"
+                      style={{ background: 'hsl(var(--amber))', letterSpacing: '0.08em' }}
                     >
                       Recommended
                     </span>
                   ) : (
-                    <span className="text-[10px] font-medium uppercase tracking-wider text-[hsl(var(--text-tertiary))]">
+                    <span
+                      className="text-[10px] font-semibold uppercase text-[#86868B]"
+                      style={{ letterSpacing: '0.08em' }}
+                    >
                       {m.tag}
                     </span>
                   )}
                 </div>
-                <div className="text-[15px] font-semibold text-foreground tracking-tight">{m.name}</div>
-                <p className="text-[12.5px] text-[hsl(var(--text-secondary))] leading-relaxed mt-1.5">{m.desc}</p>
-                <div className="flex items-center justify-between mt-5 pt-3 border-t border-border/70">
-                  <span className={`text-[11px] ${lastRun ? 'text-foreground font-medium' : 'text-[hsl(var(--text-tertiary))]'}`}>
+                <div className="type-card-title">{m.name}</div>
+                <p className="type-card-desc mt-2 flex-1">{m.desc}</p>
+                <div className="flex items-center justify-between mt-5 pt-4 border-t border-[#F0F0F2]">
+                  <span
+                    className={`flex items-center gap-1.5 text-[12px] ${
+                      lastRun ? 'text-[#1D1D1F] font-medium' : 'text-[#A1A1A6]'
+                    }`}
+                  >
+                    <Clock className="w-3 h-3" strokeWidth={1.8} />
                     {lastRun ? `Last run ${formatRelative(lastRun)}` : 'No runs yet'}
                   </span>
-                  <ArrowUpRight
-                    className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))] opacity-0 group-hover:opacity-100 group-hover:text-foreground transition-all duration-150"
-                  />
+                  <ArrowUpRight className="w-3.5 h-3.5 text-[#86868B] opacity-0 group-hover:opacity-100 transition-all duration-150" />
                 </div>
               </button>
             );
@@ -130,17 +140,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
         </div>
 
         {/* Recent activity */}
-        <div className="mt-10">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-tertiary))] mb-3" style={{ letterSpacing: '0.5px' }}>
-            Recent activity
-          </p>
+        <div className="mt-14">
+          <p className="type-section-eyebrow mb-4">Recent activity</p>
           {recent.length === 0 ? (
-            <div className="rounded-xl border border-border bg-card shadow-card px-5 py-8 text-center">
-              <Clock className="w-4 h-4 mx-auto text-[hsl(var(--text-tertiary))] opacity-60" strokeWidth={1.6} />
-              <p className="text-[13px] text-[hsl(var(--text-secondary))] mt-2 font-medium">
-                No sessions yet
-              </p>
-              <p className="text-[12px] text-[hsl(var(--text-tertiary))] mt-1">
+            <div
+              className="rounded-[10px] border border-[#E5E5EA] bg-white px-5 py-10 text-center"
+              style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}
+            >
+              <Clock className="w-4 h-4 mx-auto text-[#86868B] opacity-60" strokeWidth={1.6} />
+              <p className="text-[13px] text-[#6E6E73] mt-2 font-medium">No sessions yet</p>
+              <p className="text-[12px] text-[#86868B] mt-1">
                 Pick a workflow above to get started.
               </p>
             </div>
@@ -149,31 +158,32 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
               {recent.map((e) => (
                 <div
                   key={e.id}
-                  className="rounded-xl border border-border bg-card shadow-card px-4 py-3 flex items-center gap-3 card-hover-lift"
+                  className="rounded-[10px] border border-[#E5E5EA] bg-white px-5 py-4 flex items-center gap-3 tile-hover"
+                  style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-[13px] font-medium text-foreground truncate">
+                      <span className="text-[14px] font-semibold text-[#1D1D1F] truncate">
                         {MODULE_LABELS[e.module] ?? e.module}
                       </span>
                       {e.track && (
-                        <span className="text-[10.5px] font-mono-nums px-1.5 py-px rounded bg-secondary text-[hsl(var(--text-tertiary))]">
+                        <span className="text-[10.5px] font-mono-nums px-1.5 py-px rounded bg-[#F5F5F7] text-[#86868B]">
                           {e.track}
                         </span>
                       )}
                     </div>
-                    <p className="text-[11.5px] text-[hsl(var(--text-tertiary))] truncate mt-0.5">
+                    <p className="text-[12px] text-[#86868B] truncate mt-0.5">
                       {e.clientName} · {e.fileName}
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <div className="flex items-center justify-end gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-destructive" />
-                      <span className="text-[12.5px] font-mono-nums font-semibold text-foreground">
+                      <span className="text-[14px] font-mono-nums font-semibold text-[#1D1D1F]">
                         {e.bleedersFound.toLocaleString()} bleeders
                       </span>
                     </div>
-                    <div className="text-[11px] text-[hsl(var(--text-tertiary))] mt-0.5">
+                    <div className="text-[12px] text-[#86868B] mt-0.5">
                       {formatRelative(e.completedAt)}
                     </div>
                   </div>
@@ -184,10 +194,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
         </div>
 
         {/* Quick start */}
-        <div className="mt-10">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-tertiary))] mb-3" style={{ letterSpacing: '0.5px' }}>
-            Quick start
-          </p>
+        <div className="mt-14">
+          <p className="type-section-eyebrow mb-4">Quick start</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
               { title: 'What are bleeders?', desc: 'Targets with high spend and zero or near-zero conversions.' },
@@ -196,14 +204,22 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
             ].map((q) => (
               <div
                 key={q.title}
-                className="rounded-xl border border-border p-4 shadow-card card-hover-lift flex items-start justify-between gap-3 cursor-pointer"
-                style={{ background: '#FAFAFA' }}
+                className="rounded-[10px] border border-[#E5E5EA] bg-white p-4 tile-hover flex items-start justify-between gap-3 cursor-pointer"
+                style={{
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                  borderLeft: '3px solid rgba(0,113,227,0.3)',
+                }}
               >
                 <div className="min-w-0">
-                  <div className="text-[13px] font-semibold text-foreground tracking-tight">{q.title}</div>
-                  <p className="text-[12px] text-[hsl(var(--text-secondary))] mt-1.5 leading-relaxed">{q.desc}</p>
+                  <div className="text-[13px] font-semibold text-[#1D1D1F] tracking-tight">
+                    {q.title}
+                  </div>
+                  <p className="text-[12.5px] text-[#6E6E73] mt-1.5 leading-relaxed">{q.desc}</p>
                 </div>
-                <ChevronRight className="w-4 h-4 text-[#C7C7CC] flex-shrink-0 mt-0.5" strokeWidth={1.8} />
+                <ChevronRight
+                  className="w-4 h-4 text-[#C7C7CC] flex-shrink-0 mt-0.5"
+                  strokeWidth={1.8}
+                />
               </div>
             ))}
           </div>
@@ -211,9 +227,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-border/60 py-4 flex items-center justify-between">
-        <span className="text-[12px] text-[hsl(var(--text-tertiary))]">Zen AI · Amazon Ads Workflow</span>
-        <span className="text-[12px] text-[hsl(var(--text-tertiary))] opacity-70 font-mono-nums">v2.0</span>
+      <div className="border-t border-[#F0F0F2] py-4 flex items-center justify-between">
+        <span className="text-[12px] text-[#86868B]">Zen AI · Amazon Ads Workflow</span>
+        <span className="text-[12px] text-[#A1A1A6] font-mono-nums">v2.0</span>
       </div>
     </div>
   );
