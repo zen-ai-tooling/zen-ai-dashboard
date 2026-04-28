@@ -284,7 +284,7 @@ export const AnalysisResults = ({
         steps={[
           { label: 'File analyzed', status: 'complete' },
           { label: 'Make decisions', status: generateDone ? 'complete' : 'active' },
-          { label: 'Generate decision file', status: generateDone ? 'complete' : 'pending' },
+          { label: 'Generate Amazon file', status: generateDone ? 'complete' : 'pending' },
         ]}
       />
 
@@ -549,19 +549,14 @@ export const AnalysisResults = ({
               <button
                 onClick={handleGenerateDecisionFile}
                 disabled={decisionsMade === 0 || isGenerating}
-                className={`h-9 px-5 rounded-md text-[13px] font-semibold flex items-center gap-2 btn-press disabled:opacity-50 disabled:cursor-not-allowed shadow-xs ${
-                  generateDone
-                    ? 'bg-success text-white hover:bg-success/90'
-                    : 'bg-primary text-primary-foreground hover:bg-primary/92'
-                }`}
-                style={{ minWidth: 200 }}
+                className={`btn-primary-action btn-press ${generateDone ? 'is-done' : ''}`}
               >
                 {isGenerating ? (
-                  <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Generating…</>
+                  <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</>
                 ) : generateDone ? (
-                  <><CheckCircle2 className="w-3.5 h-3.5" /> Downloaded ✓</>
+                  <><CheckCircle2 className="w-4 h-4" /> Downloaded ✓</>
                 ) : (
-                  <><Download className="w-3.5 h-3.5" /> Generate decision file</>
+                  <>Generate Amazon file →</>
                 )}
               </button>
             </div>

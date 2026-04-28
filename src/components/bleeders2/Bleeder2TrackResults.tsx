@@ -443,30 +443,25 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 <Download className="w-3 h-3 mr-1" />
                 Download XLSX
               </Button>
-              <Button
+              <button
                 onClick={async () => {
                   await handleGenerateInline();
                   toast.success('Amazon file ready', {
                     description: `${decisionsMade} decisions exported`,
                     duration: 3000,
                   });
-                  setTimeout(() => setGenerateDone(false), 3000);
                 }}
-                disabled={decisionsMade === 0 || isGenerating}
-                className="text-[14px] font-semibold h-11 rounded-[10px] btn-press"
-                style={{ maxWidth: 240, minWidth: 200 }}
+                disabled={decisionsMade === 0 || isGenerating || !!amazonFile}
+                className={`btn-primary-action btn-press ${(generateDone || amazonFile) ? 'is-done' : ''}`}
               >
                 {isGenerating ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
-                ) : generateDone ? (
-                  <>
-                    <CheckCircle2 className="w-4 h-4 mr-1.5" />
-                    File ready
-                  </>
+                ) : (generateDone || amazonFile) ? (
+                  <><CheckCircle2 className="w-4 h-4" /> Downloaded ✓</>
                 ) : (
-                  'Generate Amazon file →'
+                  <>Generate Amazon file →</>
                 )}
-              </Button>
+              </button>
             </div>
           </div>
         </div>

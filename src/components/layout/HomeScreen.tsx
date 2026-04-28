@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpRight, Clock } from 'lucide-react';
+import { ArrowUpRight, Clock, ChevronRight } from 'lucide-react';
 import { useHistory } from '@/context/HistoryContext';
 
 type ActiveModule = 'bleeders_1' | 'bleeders_2' | 'lifetime_bleeders' | null;
@@ -92,22 +92,32 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {MODULES.map((m) => {
             const lastRun = lastRunByModule[m.historyKey];
+            const isRecommended = m.tag === 'Recommended';
             return (
               <button
                 key={m.id}
                 onClick={() => onSelectModule(m.id)}
-                className="group text-left rounded-xl border border-border bg-card p-5 shadow-card btn-press card-hover relative overflow-hidden"
+                className="group text-left rounded-xl border border-border bg-card p-5 shadow-card btn-press card-hover-lift relative overflow-hidden"
               >
                 <div className="flex items-start justify-between mb-3">
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: m.dot }} />
-                  <span className="text-[10px] font-medium uppercase tracking-wider text-[hsl(var(--text-tertiary))]">
-                    {m.tag}
-                  </span>
+                  {isRecommended ? (
+                    <span
+                      className="text-[9.5px] font-semibold uppercase tracking-wider text-white px-2 py-0.5 rounded-full"
+                      style={{ background: 'hsl(var(--amber))', letterSpacing: '0.06em' }}
+                    >
+                      Recommended
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-medium uppercase tracking-wider text-[hsl(var(--text-tertiary))]">
+                      {m.tag}
+                    </span>
+                  )}
                 </div>
                 <div className="text-[15px] font-semibold text-foreground tracking-tight">{m.name}</div>
                 <p className="text-[12.5px] text-[hsl(var(--text-secondary))] leading-relaxed mt-1.5">{m.desc}</p>
                 <div className="flex items-center justify-between mt-5 pt-3 border-t border-border/70">
-                  <span className="text-[11px] text-[hsl(var(--text-tertiary))]">
+                  <span className={`text-[11px] ${lastRun ? 'text-foreground font-medium' : 'text-[hsl(var(--text-tertiary))]'}`}>
                     {lastRun ? `Last run ${formatRelative(lastRun)}` : 'No runs yet'}
                   </span>
                   <ArrowUpRight
@@ -135,9 +145,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
               </p>
             </div>
           ) : (
-            <div className="rounded-xl border border-border bg-card shadow-card divide-y divide-border overflow-hidden">
+            <div className="space-y-2">
               {recent.map((e) => (
-                <div key={e.id} className="px-4 py-3 flex items-center gap-3 hover:bg-secondary/40 transition-colors">
+                <div
+                  key={e.id}
+                  className="rounded-xl border border-border bg-card shadow-card px-4 py-3 flex items-center gap-3 card-hover-lift"
+                >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2">
                       <span className="text-[13px] font-medium text-foreground truncate">
@@ -154,8 +167,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <div className="text-[12.5px] font-mono-nums text-foreground">
-                      {e.bleedersFound.toLocaleString()} bleeders
+                    <div className="flex items-center justify-end gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                      <span className="text-[12.5px] font-mono-nums font-semibold text-foreground">
+                        {e.bleedersFound.toLocaleString()} bleeders
+                      </span>
                     </div>
                     <div className="text-[11px] text-[hsl(var(--text-tertiary))] mt-0.5">
                       {formatRelative(e.completedAt)}
@@ -180,10 +196,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
             ].map((q) => (
               <div
                 key={q.title}
-                className="rounded-xl border border-border bg-card p-4 shadow-card card-hover"
+                className="rounded-xl border border-border bg-card p-4 shadow-card card-hover-lift flex items-start justify-between gap-3 cursor-pointer"
               >
-                <div className="text-[13px] font-semibold text-foreground tracking-tight">{q.title}</div>
-                <p className="text-[12px] text-[hsl(var(--text-secondary))] mt-1.5 leading-relaxed">{q.desc}</p>
+                <div className="min-w-0">
+                  <div className="text-[13px] font-semibold text-foreground tracking-tight">{q.title}</div>
+                  <p className="text-[12px] text-[hsl(var(--text-secondary))] mt-1.5 leading-relaxed">{q.desc}</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-[hsl(var(--text-tertiary))] flex-shrink-0 mt-0.5" strokeWidth={1.8} />
               </div>
             ))}
           </div>
