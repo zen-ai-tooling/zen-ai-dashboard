@@ -1,165 +1,234 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ─────────────────────────────────────────────
+   Zen AI — Linear/Apple-grade design system
+   Geist + neutral foundation, sparing accent.
+   ───────────────────────────────────────────── */
+
 @layer base {
   :root {
-    --background: 220 10% 95%;
-    --foreground: 228 20% 7%;
+    /* Surfaces — Apple warm grays */
+    --background: 0 0% 98%;          /* #FAFAFA main */
+    --foreground: 240 6% 10%;        /* #1D1D1F */
 
-    --card: 0 0% 100%;
-    --card-foreground: 228 20% 7%;
+    --card: 0 0% 100%;               /* #FFFFFF */
+    --card-foreground: 240 6% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 228 20% 7%;
+    --popover-foreground: 240 6% 10%;
 
-    --primary: 221 83% 53%;
+    /* Accent — Apple blue, used sparingly */
+    --primary: 211 100% 45%;         /* #0071E3 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 94%;
-    --secondary-foreground: 228 20% 7%;
+    --secondary: 240 6% 96%;         /* #F5F5F7 */
+    --secondary-foreground: 240 6% 10%;
 
-    --muted: 220 14% 94%;
-    --muted-foreground: 220 9% 40%;
+    --muted: 240 6% 96%;
+    --muted-foreground: 240 3% 44%;  /* #6E6E73 */
 
-    --accent: 220 14% 94%;
-    --accent-foreground: 228 20% 7%;
+    --accent: 240 6% 96%;
+    --accent-foreground: 240 6% 10%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 4 100% 59%;       /* #FF3B30 iOS red */
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 72% 29%;
+    --success: 142 71% 49%;          /* #34C759 iOS green */
     --success-foreground: 0 0% 100%;
 
-    --border: 220 10% 90%;
-    --input: 220 10% 90%;
-    --ring: 221 83% 53%;
-    --radius: 0.5rem;
+    --border: 240 6% 84%;            /* #D2D2D7 */
+    --input: 240 6% 84%;
+    --ring: 211 100% 45%;
+    --radius: 0.75rem;               /* 12px cards */
 
-    /* Semantic */
-    --text-secondary: 220 8% 38%;
-    --text-tertiary: 220 8% 56%;
+    /* Semantic text */
+    --text-secondary: 240 3% 44%;    /* #6E6E73 */
+    --text-tertiary: 240 3% 56%;     /* #86868B */
 
-    /* Sidebar */
-    --sidebar-background: 220 14% 97%;
-    --sidebar-foreground: 228 20% 7%;
-    --sidebar-primary: 221 83% 53%;
+    /* Sidebar — slightly cooler than content surface */
+    --sidebar-background: 240 6% 96%;   /* #F5F5F7 */
+    --sidebar-foreground: 240 6% 10%;
+    --sidebar-primary: 211 100% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 100%;
-    --sidebar-accent-foreground: 228 20% 7%;
-    --sidebar-border: 220 10% 90%;
-    --sidebar-ring: 221 83% 53%;
-    --sidebar-active-bg: 214 95% 97%;
+    --sidebar-accent-foreground: 240 6% 10%;
+    --sidebar-border: 240 6% 88%;
+    --sidebar-ring: 211 100% 45%;
+    --sidebar-active-bg: 211 100% 96%;
 
-    --spend: 0 72% 51%;
+    --spend: 4 100% 59%;
 
-    /* Named tokens */
-    --page-bg: 220 10% 95%;
-    --border-strong: 220 10% 82%;
-    --accent-blue: 221 83% 53%;
-    --accent-blue-light: 214 95% 97%;
-    --accent-blue-border: 213 94% 87%;
-    --red: 0 72% 51%;
-    --red-light: 0 86% 97%;
-    --red-border: 0 93% 89%;
-    --green: 142 72% 29%;
-    --green-light: 138 76% 97%;
-    --green-border: 142 69% 82%;
-    --amber: 32 95% 44%;
-    --amber-light: 48 96% 89%;
+    /* Named tokens (back-compat) */
+    --page-bg: 0 0% 98%;
+    --border-strong: 240 6% 78%;
+    --accent-blue: 211 100% 45%;
+    --accent-blue-light: 211 100% 96%;
+    --accent-blue-border: 211 80% 88%;
+    --red: 4 100% 59%;
+    --red-light: 4 100% 97%;
+    --red-border: 4 90% 90%;
+    --green: 142 71% 39%;
+    --green-light: 142 71% 96%;
+    --green-border: 142 60% 82%;
+    --amber: 33 100% 50%;            /* #FF9500 */
+    --amber-light: 33 100% 95%;
+    --amber-border: 33 90% 85%;
+
+    /* Elevation */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+    --shadow-pop: 0 8px 24px rgba(0, 0, 0, 0.12);
   }
 
   .dark {
-    --background: 220 15% 10%;
-    --foreground: 220 14% 93%;
-    --card: 220 15% 13%;
-    --card-foreground: 220 14% 93%;
-    --popover: 220 15% 13%;
-    --popover-foreground: 220 14% 93%;
-    --primary: 221 83% 53%;
+    --background: 240 6% 7%;
+    --foreground: 0 0% 96%;
+    --card: 240 6% 10%;
+    --card-foreground: 0 0% 96%;
+    --popover: 240 6% 10%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 211 100% 55%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 15% 16%;
-    --secondary-foreground: 220 14% 93%;
-    --muted: 220 15% 16%;
-    --muted-foreground: 220 9% 55%;
-    --accent: 220 15% 16%;
-    --accent-foreground: 220 14% 93%;
-    --destructive: 0 72% 51%;
+    --secondary: 240 6% 14%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 240 6% 14%;
+    --muted-foreground: 240 3% 60%;
+    --accent: 240 6% 14%;
+    --accent-foreground: 0 0% 96%;
+    --destructive: 4 100% 62%;
     --destructive-foreground: 0 0% 100%;
-    --success: 142 72% 35%;
+    --success: 142 71% 49%;
     --success-foreground: 0 0% 100%;
-    --border: 220 15% 20%;
-    --input: 220 15% 18%;
-    --ring: 221 83% 53%;
-    --text-secondary: 220 9% 55%;
-    --text-tertiary: 220 9% 45%;
-    --sidebar-background: 220 15% 11%;
-    --sidebar-foreground: 220 14% 93%;
-    --sidebar-primary: 221 83% 53%;
+    --border: 240 6% 18%;
+    --input: 240 6% 18%;
+    --ring: 211 100% 55%;
+    --text-secondary: 240 3% 65%;
+    --text-tertiary: 240 3% 50%;
+    --sidebar-background: 240 6% 9%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 211 100% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 15% 16%;
-    --sidebar-accent-foreground: 220 14% 93%;
-    --sidebar-border: 220 15% 20%;
-    --sidebar-ring: 221 83% 53%;
-    --sidebar-active-bg: 221 83% 15%;
-    --spend: 0 72% 55%;
-    --page-bg: 220 15% 8%;
-    --border-strong: 220 15% 25%;
-    --accent-blue: 221 83% 58%;
-    --accent-blue-light: 221 83% 15%;
-    --accent-blue-border: 221 70% 30%;
-    --red: 0 72% 55%;
-    --red-light: 0 50% 15%;
-    --red-border: 0 50% 25%;
-    --green: 142 72% 35%;
+    --sidebar-accent: 240 6% 14%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 240 6% 16%;
+    --sidebar-ring: 211 100% 55%;
+    --sidebar-active-bg: 211 80% 18%;
+    --spend: 4 100% 62%;
+    --page-bg: 240 6% 7%;
+    --border-strong: 240 6% 24%;
+    --accent-blue: 211 100% 55%;
+    --accent-blue-light: 211 80% 16%;
+    --accent-blue-border: 211 60% 28%;
+    --red: 4 100% 62%;
+    --red-light: 4 60% 14%;
+    --red-border: 4 50% 24%;
+    --green: 142 71% 49%;
     --green-light: 142 50% 12%;
     --green-border: 142 50% 22%;
-    --amber: 32 95% 50%;
-    --amber-light: 48 50% 15%;
+    --amber: 33 100% 55%;
+    --amber-light: 33 60% 14%;
+    --amber-border: 33 50% 24%;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
-    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  html, body, #root {
+    font-family: 'Geist', 'SF Pro Display', 'SF Pro Text', -apple-system,
+      BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'cv11', 'ss01', 'ss03';
   }
 
   body {
     @apply bg-background text-foreground;
+    letter-spacing: -0.005em;
   }
 
-  .font-display {
-    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  /* Match Apple-ish display tightening at larger sizes */
+  h1, h2, h3, .font-display {
+    letter-spacing: -0.02em;
   }
 
-  .font-mono-nums {
-    font-family: 'DM Mono', 'SF Mono', monospace;
-    font-feature-settings: 'tnum';
-    font-variant-numeric: tabular-nums;
-  }
-
+  .font-mono-nums,
   .tabular-nums {
-    font-family: 'DM Mono', 'SF Mono', monospace;
-    font-feature-settings: 'tnum';
+    font-family: 'Geist Mono', 'SF Mono', ui-monospace, 'JetBrains Mono', monospace;
+    font-feature-settings: 'tnum', 'zero';
     font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
   }
+
+  /* Native scrollbars feel a lot more "tool-grade" when subtle */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--border-strong)); background-clip: padding-box; border: 2px solid transparent; }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* Selection */
+  ::selection { background: hsl(var(--primary) / 0.18); color: hsl(var(--foreground)); }
 }
 
 @layer utilities {
   .btn-press {
-    transition: all 150ms ease;
+    transition: transform 100ms ease, background-color 150ms ease,
+      border-color 150ms ease, color 150ms ease, box-shadow 150ms ease,
+      opacity 150ms ease;
   }
-  .btn-press:active {
-    transform: scale(0.98);
-  }
+  .btn-press:active { transform: scale(0.98); }
 
   .card-hover {
-    transition: border-color 150ms ease;
+    transition: border-color 150ms ease, box-shadow 200ms ease,
+      transform 200ms ease;
   }
   .card-hover:hover {
     border-color: hsl(var(--border-strong));
+    box-shadow: var(--shadow-sm);
   }
+
+  .shadow-card { box-shadow: var(--shadow-sm); }
+  .shadow-pop { box-shadow: var(--shadow-pop); }
+
+  /* Decision row indicators */
+  .row-decision-keep { box-shadow: inset 3px 0 0 hsl(var(--success)); }
+  .row-decision-pause { box-shadow: inset 3px 0 0 hsl(var(--destructive)); }
+  .row-decision-cut { box-shadow: inset 3px 0 0 hsl(var(--amber)); }
+  .row-decision-negate { box-shadow: inset 3px 0 0 hsl(var(--destructive)); }
+
+  /* Page enter */
+  .page-enter { animation: page-enter 200ms ease-out both; }
+
+  /* Stagger helper */
+  .row-enter { animation: row-enter 240ms ease-out both; }
 }
+
+/* ── keyframes ── */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes row-enter {
+  from { opacity: 0; transform: translateY(2px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes drag-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.18); }
+  50%      { box-shadow: 0 0 0 8px hsl(var(--primary) / 0); }
+}
+
+.drag-pulse { animation: drag-pulse 1.4s ease-out infinite; }
