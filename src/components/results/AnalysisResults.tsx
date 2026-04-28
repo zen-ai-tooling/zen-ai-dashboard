@@ -279,6 +279,24 @@ export const AnalysisResults = ({
         </div>
       </div>
 
+      {/* Workflow stepper */}
+      <WorkflowSteps
+        steps={[
+          { label: 'File analyzed', status: 'complete' },
+          { label: 'Make decisions', status: generateDone ? 'complete' : 'active' },
+          { label: 'Generate decision file', status: generateDone ? 'complete' : 'pending' },
+        ]}
+      />
+
+      {/* Completion banner */}
+      {generateDone && generatedFileName && (
+        <CompletionBanner
+          fileName={generatedFileName}
+          onDownload={() => lastDownloadRef.current?.()}
+          onStartNew={handleStartNew}
+        />
+      )}
+
       {/* Insights — collapsible top spenders */}
       {topSpenders.length > 0 && (
         <details className="group rounded-xl border border-border bg-card shadow-card overflow-hidden">
