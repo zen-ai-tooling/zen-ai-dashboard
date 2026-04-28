@@ -488,7 +488,7 @@ const StatCell: React.FC<{ icon: React.ReactNode; value: string; label: string }
   <div className="px-5 py-4">
     <div className="flex items-center gap-1.5 text-[hsl(var(--text-tertiary))] mb-1.5">
       {icon}
-      <span className="text-[10px] font-semibold uppercase tracking-[0.08em]">{label}</span>
+      <span className="text-[11px] font-semibold uppercase" style={{ letterSpacing: '0.08em' }}>{label}</span>
     </div>
     <div className="text-[28px] font-semibold leading-none text-foreground font-mono-nums tracking-tight">
       {value}
