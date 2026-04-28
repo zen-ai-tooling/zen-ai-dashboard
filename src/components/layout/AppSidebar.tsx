@@ -33,7 +33,7 @@ const MODULES: { id: Exclude<ActiveModule, null>; label: string; dot: string }[]
 ];
 
 const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="px-4 pt-4 pb-1.5 text-[10px] font-semibold tracking-[0.08em] uppercase text-[hsl(var(--text-tertiary))]">
+  <div className="px-4 pt-4 pb-1.5 text-[11px] font-semibold uppercase text-[#6E6E73]" style={{ letterSpacing: '0.08em' }}>
     {children}
   </div>
 );
@@ -60,23 +60,23 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   const onHome = !activeModule && !showHistoryView;
 
   return (
-    <aside className="w-[224px] flex-shrink-0 h-screen sticky top-0 flex flex-col border-r border-sidebar-border bg-sidebar shadow-sidebar relative z-10">
+    <aside className="w-[224px] flex-shrink-0 h-screen sticky top-0 flex flex-col bg-sidebar text-sidebar-foreground relative z-10">
       {/* Brand */}
       <button
         onClick={() => { onSelectModule(null); setShowHistoryView?.(false); }}
         className="px-4 pt-5 pb-4 text-left btn-press"
       >
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-foreground text-background flex items-center justify-center text-[11px] font-semibold">
+          <div className="w-6 h-6 rounded-md bg-white text-[#1D1D1F] flex items-center justify-center text-[11px] font-semibold">
             Z
           </div>
           <div>
-            <div className={`text-[14px] font-semibold leading-tight ${onHome ? 'text-foreground' : 'text-foreground'}`}>Zen AI</div>
-            <div className="text-[10.5px] text-[hsl(var(--text-tertiary))] mt-px tracking-wide">Amazon Ads Workflow</div>
+            <div className="text-[16px] font-semibold leading-tight text-white">Zen AI</div>
+            <div className="text-[11px] text-[#86868B] mt-px tracking-wide">Amazon Ads Workflow</div>
           </div>
         </div>
       </button>
-      <div className="border-b border-sidebar-border mx-3" />
+      <div className="border-b border-white/10 mx-3" />
 
       {/* Modules */}
       <nav className="flex-1 overflow-y-auto pb-2">
@@ -89,12 +89,18 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
               <button
                 key={mod.id}
                 onClick={() => onSelectModule(isActive ? null : mod.id)}
-                className={`group w-full flex items-center gap-2.5 py-[7px] px-3 rounded-md text-[14px] my-[1px] btn-press ${
+                className={`group relative w-full flex items-center gap-2.5 py-[7px] pl-3 pr-3 rounded-md text-[14px] my-[1px] btn-press ${
                   isActive
-                    ? 'bg-secondary text-foreground font-semibold'
-                    : 'text-[hsl(var(--text-secondary))] font-medium hover:bg-secondary/70 hover:text-foreground'
+                    ? 'bg-white/[0.08] text-white font-semibold'
+                    : 'text-[#E5E5EA] font-normal hover:bg-white/[0.05] hover:text-white'
                 }`}
               >
+                {isActive && (
+                  <span
+                    className="absolute left-0 top-1.5 bottom-1.5 w-[2px] rounded-r"
+                    style={{ backgroundColor: mod.dot }}
+                  />
+                )}
                 <span
                   className="w-[7px] h-[7px] rounded-full flex-shrink-0"
                   style={{ backgroundColor: mod.dot }}
@@ -109,13 +115,13 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         {showTracks && activeModule === 'bleeders_2' && (
           <div className="px-2 mt-2">
             <div className="flex items-center justify-between px-3 mb-1">
-              <span className="text-[10px] font-semibold tracking-[0.08em] uppercase text-[hsl(var(--text-tertiary))]">
+              <span className="text-[10px] font-semibold uppercase text-[#6E6E73]" style={{ letterSpacing: '0.08em' }}>
                 Tracks
               </span>
               {bleeder2ActiveTrack && onBackToTrackPicker && (
                 <button
                   onClick={onBackToTrackPicker}
-                  className="flex items-center gap-1 text-[10px] text-[hsl(var(--text-tertiary))] hover:text-foreground btn-press"
+                  className="flex items-center gap-1 text-[10px] text-[#86868B] hover:text-white btn-press"
                 >
                   <ArrowLeft className="w-3 h-3" /> Back
                 </button>
@@ -131,12 +137,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                   onClick={() => onSelectTrack(t.id)}
                   className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-[12px] my-[1px] btn-press ${
                     isTrackActive
-                      ? 'bg-card text-foreground font-medium shadow-xs'
-                      : 'text-[hsl(var(--text-secondary))] hover:bg-card/60 hover:text-foreground'
+                      ? 'bg-white/[0.08] text-white font-medium'
+                      : 'text-[#E5E5EA] hover:bg-white/[0.05] hover:text-white'
                   }`}
                 >
                   {isComplete ? (
-                    <span className="w-3.5 h-3.5 rounded-full bg-success/15 text-success flex items-center justify-center flex-shrink-0">
+                    <span className="w-3.5 h-3.5 rounded-full bg-success/20 text-success flex items-center justify-center flex-shrink-0">
                       <Check className="w-2.5 h-2.5" />
                     </span>
                   ) : (
@@ -146,7 +152,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                         backgroundColor:
                           isTrackActive ? 'hsl(var(--primary))' :
                           status === 'done' ? 'hsl(var(--success))' :
-                          'hsl(var(--border-strong))',
+                          '#6E6E73',
                       }}
                     />
                   )}
@@ -164,8 +170,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             onClick={() => setShowHistoryView?.(true)}
             className={`w-full flex items-center gap-2.5 py-[7px] px-3 rounded-md text-[14px] my-[1px] btn-press ${
               showHistoryView
-                ? 'bg-secondary text-foreground font-semibold'
-                : 'text-[hsl(var(--text-secondary))] font-medium hover:bg-secondary/70 hover:text-foreground'
+                ? 'bg-white/[0.08] text-white font-semibold'
+                : 'text-[#E5E5EA] font-normal hover:bg-white/[0.05] hover:text-white'
             }`}
           >
             <Clock className="w-3.5 h-3.5 opacity-70" />
@@ -175,17 +181,17 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       </nav>
 
       {/* Client switcher */}
-      <div className="p-3 border-t border-sidebar-border relative">
+      <div className="p-3 border-t border-white/10 relative">
         <button
           onClick={() => setClientDropdownOpen(prev => !prev)}
-          className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md bg-card border border-border hover:border-[hsl(var(--border-strong))] btn-press"
+          className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md bg-white/[0.05] border border-white/10 hover:bg-white/[0.08] hover:border-white/15 btn-press"
         >
-          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[11px] font-semibold text-primary">
+          <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-[11px] font-semibold text-white">
             {activeClient.initials}
           </div>
           <div className="text-left min-w-0 flex-1">
-            <div className="text-[12px] font-medium text-foreground truncate leading-tight">{activeClient.name}</div>
-            <div className="text-[10px] text-[hsl(var(--text-tertiary))]">Active client</div>
+            <div className="text-[12px] font-medium text-[#E5E5EA] truncate leading-tight">{activeClient.name}</div>
+            <div className="text-[10px] text-[#6E6E73]">Active client</div>
           </div>
         </button>
 
