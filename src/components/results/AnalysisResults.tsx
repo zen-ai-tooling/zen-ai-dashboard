@@ -420,8 +420,8 @@ export const AnalysisResults = ({
             </button>
           </div>
 
-          {/* Table — fixed layout, no horizontal scroll on standard widths */}
-          <div className="w-full">
+          {/* Table — scrollable area, action bar pinned below */}
+          <div className="w-full max-h-[58vh] overflow-auto">
             <Table className="table-fixed w-full">
               <colgroup>
                 <col style={{ width: '22%' }} />
