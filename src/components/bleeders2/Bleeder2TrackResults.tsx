@@ -381,26 +381,48 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         </div>
 
         {/* Bulk action buttons */}
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/60 bg-muted/20">
-          <span className="text-[11px] text-muted-foreground mr-1">Bulk:</span>
-          <Button variant="outline" size="sm" onClick={() => {
-            const allSuggested: Record<number, string> = {};
-            suggestions.forEach((s, idx) => { allSuggested[idx] = s.decision; });
-            setDecisions(allSuggested);
-          }} className="text-[11px] h-6 px-2.5 btn-press">
-            Apply all suggestions
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleSetAllPause} className="text-[11px] h-6 px-2.5 btn-press">
-            Select all → Pause
-          </Button>
-          <Button variant="ghost" size="sm" onClick={handleClearAll} className="text-[11px] h-6 px-2.5 btn-press text-muted-foreground">
-            <XCircle className="w-3 h-3 mr-1" />
-            Clear all
-          </Button>
+        <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-border bg-[#FAFAFA]">
+          <div className="text-[12px] text-[hsl(var(--text-secondary))] truncate">
+            <span className="font-medium text-foreground">{TRACK_LABELS[result.trackType]}</span>
+            <span className="mx-1.5 text-[hsl(var(--text-tertiary))]">·</span>
+            <span className="font-mono-nums">{result.bleeders.length}</span> bleeders
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button onClick={() => {
+              const allSuggested: Record<number, string> = {};
+              suggestions.forEach((s, idx) => { allSuggested[idx] = s.decision; });
+              setDecisions(allSuggested);
+            }} className="bulk-btn btn-press">
+              <span className="decision-dot" style={{ background: '#0071E3' }} />
+              Apply all suggestions
+            </button>
+            {getDecisionOptions().includes('Pause') && (
+              <button onClick={handleSetAllPause} className="bulk-btn btn-press">
+                <span className="decision-dot" style={{ background: '#FF3B30' }} />
+                Select all → Pause
+              </button>
+            )}
+            {getDecisionOptions().includes('Cut Bid') && (
+              <button onClick={handleSetAllCutBid} className="bulk-btn btn-press">
+                <span className="decision-dot" style={{ background: '#FF9500' }} />
+                Select all → Cut Bid
+              </button>
+            )}
+            {getDecisionOptions().includes('Keep') && (
+              <button onClick={handleSetAllKeep} className="bulk-btn btn-press">
+                <span className="decision-dot" style={{ background: '#34C759' }} />
+                Select all → Keep
+              </button>
+            )}
+            <button onClick={handleClearAll} className="bulk-btn bulk-btn-ghost btn-press">
+              <XCircle className="w-3 h-3" />
+              Clear
+            </button>
+          </div>
         </div>
 
-        {/* Table — scrollable with pinned footer below */}
-        <div className="max-h-[58vh] overflow-auto">
+        {/* Table — scrollable with sticky thead, pinned footer below */}
+        <div className="max-h-[58vh] overflow-auto table-sticky-header">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
