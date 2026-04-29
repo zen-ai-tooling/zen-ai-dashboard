@@ -132,23 +132,52 @@ export const StandardUploadZone: React.FC<StandardUploadZoneProps> = ({
         </div>
       </div>
 
-      {expectedSheets && expectedSheets.length > 0 && (
-        <div className="grid grid-cols-2 gap-x-6 gap-y-2 px-1">
-          {expectedSheets.map((sheet) => {
-            const detected = detectedSheets.includes(sheet);
-            return (
-              <div key={sheet} className="flex items-center gap-2 text-[13px] text-[hsl(var(--text-secondary))]">
-                {detected ? (
-                  <CheckCircle2 className="w-3.5 h-3.5 text-success flex-shrink-0" strokeWidth={2.2} />
-                ) : (
-                  <Circle className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))] opacity-50 flex-shrink-0" strokeWidth={1.5} />
-                )}
-                <span className={detected ? 'text-foreground' : ''}>{sheet}</span>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {expectedSheets && expectedSheets.length > 0 && (() => {
+        const useRow = expectedSheets.length <= 2;
+        return (
+          <div className="px-1">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-tertiary))] mb-2">
+              Expected sheets
+            </p>
+            <div
+              className={
+                useRow
+                  ? 'flex flex-wrap gap-x-8 gap-y-2 py-1'
+                  : 'grid grid-cols-2 gap-x-6 gap-y-2'
+              }
+            >
+              {expectedSheets.map((sheet) => {
+                const detected = detectedSheets.includes(sheet);
+                return (
+                  <div key={sheet} className="flex items-center gap-2 text-[13px] text-[hsl(var(--text-secondary))]">
+                    {detected ? (
+                      <CheckCircle2 className="w-3.5 h-3.5 text-success flex-shrink-0" strokeWidth={2.2} />
+                    ) : (
+                      <Circle className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))] opacity-50 flex-shrink-0" strokeWidth={1.5} />
+                    )}
+                    <span className={detected ? 'text-foreground' : ''}>{sheet}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* How it works — inline stepper */}
+      <div className="flex items-center gap-3 pt-3 px-1 text-[12px] text-[#86868B] flex-wrap">
+        {['Upload bulk file', 'Review bleeders', 'Generate decisions'].map((s, i, arr) => (
+          <React.Fragment key={s}>
+            <div className="flex items-center gap-1.5">
+              <span className="w-4 h-4 rounded-full border border-[#D2D2D7] bg-white flex items-center justify-center text-[10px] font-semibold text-[#86868B] font-mono-nums">
+                {i + 1}
+              </span>
+              <span>{s}</span>
+            </div>
+            {i < arr.length - 1 && <span className="text-[#D2D2D7]">→</span>}
+          </React.Fragment>
+        ))}
+      </div>
     </div>
   );
 };
