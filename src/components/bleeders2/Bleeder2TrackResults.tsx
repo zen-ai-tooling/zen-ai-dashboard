@@ -229,31 +229,16 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* Stats row — standardized 3-up like Bleeders 1.0, amber-tinted for B2.0 */}
-      <div className="rounded-xl border border-border shadow-card overflow-hidden stat-accent-amber">
-        <div className="grid grid-cols-3 divide-x divide-border">
-          <StatCellV2
-            icon={<AlertTriangle className="w-3.5 h-3.5" strokeWidth={1.8} />}
-            value={result.bleeders.length.toLocaleString()}
-            label="Bleeders found"
-          />
-          <StatCellV2
-            icon={<DollarSign className="w-3.5 h-3.5" strokeWidth={1.8} />}
-            value={`$${result.totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
-            label="At-risk spend"
-          />
-          <StatCellV2
-            icon={<Percent className="w-3.5 h-3.5" strokeWidth={1.8} />}
-            value={`${avgAcos.toFixed(1)}%`}
-            label="Average ACoS"
-            danger={avgAcos > 100}
-          />
-        </div>
-      </div>
-
-      {/* Workflow stepper (shared) */}
-      <WorkflowSteps
+      {/* Compact stats + 4-step workflow — single unified container */}
+      <CompactStatsBar
+        accent="amber"
+        stats={[
+          { value: result.bleeders.length.toLocaleString(), label: 'bleeders' },
+          { value: `$${result.totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}`, label: 'at risk' },
+          { value: `${avgAcos.toFixed(1)}%`, label: 'avg ACoS', danger: avgAcos > 100 },
+        ]}
         steps={[
+          { label: 'Thresholds set', status: 'complete' },
           { label: 'File analyzed', status: 'complete' },
           { label: 'Make decisions', status: (generateDone || amazonFile) ? 'complete' : 'active' },
           { label: 'Generate Amazon file', status: (generateDone || amazonFile) ? 'complete' : 'pending' },
