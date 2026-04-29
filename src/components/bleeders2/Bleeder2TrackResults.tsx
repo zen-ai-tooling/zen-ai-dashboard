@@ -42,7 +42,7 @@ const TRACK_DECISIONS: Record<Bleeder2TrackType, string[]> = {
 
 export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
   result, onDownload, onUploadDecision, onAdjustThresholds, onUploadNewFile,
-  decisionFile, amazonFile, onDownloadAmazon
+  decisionFile, amazonFile, onDownloadAmazon, onStartNew, acosThresholdLabel
 }) => {
   const [decisions, setDecisions] = useState<Record<number, string>>({});
   const [cutBidPcts, setCutBidPcts] = useState<Record<number, number>>({});
