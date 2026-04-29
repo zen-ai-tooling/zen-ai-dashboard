@@ -1043,6 +1043,8 @@ const Index = () => {
                 decisionFile={bleeder2TrackState[bleeder2ActiveTrack].decisionFile}
                 amazonFile={bleeder2TrackState[bleeder2ActiveTrack].amazonFile}
                 onDownloadAmazon={() => handleDownloadAmazonFile(bleeder2ActiveTrack!)}
+                onStartNew={() => { setBleeder2ActiveTrack(null); setBleeder2Stage('picker'); }}
+                acosThresholdLabel={`${bleeder2Thresholds.targetACOS + 10}% (SB/SD) / ${bleeder2Thresholds.targetACOS + 20}% (SP)`}
               />
             )}
 
