@@ -564,19 +564,33 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         </div>
 
         {/* Pinned action bar */}
-        <div className="sticky bottom-0 z-10 p-4 border-t border-border bg-card/95 backdrop-blur-sm space-y-2">
+        <div className="sticky bottom-0 z-10 p-4 border-t border-border bg-[#FAFAFA] space-y-2">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
-              <div className="flex items-baseline gap-2">
-                <span className="text-[14px] font-semibold text-foreground font-mono-nums">
-                  {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{result.bleeders.length}</span>
-                </span>
-                <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions made</span>
-              </div>
-              <div className="mt-2 h-1 w-full max-w-[280px] rounded-full bg-secondary overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-primary transition-all duration-300"
-                  style={{ width: `${(decisionsMade / Math.max(result.bleeders.length, 1)) * 100}%` }}
+              {decisionsMade >= result.bleeders.length && result.bleeders.length > 0 ? (
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[14px] font-semibold font-mono-nums" style={{ color: '#34C759' }}>
+                    All {result.bleeders.length} decisions complete
+                  </span>
+                  <CheckCircle2 className="w-4 h-4" style={{ color: '#34C759' }} />
+                </div>
+              ) : (
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[14px] font-semibold text-foreground font-mono-nums">
+                    {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{result.bleeders.length}</span>
+                  </span>
+                  <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions</span>
+                </div>
+              )}
+              <div className="mt-2">
+                <DecisionProgressBar
+                  total={result.bleeders.length}
+                  segments={[
+                    { key: 'Pause', count: Object.values(decisions).filter(d => d === 'Pause').length, color: '#FF3B30' },
+                    { key: 'Cut', count: Object.values(decisions).filter(d => d === 'Cut Bid').length, color: '#FF9500' },
+                    { key: 'Negative', count: Object.values(decisions).filter(d => d === 'Negative').length, color: '#0071E3' },
+                    { key: 'Keep', count: Object.values(decisions).filter(d => d === 'Keep').length, color: '#34C759' },
+                  ]}
                 />
               </div>
             </div>
@@ -594,7 +608,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                   });
                 }}
                 disabled={decisionsMade === 0 || isGenerating || !!amazonFile}
-                className={`btn-primary-action btn-press ${(generateDone || amazonFile) ? 'is-done' : ''}`}
+                className={`btn-primary-action btn-press ${(generateDone || amazonFile) ? 'is-done' : ''} ${decisionsMade >= result.bleeders.length && result.bleeders.length > 0 && !generateDone && !amazonFile ? 'is-ready-pulse' : ''}`}
               >
                 {isGenerating ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
