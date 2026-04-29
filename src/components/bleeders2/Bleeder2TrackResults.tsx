@@ -454,8 +454,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
           </Table>
         </div>
 
-        {/* Table footer */}
-        <div className="p-4 border-t border-border bg-muted/30 space-y-2">
+        {/* Pinned action bar */}
+        <div className="sticky bottom-0 z-10 p-4 border-t border-border bg-card/95 backdrop-blur-sm space-y-2">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline gap-2">
