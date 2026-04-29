@@ -463,15 +463,16 @@ export const AnalysisResults = ({
           <div className="w-full max-h-[58vh] overflow-auto">
             <Table className="table-fixed w-full">
               <colgroup>
-                <col style={{ width: '22%' }} />
-                <col style={{ width: '18%' }} />
-                <col style={{ width: '14%' }} />
-                <col style={{ width: '8%' }} />
-                <col style={{ width: '7%' }} />
-                <col style={{ width: '9%' }} />
-                <col style={{ width: '8%' }} />
-                <col style={{ width: '7%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '16%' }} />
                 <col style={{ width: '13%' }} />
+                <col style={{ width: '7%' }} />
+                <col style={{ width: '6%' }} />
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '7%' }} />
+                <col style={{ width: '7%' }} />
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '8%' }} />
               </colgroup>
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-b border-border">
@@ -497,6 +498,7 @@ export const AnalysisResults = ({
                   <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
                     <SortHeader active={sortKey === 'acos'} dir={sortDir} onClick={() => toggleSort('acos')} align="right">ACoS</SortHeader>
                   </TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>Suggestion</TableHead>
                   <TableHead style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
                 </TableRow>
               </TableHeader>
