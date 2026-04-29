@@ -348,14 +348,7 @@ export const AnalysisResults = ({
         ]}
       />
 
-      {/* Completion banner */}
-      {generateDone && generatedFileName && (
-        <CompletionBanner
-          fileName={generatedFileName}
-          onDownload={() => lastDownloadRef.current?.()}
-          onStartNew={handleStartNew}
-        />
-      )}
+      {/* Completion banner removed — replaced by full CompletionView page */}
 
       {/* Insights — collapsible top spenders */}
       {topSpenders.length > 0 && (
