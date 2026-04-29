@@ -711,10 +711,10 @@ const Index = () => {
 
   // ── Track picker cards ──
   const TRACK_CARDS = [
-    { id: 'SBSD' as const, name: 'SB/SD Bad Targets', desc: 'Sponsored Brands & Display targeting', accent: 'border-l-red-500' },
-    { id: 'SP' as const, name: 'SP Bad Search Terms', desc: 'Sponsored Products search terms', accent: 'border-l-amber-500' },
-    { id: 'SP_KEYWORDS' as const, name: 'SP Bad Targets', desc: 'Sponsored Products targets', accent: 'border-l-primary' },
-    { id: 'ACOS100' as const, name: 'Campaigns >100% ACoS', desc: 'High ACoS campaign cleanup', accent: 'border-l-purple-500' },
+    { id: 'SBSD' as const, name: 'SB/SD Bad Targets', desc: 'Sponsored Brands & Display targeting', accent: 'border-l-red-500', hover: 'track-card-hover-red' },
+    { id: 'SP' as const, name: 'SP Bad Search Terms', desc: 'Sponsored Products search terms', accent: 'border-l-amber-500', hover: 'track-card-hover-amber' },
+    { id: 'SP_KEYWORDS' as const, name: 'SP Bad Targets', desc: 'Sponsored Products targets', accent: 'border-l-primary', hover: 'track-card-hover-blue' },
+    { id: 'ACOS100' as const, name: 'Campaigns >100% ACoS', desc: 'High ACoS campaign cleanup', accent: 'border-l-purple-500', hover: 'track-card-hover-purple' },
   ];
 
   // ── Back navigation ──
@@ -888,15 +888,15 @@ const Index = () => {
                           <button
                             key={t.id}
                             onClick={() => handleSelectTrack(t.id)}
-                            className={`group w-full text-left rounded-xl border border-border bg-card border-l-4 ${t.accent} card-hover btn-press relative px-4 py-3.5`}
+                            className={`group w-full text-left rounded-xl border border-border bg-card border-l-4 ${t.accent} ${t.hover} card-hover btn-press relative px-4 py-3.5 transition-colors`}
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
                                 <div className="text-[14px] font-semibold text-foreground">{t.name}</div>
                                 <div className="text-[12.5px] text-[#86868B] mt-0.5">{t.desc}</div>
                                 {isDone && result && (
-                                  <div className="text-[12px] text-[#1A7F3E] mt-1.5 font-mono-nums">
-                                    {result.bleeders?.length ?? 0} bleeders found · ${(result.totalSpend ?? 0).toFixed(0)} at risk
+                                  <div className="text-[12px] text-[#34C759] mt-1.5 font-mono-nums">
+                                    ✓ {result.bleeders?.length ?? 0} bleeders · ${(result.totalSpend ?? 0).toFixed(0)} at risk
                                   </div>
                                 )}
                               </div>
@@ -904,7 +904,7 @@ const Index = () => {
                                 {isDone && (
                                   <CheckCircle2 className="w-4 h-4" style={{ color: '#34C759' }} strokeWidth={2.2} />
                                 )}
-                                <ArrowRight className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))] opacity-0 group-hover:opacity-100" style={{ transition: 'opacity 150ms ease' }} />
+                                <span className="text-[18px] leading-none text-[#C7C7CC] group-hover:text-[#86868B] transition-colors">›</span>
                               </div>
                             </div>
                           </button>
