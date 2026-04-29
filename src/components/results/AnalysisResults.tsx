@@ -524,120 +524,106 @@ export const AnalysisResults = ({
               </TableBody>
             </Table>
           </div>
+
+          {/* Pinned action bar — sticky at the bottom of the table card */}
+          <div className="sticky bottom-0 z-10 border-t border-border bg-card/95 backdrop-blur-sm p-4">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[14px] font-semibold text-foreground font-mono-nums">
+                    {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{allRows.length}</span>
+                  </span>
+                  <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions made</span>
+                </div>
+                <div className="mt-1.5 h-1 w-full max-w-[280px] rounded-full bg-secondary overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all duration-300"
+                    style={{ width: `${(decisionsMade / Math.max(allRows.length, 1)) * 100}%` }}
+                  />
+                </div>
+                <p className="text-[12px] text-[#6E6E73] mt-1.5 inline-flex items-center gap-1.5">
+                  <Info className="w-3 h-3" />
+                  Pause on search terms auto-converts to Negate (Exact)
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 flex-shrink-0 relative">
+                <button
+                  onClick={() => setMoreOpen(o => !o)}
+                  className="h-9 w-9 rounded-md border border-border bg-card text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press flex items-center justify-center"
+                  aria-label="More actions"
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
+                {moreOpen && (
+                  <div className="absolute right-0 bottom-11 min-w-[240px] rounded-lg border border-border bg-popover shadow-pop p-1 z-20 animate-scale-in">
+                    <button
+                      onClick={() => { handleDownload(); setMoreOpen(false); }}
+                      className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
+                    >
+                      <FileSpreadsheet className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))]" />
+                      {formattedWorkbook ? 'Download formatted Excel' : 'Download combined CSV'}
+                      <span className="ml-auto text-[10px] text-[hsl(var(--text-tertiary))]">legacy</span>
+                    </button>
+                    {onProceedToProcessor && (
+                      <button
+                        onClick={() => { onProceedToProcessor(); setMoreOpen(false); }}
+                        className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
+                      >
+                        Proceed to Decision Processor →
+                      </button>
+                    )}
+                  </div>
+                )}
+                <button
+                  onClick={handleGenerateDecisionFile}
+                  disabled={decisionsMade === 0 || isGenerating}
+                  className={`btn-primary-action btn-press ${generateDone ? 'is-done' : ''}`}
+                >
+                  {isGenerating ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</>
+                  ) : generateDone ? (
+                    <><CheckCircle2 className="w-4 h-4" /> Downloaded ✓</>
+                  ) : (
+                    <>Generate Amazon file →</>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Action bar */}
+      {/* Manual decision upload — collapsed */}
       {allRows.length > 0 && (
-        <div className="rounded-xl border border-border bg-card shadow-card p-5">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            {/* Progress indicator */}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-baseline gap-2">
-                <span className="text-[14px] font-semibold text-foreground font-mono-nums">
-                  {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{allRows.length}</span>
-                </span>
-                <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions made</span>
-              </div>
-              <div className="mt-2 h-1 w-full max-w-[280px] rounded-full bg-secondary overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-primary transition-all duration-300"
-                  style={{ width: `${(decisionsMade / Math.max(allRows.length, 1)) * 100}%` }}
-                />
-              </div>
-              <p className="text-[12px] text-[hsl(var(--muted-foreground))] mt-2 inline-flex items-center gap-1.5">
-                <Info className="w-3 h-3" />
-                Pause on search terms auto-converts to Negate (Exact)
-              </p>
-            </div>
-
-            {/* Buttons */}
-            <div className="flex items-center gap-2 flex-shrink-0 relative">
-              <button
-                onClick={() => setMoreOpen(o => !o)}
-                className="h-9 w-9 rounded-md border border-border bg-card text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press flex items-center justify-center"
-                aria-label="More actions"
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </button>
-              {moreOpen && (
-                <div className="absolute right-0 top-11 min-w-[240px] rounded-lg border border-border bg-popover shadow-pop p-1 z-20 animate-scale-in">
-                  <button
-                    onClick={() => { handleDownload(); setMoreOpen(false); }}
-                    className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
-                  >
-                    <FileSpreadsheet className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))]" />
-                    {formattedWorkbook ? 'Download formatted Excel' : 'Download combined CSV'}
-                    <span className="ml-auto text-[10px] text-[hsl(var(--text-tertiary))]">legacy</span>
-                  </button>
-                  {onProceedToProcessor && (
-                    <button
-                      onClick={() => { onProceedToProcessor(); setMoreOpen(false); }}
-                      className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
-                    >
-                      Proceed to Decision Processor →
-                    </button>
-                  )}
-                </div>
-              )}
-              <button
-                onClick={handleGenerateDecisionFile}
-                disabled={decisionsMade === 0 || isGenerating}
-                className={`btn-primary-action btn-press ${generateDone ? 'is-done' : ''}`}
-              >
-                {isGenerating ? (
-                  <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</>
-                ) : generateDone ? (
-                  <><CheckCircle2 className="w-4 h-4" /> Downloaded ✓</>
-                ) : (
-                  <>Generate Amazon file →</>
-                )}
-              </button>
-            </div>
+        <details className="group">
+          <summary className="list-none select-none cursor-pointer inline-flex items-center gap-1.5 text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground transition-colors">
+            <ChevronDown className="w-3 h-3 transition-transform duration-200 group-open:rotate-180" />
+            Or upload a decision file manually
+          </summary>
+          <div className="mt-3 max-w-[480px]">
+            <label
+              htmlFor="manual-decision-upload-b1"
+              className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-4 py-3 cursor-pointer hover:border-primary/60 btn-press"
+            >
+              <Upload className="w-4 h-4 text-[hsl(var(--text-tertiary))]" />
+              <span className="text-[12.5px] text-[hsl(var(--text-secondary))]">
+                Drop or click to upload a pre-made decision file (.xlsx)
+              </span>
+              <input
+                id="manual-decision-upload-b1"
+                type="file"
+                accept=".xlsx,.xls,.csv"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleManualDecisionUpload(f);
+                }}
+              />
+            </label>
           </div>
-
-          {/* Manual decision upload — collapsed for parity with Bleeders 2.0 */}
-          <details className="group mt-4 pt-4 border-t border-border">
-            <summary className="list-none select-none cursor-pointer inline-flex items-center gap-1.5 text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground transition-colors">
-              <ChevronDown className="w-3 h-3 transition-transform duration-200 group-open:rotate-180" />
-              Or upload a decision file manually
-            </summary>
-            <div className="mt-3 max-w-[480px]">
-              <label
-                htmlFor="manual-decision-upload-b1"
-                className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-4 py-3 cursor-pointer hover:border-primary/60 btn-press"
-              >
-                <Upload className="w-4 h-4 text-[hsl(var(--text-tertiary))]" />
-                <span className="text-[12.5px] text-[hsl(var(--text-secondary))]">
-                  Drop or click to upload a pre-made decision file (.xlsx)
-                </span>
-                <input
-                  id="manual-decision-upload-b1"
-                  type="file"
-                  accept=".xlsx,.xls,.csv"
-                  className="hidden"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) handleManualDecisionUpload(f);
-                  }}
-                />
-              </label>
-            </div>
-          </details>
-        </div>
+        </details>
       )}
     </div>
   );
 };
-
-const StatCell: React.FC<{ icon: React.ReactNode; value: string; label: string }> = ({ icon, value, label }) => (
-  <div className="px-5 py-4">
-    <div className="flex items-center gap-1.5 text-[hsl(var(--text-tertiary))] mb-1.5">
-      {icon}
-      <span className="text-[11px] font-semibold uppercase" style={{ letterSpacing: '0.08em' }}>{label}</span>
-    </div>
-    <div className="text-[28px] font-semibold leading-none text-foreground font-mono-nums tracking-tight">
-      {value}
-    </div>
-  </div>
-);
