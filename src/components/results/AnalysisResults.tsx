@@ -6,6 +6,7 @@ import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSe
 import { CompactStatsBar } from "@/components/shared/CompactStatsBar";
 import { SortHeader, useSortable } from "@/components/shared/SortHeader";
 import { CompletionView } from "@/components/shared/CompletionView";
+import { DecisionProgressBar } from "@/components/shared/DecisionProgressBar";
 import { suggestB1Row } from "@/lib/ui/bleeder1Suggestion";
 
 interface TopSpender {
@@ -101,7 +102,18 @@ export const AnalysisResults = ({
   const [showFullResults, setShowFullResults] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [generatedFileName, setGeneratedFileName] = useState<string>('');
+  const [flashKey, setFlashKey] = useState<{ key: string; cls: string; ts: number } | null>(null);
   const lastDownloadRef = useRef<(() => void) | null>(null);
+
+  const setDecisionWithFlash = (key: string, val: string) => {
+    setDecisions(prev => ({ ...prev, [key]: val }));
+    let cls = '';
+    if (val === 'Pause') cls = 'row-flash-pause';
+    else if (val === 'Keep') cls = 'row-flash-keep';
+    else if (val.startsWith('Cut')) cls = 'row-flash-cut';
+    else if (val.startsWith('Negat')) cls = 'row-flash-negate';
+    if (cls) setFlashKey({ key, cls, ts: Date.now() });
+  };
 
   const rowsBySheet = useMemo(() => {
     const grouped: Record<string, NormalizedRow[]> = {};
@@ -146,6 +158,15 @@ export const AnalysisResults = ({
     });
     return idx;
   }, [currentRows, sortKey, sortDir]);
+
+  // Urgency quartiles based on Spend within the current sheet
+  const urgencyBands = useMemo(() => {
+    const spends = currentRows.map(r => r.spend || 0).slice().sort((a, b) => a - b);
+    if (spends.length === 0) return { high: Infinity, low: -Infinity };
+    const q = (p: number) => spends[Math.min(spends.length - 1, Math.floor(spends.length * p))];
+    return { high: q(0.75), low: q(0.25) };
+  }, [currentRows]);
+
 
   const decisionsMade = useMemo(
     () => Object.values(decisions).filter(d => d && d !== '').length,
@@ -294,11 +315,14 @@ export const AnalysisResults = ({
       <CompletionView
         fileName={generatedFileName}
         title="Workflow complete"
+        impactHeadline={`$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })} in at-risk spend addressed`}
+        impactSubtitle="The bleeders below were captured and packaged into your Amazon bulk file."
+        totalRows={allRows.length}
         summary={[
           { label: 'Bleeders found', value: allRows.length.toLocaleString() },
-          { label: 'At-risk spend', value: `$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}` },
           { label: 'Sheets processed', value: String(sheetsCount) },
           { label: 'Decisions made', value: `${decisionsMade}/${allRows.length}` },
+          { label: 'Avg spend per bleeder', value: `$${(totalSpend / Math.max(allRows.length, 1)).toFixed(2)}` },
         ]}
         breakdown={breakdown}
         onDownload={() => lastDownloadRef.current?.()}
@@ -423,45 +447,68 @@ export const AnalysisResults = ({
           </div>
 
           {/* Bulk action bar */}
-          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-secondary/30">
-            <span className="text-[11px] text-[hsl(var(--text-tertiary))] mr-1 font-semibold uppercase tracking-[0.06em]">Bulk:</span>
-            <button
-              onClick={() => {
-                const next = { ...decisions };
-                currentRows.forEach((_, idx) => { next[`${currentSheet}-ROWINDEX-${idx}`] = decisionOptions.find(o => o === 'Pause') || decisionOptions[0]; });
-                setDecisions(next);
-              }}
-              className="text-[11px] h-6 px-2.5 rounded-md border border-border bg-card hover:bg-secondary btn-press inline-flex items-center gap-1.5"
-            >
-              <span className="decision-dot" style={{ background: 'hsl(var(--destructive))' }} />
-              Select all → Pause
-            </button>
-            <button
-              onClick={() => {
-                const next = { ...decisions };
-                currentRows.forEach((_, idx) => { next[`${currentSheet}-ROWINDEX-${idx}`] = 'Keep'; });
-                setDecisions(next);
-              }}
-              className="text-[11px] h-6 px-2.5 rounded-md border border-border bg-card hover:bg-secondary btn-press inline-flex items-center gap-1.5"
-            >
-              <span className="decision-dot" style={{ background: 'hsl(var(--success))' }} />
-              Select all → Keep
-            </button>
-            <button
-              onClick={() => {
-                const next = { ...decisions };
-                currentRows.forEach((_, idx) => { delete next[`${currentSheet}-ROWINDEX-${idx}`]; });
-                setDecisions(next);
-              }}
-              className="text-[11px] h-6 px-2.5 rounded-md text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press inline-flex items-center gap-1"
-            >
-              <XCircle className="w-3 h-3" />
-              Clear all
-            </button>
+          <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-border bg-[#FAFAFA]">
+            <div className="text-[12px] text-[hsl(var(--text-secondary))] truncate">
+              <span className="font-medium text-foreground">{shortTabLabel(currentSheet)}</span>
+              <span className="mx-1.5 text-[hsl(var(--text-tertiary))]">·</span>
+              <span className="font-mono-nums">{currentRows.length}</span> bleeders
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {decisionOptions.includes('Pause') && (
+                <button
+                  onClick={() => {
+                    const next = { ...decisions };
+                    currentRows.forEach((_, idx) => { next[`${currentSheet}-ROWINDEX-${idx}`] = 'Pause'; });
+                    setDecisions(next);
+                  }}
+                  className="bulk-btn btn-press"
+                >
+                  <span className="decision-dot" style={{ background: '#FF3B30' }} />
+                  Select all → Pause
+                </button>
+              )}
+              {decisionOptions.includes('Cut Bid 50%') && (
+                <button
+                  onClick={() => {
+                    const next = { ...decisions };
+                    currentRows.forEach((_, idx) => { next[`${currentSheet}-ROWINDEX-${idx}`] = 'Cut Bid 50%'; });
+                    setDecisions(next);
+                  }}
+                  className="bulk-btn btn-press"
+                >
+                  <span className="decision-dot" style={{ background: '#FF9500' }} />
+                  Select all → Cut Bid 50%
+                </button>
+              )}
+              {decisionOptions.includes('Keep') && (
+                <button
+                  onClick={() => {
+                    const next = { ...decisions };
+                    currentRows.forEach((_, idx) => { next[`${currentSheet}-ROWINDEX-${idx}`] = 'Keep'; });
+                    setDecisions(next);
+                  }}
+                  className="bulk-btn btn-press"
+                >
+                  <span className="decision-dot" style={{ background: '#34C759' }} />
+                  Select all → Keep
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  const next = { ...decisions };
+                  currentRows.forEach((_, idx) => { delete next[`${currentSheet}-ROWINDEX-${idx}`]; });
+                  setDecisions(next);
+                }}
+                className="bulk-btn bulk-btn-ghost btn-press"
+              >
+                <XCircle className="w-3 h-3" />
+                Clear
+              </button>
+            </div>
           </div>
 
-          {/* Table — scrollable area, action bar pinned below */}
-          <div className="w-full max-h-[58vh] overflow-auto">
+          {/* Table — scrollable area with sticky thead, action bar pinned below */}
+          <div className="w-full max-h-[58vh] overflow-auto table-sticky-header">
             <Table className="table-fixed w-full">
               <colgroup>
                 <col style={{ width: '20%' }} />
@@ -513,10 +560,28 @@ export const AnalysisResults = ({
                   const isHighSpend = row.spend > decisionThresholdSpend;
                   const acosNum = parseAcosNum(row.acos);
                   const hasAcos = acosNum >= 0 && row.acos && row.acos !== '0' && row.acos !== '0%';
+
+                  // Urgency: high (top 25% spend) or low (bottom 25%) — only when no decision yet
+                  const isHighUrgency = !decision && row.spend >= urgencyBands.high && row.spend > 0;
+                  const isLowUrgency = !decision && row.spend <= urgencyBands.low;
+                  const urgencyClass = decision
+                    ? ''
+                    : isHighUrgency
+                      ? 'row-urgency-high'
+                      : isLowUrgency
+                        ? 'row-urgency-low'
+                        : '';
+
+                  // Row flash on decision change (one-shot)
+                  const flashClass =
+                    flashKey && flashKey.key === key && Date.now() - flashKey.ts < 400
+                      ? flashKey.cls
+                      : '';
+
                   return (
                     <TableRow
-                      key={rowIdx}
-                      className={`row-enter cursor-pointer hover:bg-[#F9F9FB] transition-colors ${displayIdx % 2 === 1 ? 'bg-secondary/30' : ''} ${indicatorClass}`}
+                      key={`${rowIdx}-${flashKey?.key === key ? flashKey.ts : 'r'}`}
+                      className={`row-enter cursor-pointer hover:bg-[#F9F9FB] transition-colors ${displayIdx % 2 === 1 && !decision ? 'bg-secondary/30' : ''} ${urgencyClass} ${indicatorClass} ${flashClass}`}
                       style={{ animationDelay: `${Math.min(displayIdx * 12, 240)}ms` }}
                     >
                       <TableCell className="truncate font-medium" title={row.campaign}>
@@ -557,8 +622,13 @@ export const AnalysisResults = ({
                           const sug = suggestB1Row({ clicks: row.clicks ?? 0, spend: row.spend ?? 0, sales: row.sales ?? 0, orders: row.orders ?? 0 });
                           return (
                             <span
-                              className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full"
-                              style={{ background: sug.bg, color: sug.color, border: `1px solid ${sug.border}` }}
+                              className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full transition-opacity"
+                              style={{
+                                background: sug.bg,
+                                color: sug.color,
+                                border: `1px solid ${sug.border}`,
+                                opacity: decision ? 0.45 : 1,
+                              }}
                             >
                               {sug.label}
                             </span>
@@ -566,12 +636,17 @@ export const AnalysisResults = ({
                         })()}
                       </TableCell>
                       <TableCell className="px-2">
-                        <DecisionSelect
-                          value={decision}
-                          onChange={(val) => setDecisions(prev => ({ ...prev, [key]: val }))}
-                          options={decisionOptions}
-                          width="100%"
-                        />
+                        <div className="flex items-center gap-1.5">
+                          {decision && (
+                            <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#34C759' }} />
+                          )}
+                          <DecisionSelect
+                            value={decision}
+                            onChange={(val) => setDecisionWithFlash(key, val)}
+                            options={decisionOptions}
+                            width="100%"
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
@@ -584,16 +659,30 @@ export const AnalysisResults = ({
           <div className="sticky bottom-0 z-10 border-t border-border bg-card/95 backdrop-blur-sm p-4">
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="min-w-0 flex-1">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[14px] font-semibold text-foreground font-mono-nums">
-                    {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{allRows.length}</span>
-                  </span>
-                  <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions made</span>
-                </div>
-                <div className="mt-1.5 h-1 w-full max-w-[280px] rounded-full bg-secondary overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-primary transition-all duration-300"
-                    style={{ width: `${(decisionsMade / Math.max(allRows.length, 1)) * 100}%` }}
+                {decisionsMade >= allRows.length && allRows.length > 0 ? (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-[14px] font-semibold font-mono-nums" style={{ color: '#34C759' }}>
+                      All {allRows.length} decisions complete
+                    </span>
+                    <CheckCircle2 className="w-4 h-4" style={{ color: '#34C759' }} />
+                  </div>
+                ) : (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-[14px] font-semibold text-foreground font-mono-nums">
+                      {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{allRows.length}</span>
+                    </span>
+                    <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions</span>
+                  </div>
+                )}
+                <div className="mt-1.5">
+                  <DecisionProgressBar
+                    total={allRows.length}
+                    segments={[
+                      { key: 'Pause', count: breakdown.find(b => b.label === 'Paused')?.count ?? 0, color: '#FF3B30' },
+                      { key: 'Cut', count: breakdown.find(b => b.label === 'Cut Bid 50%')?.count ?? 0, color: '#FF9500' },
+                      { key: 'Negative', count: breakdown.find(b => b.label === 'Negative')?.count ?? 0, color: '#0071E3' },
+                      { key: 'Keep', count: breakdown.find(b => b.label === 'Keep')?.count ?? 0, color: '#34C759' },
+                    ]}
                   />
                 </div>
                 <p className="text-[12px] text-[#6E6E73] mt-1.5 inline-flex items-center gap-1.5">
@@ -633,7 +722,7 @@ export const AnalysisResults = ({
                 <button
                   onClick={handleGenerateDecisionFile}
                   disabled={decisionsMade === 0 || isGenerating}
-                  className={`btn-primary-action btn-press ${generateDone ? 'is-done' : ''}`}
+                  className={`btn-primary-action btn-press ${generateDone ? 'is-done' : ''} ${decisionsMade >= allRows.length && allRows.length > 0 && !generateDone ? 'is-ready-pulse' : ''}`}
                 >
                   {isGenerating ? (
                     <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</>

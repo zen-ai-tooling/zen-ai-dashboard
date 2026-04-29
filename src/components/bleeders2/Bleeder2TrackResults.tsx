@@ -12,6 +12,7 @@ import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSe
 import { CompactStatsBar } from "@/components/shared/CompactStatsBar";
 import { SortHeader, useSortable } from "@/components/shared/SortHeader";
 import { CompletionView } from "@/components/shared/CompletionView";
+import { DecisionProgressBar } from "@/components/shared/DecisionProgressBar";
 
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
@@ -49,6 +50,17 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateDone, setGenerateDone] = useState(false);
   const [showFullResults, setShowFullResults] = useState(false);
+  const [flashIdx, setFlashIdx] = useState<{ idx: number; cls: string; ts: number } | null>(null);
+
+  const setDecisionWithFlash = (idx: number, val: string) => {
+    setDecisions(prev => ({ ...prev, [idx]: val }));
+    let cls = '';
+    if (val === 'Pause') cls = 'row-flash-pause';
+    else if (val === 'Keep') cls = 'row-flash-keep';
+    else if (val.startsWith('Cut')) cls = 'row-flash-cut';
+    else if (val.startsWith('Negat')) cls = 'row-flash-negate';
+    if (cls) setFlashIdx({ idx, cls, ts: Date.now() });
+  };
 
   const hasBleeders = result.bleeders.length > 0;
 
@@ -111,9 +123,29 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
     return idx;
   }, [result.bleeders, sortKey, sortDir]);
 
+  // Urgency quartiles based on Spend
+  const urgencyBands = useMemo(() => {
+    const spends = result.bleeders.map(b => b.spend || 0).slice().sort((a, b) => a - b);
+    if (spends.length === 0) return { high: Infinity, low: -Infinity };
+    const q = (p: number) => spends[Math.min(spends.length - 1, Math.floor(spends.length * p))];
+    return { high: q(0.75), low: q(0.25) };
+  }, [result.bleeders]);
+
   const handleSetAllPause = () => {
     const all: Record<number, string> = {};
     result.bleeders.forEach((_, idx) => { all[idx] = 'Pause'; });
+    setDecisions(all);
+  };
+
+  const handleSetAllKeep = () => {
+    const all: Record<number, string> = {};
+    result.bleeders.forEach((_, idx) => { all[idx] = 'Keep'; });
+    setDecisions(all);
+  };
+
+  const handleSetAllCutBid = () => {
+    const all: Record<number, string> = {};
+    result.bleeders.forEach((_, idx) => { all[idx] = 'Cut Bid'; });
     setDecisions(all);
   };
 
@@ -243,11 +275,14 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
       <CompletionView
         fileName={amazonFile.fileName}
         title="Workflow complete"
+        impactHeadline={`$${result.totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })} in at-risk spend addressed`}
+        impactSubtitle={`${TRACK_LABELS[result.trackType]} captured into your Amazon bulk file.`}
+        totalRows={result.bleeders.length}
         summary={[
           { label: 'Bleeders found', value: result.bleeders.length.toLocaleString() },
-          { label: 'At-risk spend', value: `$${result.totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}` },
           { label: 'Average ACoS', value: `${avgAcos.toFixed(1)}%` },
           { label: 'Decisions made', value: `${decisionsMade}/${result.bleeders.length}` },
+          { label: 'Avg spend per bleeder', value: `$${(result.totalSpend / Math.max(result.bleeders.length, 1)).toFixed(2)}` },
           ...(acosThresholdLabel ? [{ label: 'Threshold used', value: acosThresholdLabel }] : []),
         ]}
         breakdown={[
@@ -349,26 +384,48 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         </div>
 
         {/* Bulk action buttons */}
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/60 bg-muted/20">
-          <span className="text-[11px] text-muted-foreground mr-1">Bulk:</span>
-          <Button variant="outline" size="sm" onClick={() => {
-            const allSuggested: Record<number, string> = {};
-            suggestions.forEach((s, idx) => { allSuggested[idx] = s.decision; });
-            setDecisions(allSuggested);
-          }} className="text-[11px] h-6 px-2.5 btn-press">
-            Apply all suggestions
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleSetAllPause} className="text-[11px] h-6 px-2.5 btn-press">
-            Select all → Pause
-          </Button>
-          <Button variant="ghost" size="sm" onClick={handleClearAll} className="text-[11px] h-6 px-2.5 btn-press text-muted-foreground">
-            <XCircle className="w-3 h-3 mr-1" />
-            Clear all
-          </Button>
+        <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-border bg-[#FAFAFA]">
+          <div className="text-[12px] text-[hsl(var(--text-secondary))] truncate">
+            <span className="font-medium text-foreground">{TRACK_LABELS[result.trackType]}</span>
+            <span className="mx-1.5 text-[hsl(var(--text-tertiary))]">·</span>
+            <span className="font-mono-nums">{result.bleeders.length}</span> bleeders
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button onClick={() => {
+              const allSuggested: Record<number, string> = {};
+              suggestions.forEach((s, idx) => { allSuggested[idx] = s.decision; });
+              setDecisions(allSuggested);
+            }} className="bulk-btn btn-press">
+              <span className="decision-dot" style={{ background: '#0071E3' }} />
+              Apply all suggestions
+            </button>
+            {getDecisionOptions().includes('Pause') && (
+              <button onClick={handleSetAllPause} className="bulk-btn btn-press">
+                <span className="decision-dot" style={{ background: '#FF3B30' }} />
+                Select all → Pause
+              </button>
+            )}
+            {getDecisionOptions().includes('Cut Bid') && (
+              <button onClick={handleSetAllCutBid} className="bulk-btn btn-press">
+                <span className="decision-dot" style={{ background: '#FF9500' }} />
+                Select all → Cut Bid
+              </button>
+            )}
+            {getDecisionOptions().includes('Keep') && (
+              <button onClick={handleSetAllKeep} className="bulk-btn btn-press">
+                <span className="decision-dot" style={{ background: '#34C759' }} />
+                Select all → Keep
+              </button>
+            )}
+            <button onClick={handleClearAll} className="bulk-btn bulk-btn-ghost btn-press">
+              <XCircle className="w-3 h-3" />
+              Clear
+            </button>
+          </div>
         </div>
 
-        {/* Table — scrollable with pinned footer below */}
-        <div className="max-h-[58vh] overflow-auto">
+        {/* Table — scrollable with sticky thead, pinned footer below */}
+        <div className="max-h-[58vh] overflow-auto table-sticky-header">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
@@ -414,8 +471,20 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 const acosVal = bleeder.acos;
                 const aboveThreshold = acosVal >= (result.acosThreshold ?? 0);
                 const acosBg = aboveThreshold ? '#FF3B30' : '#FF9500';
+
+                const isHighUrgency = !decision && bleeder.spend >= urgencyBands.high && bleeder.spend > 0;
+                const isLowUrgency = !decision && bleeder.spend <= urgencyBands.low;
+                const urgencyClass = decision
+                  ? ''
+                  : isHighUrgency ? 'row-urgency-high' : isLowUrgency ? 'row-urgency-low' : '';
+                const flashClass =
+                  flashIdx && flashIdx.idx === idx && Date.now() - flashIdx.ts < 400 ? flashIdx.cls : '';
+
                 return (
-                  <TableRow key={idx} className={`hover:bg-[#F9F9FB] transition-colors ${indicatorClass}`}>
+                  <TableRow
+                    key={`${idx}-${flashIdx?.idx === idx ? flashIdx.ts : 'r'}`}
+                    className={`hover:bg-[#F9F9FB] transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
+                  >
                     <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.campaignName}>
                       {bleeder.campaignName}
                     </TableCell>
@@ -456,19 +525,22 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                     </TableCell>
                     <TableCell>
                       <button
-                        onClick={() => setDecisions(prev => ({ ...prev, [idx]: suggestion.decision }))}
+                        onClick={() => setDecisionWithFlash(idx, suggestion.decision)}
                         title={suggestion.reason}
                         className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium cursor-pointer transition-all hover:opacity-80"
-                        style={sugStyle}
+                        style={{ ...sugStyle, opacity: decision ? 0.45 : 1 }}
                       >
                         {suggestion.shortLabel}
                       </button>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1.5">
+                        {decision && (
+                          <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#34C759' }} />
+                        )}
                         <DecisionSelect
                           value={decision}
-                          onChange={(val) => setDecisions(prev => ({ ...prev, [idx]: val }))}
+                          onChange={(val) => setDecisionWithFlash(idx, val)}
                           options={getDecisionOptions()}
                           width="128px"
                         />
@@ -495,19 +567,33 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         </div>
 
         {/* Pinned action bar */}
-        <div className="sticky bottom-0 z-10 p-4 border-t border-border bg-card/95 backdrop-blur-sm space-y-2">
+        <div className="sticky bottom-0 z-10 p-4 border-t border-border bg-[#FAFAFA] space-y-2">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
-              <div className="flex items-baseline gap-2">
-                <span className="text-[14px] font-semibold text-foreground font-mono-nums">
-                  {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{result.bleeders.length}</span>
-                </span>
-                <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions made</span>
-              </div>
-              <div className="mt-2 h-1 w-full max-w-[280px] rounded-full bg-secondary overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-primary transition-all duration-300"
-                  style={{ width: `${(decisionsMade / Math.max(result.bleeders.length, 1)) * 100}%` }}
+              {decisionsMade >= result.bleeders.length && result.bleeders.length > 0 ? (
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[14px] font-semibold font-mono-nums" style={{ color: '#34C759' }}>
+                    All {result.bleeders.length} decisions complete
+                  </span>
+                  <CheckCircle2 className="w-4 h-4" style={{ color: '#34C759' }} />
+                </div>
+              ) : (
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[14px] font-semibold text-foreground font-mono-nums">
+                    {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{result.bleeders.length}</span>
+                  </span>
+                  <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions</span>
+                </div>
+              )}
+              <div className="mt-2">
+                <DecisionProgressBar
+                  total={result.bleeders.length}
+                  segments={[
+                    { key: 'Pause', count: Object.values(decisions).filter(d => d === 'Pause').length, color: '#FF3B30' },
+                    { key: 'Cut', count: Object.values(decisions).filter(d => d === 'Cut Bid').length, color: '#FF9500' },
+                    { key: 'Negative', count: Object.values(decisions).filter(d => d === 'Negative').length, color: '#0071E3' },
+                    { key: 'Keep', count: Object.values(decisions).filter(d => d === 'Keep').length, color: '#34C759' },
+                  ]}
                 />
               </div>
             </div>
@@ -525,7 +611,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                   });
                 }}
                 disabled={decisionsMade === 0 || isGenerating || !!amazonFile}
-                className={`btn-primary-action btn-press ${(generateDone || amazonFile) ? 'is-done' : ''}`}
+                className={`btn-primary-action btn-press ${(generateDone || amazonFile) ? 'is-done' : ''} ${decisionsMade >= result.bleeders.length && result.bleeders.length > 0 && !generateDone && !amazonFile ? 'is-ready-pulse' : ''}`}
               >
                 {isGenerating ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
