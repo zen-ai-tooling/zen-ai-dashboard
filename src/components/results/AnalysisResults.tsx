@@ -656,16 +656,30 @@ export const AnalysisResults = ({
           <div className="sticky bottom-0 z-10 border-t border-border bg-card/95 backdrop-blur-sm p-4">
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="min-w-0 flex-1">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[14px] font-semibold text-foreground font-mono-nums">
-                    {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{allRows.length}</span>
-                  </span>
-                  <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions made</span>
-                </div>
-                <div className="mt-1.5 h-1 w-full max-w-[280px] rounded-full bg-secondary overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-primary transition-all duration-300"
-                    style={{ width: `${(decisionsMade / Math.max(allRows.length, 1)) * 100}%` }}
+                {decisionsMade >= allRows.length && allRows.length > 0 ? (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-[14px] font-semibold font-mono-nums" style={{ color: '#34C759' }}>
+                      All {allRows.length} decisions complete
+                    </span>
+                    <CheckCircle2 className="w-4 h-4" style={{ color: '#34C759' }} />
+                  </div>
+                ) : (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-[14px] font-semibold text-foreground font-mono-nums">
+                      {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{allRows.length}</span>
+                    </span>
+                    <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions</span>
+                  </div>
+                )}
+                <div className="mt-1.5">
+                  <DecisionProgressBar
+                    total={allRows.length}
+                    segments={[
+                      { key: 'Pause', count: breakdown.find(b => b.label === 'Paused')?.count ?? 0, color: '#FF3B30' },
+                      { key: 'Cut', count: breakdown.find(b => b.label === 'Cut Bid 50%')?.count ?? 0, color: '#FF9500' },
+                      { key: 'Negative', count: breakdown.find(b => b.label === 'Negative')?.count ?? 0, color: '#0071E3' },
+                      { key: 'Keep', count: breakdown.find(b => b.label === 'Keep')?.count ?? 0, color: '#34C759' },
+                    ]}
                   />
                 </div>
                 <p className="text-[12px] text-[#6E6E73] mt-1.5 inline-flex items-center gap-1.5">
