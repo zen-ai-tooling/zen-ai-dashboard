@@ -50,6 +50,17 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateDone, setGenerateDone] = useState(false);
   const [showFullResults, setShowFullResults] = useState(false);
+  const [flashIdx, setFlashIdx] = useState<{ idx: number; cls: string; ts: number } | null>(null);
+
+  const setDecisionWithFlash = (idx: number, val: string) => {
+    setDecisions(prev => ({ ...prev, [idx]: val }));
+    let cls = '';
+    if (val === 'Pause') cls = 'row-flash-pause';
+    else if (val === 'Keep') cls = 'row-flash-keep';
+    else if (val.startsWith('Cut')) cls = 'row-flash-cut';
+    else if (val.startsWith('Negat')) cls = 'row-flash-negate';
+    if (cls) setFlashIdx({ idx, cls, ts: Date.now() });
+  };
 
   const hasBleeders = result.bleeders.length > 0;
 
