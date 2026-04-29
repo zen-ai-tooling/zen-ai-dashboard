@@ -30,13 +30,20 @@ export const SortHeader: React.FC<SortHeaderProps> = ({ active, dir, onClick, cl
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center gap-1 select-none cursor-pointer hover:text-foreground transition-colors ${
+      className={`group inline-flex items-center gap-1 select-none cursor-pointer transition-colors ${
         align === 'right' ? 'flex-row-reverse' : ''
       } ${className}`}
       style={{ color: active ? 'hsl(var(--accent-blue))' : undefined }}
     >
-      <span>{children}</span>
-      <Icon className="w-3 h-3 opacity-70" strokeWidth={2} />
+      <span className={active ? 'font-semibold' : 'group-hover:text-foreground transition-colors'}>
+        {children}
+      </span>
+      <Icon
+        className={`w-3 h-3 transition-opacity ${
+          active ? 'opacity-100' : 'opacity-0 group-hover:opacity-60'
+        }`}
+        strokeWidth={2}
+      />
     </button>
   );
 };
