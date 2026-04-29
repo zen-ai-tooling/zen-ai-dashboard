@@ -421,6 +421,46 @@
     animation: action-pulse 1.6s ease-out infinite;
   }
 
+  /* ── Decision-table urgency banding ── */
+  .row-urgency-high  { box-shadow: inset 3px 0 0 #FF3B30; }
+  .row-urgency-low td { color: #6E6E73; }
+  /* When a decision is made, its color overrides urgency via more specific row-decision-* */
+
+  /* Row flash on decision change */
+  .row-flash-pause   { animation: row-flash-pause 320ms ease-out; }
+  .row-flash-keep    { animation: row-flash-keep 320ms ease-out; }
+  .row-flash-cut     { animation: row-flash-cut 320ms ease-out; }
+  .row-flash-negate  { animation: row-flash-negate 320ms ease-out; }
+
+  /* Generate button: pulse glow when all decisions complete */
+  .btn-primary-action.is-ready-pulse {
+    animation: ready-pulse 1.8s ease-in-out infinite;
+  }
+
+  /* Pinned table sub-headers */
+  .table-sticky-header thead { position: sticky; top: 0; z-index: 5; background: #FAFAFA; }
+  .table-sticky-header thead th { background: #FAFAFA; }
+
+  /* Bulk action button — outlined */
+  .bulk-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid #D2D2D7;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1D1D1F;
+    background: #fff;
+    transition: background 120ms ease, border-color 120ms ease;
+  }
+  .bulk-btn:hover { background: #F5F5F7; border-color: #C7C7CC; }
+  .bulk-btn-ghost {
+    color: #86868B;
+    border-color: transparent;
+    background: transparent;
+  }
+  .bulk-btn-ghost:hover { background: #F5F5F7; color: #1D1D1F; }
+
   /* Suggestion pills — unified */
   .pill-suggest {
     display: inline-flex; align-items: center;
