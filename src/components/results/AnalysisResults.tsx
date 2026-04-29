@@ -304,6 +304,7 @@ export const AnalysisResults = ({
         onDownload={() => lastDownloadRef.current?.()}
         onStartNew={handleStartNew}
         onViewFullResults={() => setShowFullResults(true)}
+        accentColor="#FF3B30"
       />
     );
   }

@@ -260,6 +260,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         onDownload={onDownloadAmazon}
         onStartNew={onStartNew}
         onViewFullResults={() => setShowFullResults(true)}
+        accentColor="#FF9500"
       />
     );
   }

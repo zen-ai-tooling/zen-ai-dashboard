@@ -78,9 +78,9 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
           <p className="text-[14px] text-[#86868B] mt-1">Set your campaign performance parameters.</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 items-start">
+        <div className="grid grid-cols-2 gap-4 items-stretch">
           {/* Left — Form */}
-          <div className="rounded-xl border border-border bg-card p-6 space-y-5 shadow-card">
+          <div className="rounded-xl border border-border bg-card p-6 space-y-5 shadow-card flex flex-col h-full">
             <div className="space-y-1.5">
               <Label htmlFor="targetACOS" className="text-[12px] font-medium text-foreground">
                 Target ACoS / Break-even ACoS (%)
@@ -148,7 +148,7 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
           </div>
 
           {/* Right — Live preview */}
-          <div className="rounded-xl border border-border bg-card p-6 shadow-card">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-card flex flex-col h-full">
             <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-secondary))] mb-5">
               Computed Thresholds
             </h3>
