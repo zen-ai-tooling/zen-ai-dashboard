@@ -48,6 +48,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
   const [cutBidPcts, setCutBidPcts] = useState<Record<number, number>>({});
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateDone, setGenerateDone] = useState(false);
+  const [showFullResults, setShowFullResults] = useState(false);
 
   const hasBleeders = result.bleeders.length > 0;
 
