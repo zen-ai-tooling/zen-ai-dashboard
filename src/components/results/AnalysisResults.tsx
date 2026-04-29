@@ -159,6 +159,15 @@ export const AnalysisResults = ({
     return idx;
   }, [currentRows, sortKey, sortDir]);
 
+  // Urgency quartiles based on Spend within the current sheet
+  const urgencyBands = useMemo(() => {
+    const spends = currentRows.map(r => r.spend || 0).slice().sort((a, b) => a - b);
+    if (spends.length === 0) return { high: Infinity, low: -Infinity };
+    const q = (p: number) => spends[Math.min(spends.length - 1, Math.floor(spends.length * p))];
+    return { high: q(0.75), low: q(0.25) };
+  }, [currentRows]);
+
+
   const decisionsMade = useMemo(
     () => Object.values(decisions).filter(d => d && d !== '').length,
     [decisions]
