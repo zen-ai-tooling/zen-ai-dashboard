@@ -868,51 +868,125 @@ const Index = () => {
             )}
 
             {/* BLEEDERS 2.0 — Track picker */}
-            {bleeder2Stage === "picker" && activeModule === "bleeders_2" && (
-              <div className="space-y-5">
-                <div>
-                  <h2 className="text-[20px] font-semibold text-foreground">Select a Track</h2>
-                  <p className="text-[13px] text-[hsl(var(--text-secondary))] mt-1">Choose which analysis to run.</p>
-                </div>
-                {Object.values(trackCompletionStatus).every(s => s === 'complete') ? (
-                  <div style={{
-                    background: '#F0FDF4', border: '1px solid #BBF7D0',
-                    borderRadius: '8px', padding: '10px 16px',
-                    fontSize: '13px', color: '#16A34A', fontWeight: '500',
-                    marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px'
-                  }}>
-                    <span>✓</span> All tracks complete — session ready to archive
+            {bleeder2Stage === "picker" && activeModule === "bleeders_2" && (() => {
+              const completedCount = Object.values(trackCompletionStatus).filter(s => s === 'complete').length;
+              const totalCount = 4;
+              return (
+                <div className="space-y-5">
+                  <div>
+                    <h2 className="text-[24px] font-semibold text-foreground tracking-tight">Select a Track</h2>
+                    <p className="text-[14px] text-[#86868B] mt-1">Choose which analysis to run.</p>
                   </div>
-                ) : (
-                  <p style={{fontSize: '12px', color: '#9BA3AF', marginBottom: '0px'}}>
-                    {Object.values(trackCompletionStatus).filter(s => s === 'complete').length} of 4 tracks complete
-                  </p>
-                )}
-                <div className="grid grid-cols-2 gap-3">
-                  {TRACK_CARDS.map(t => {
-                    const isDone = trackCompletionStatus[t.id] === 'complete' || trackStatus[t.id] === 'done';
-                    return (
-                      <button
-                        key={t.id}
-                        onClick={() => handleSelectTrack(t.id)}
-                        className={`group text-left rounded-xl border border-border bg-card border-l-4 ${t.accent} card-hover btn-press relative p-5`}
-                      >
-                        {isDone && (
-                          <span className="absolute top-3 right-3" style={{
-                            background: '#F0FDF4', color: '#16A34A',
-                            border: '1px solid #BBF7D0', borderRadius: '99px',
-                            fontSize: '11px', fontWeight: '500', padding: '2px 8px'
-                          }}>Done</span>
-                        )}
-                        <div className="text-[15px] font-semibold text-foreground">{t.name}</div>
-                        <div className="text-[13px] text-[hsl(var(--text-secondary))] mt-1">{t.desc}</div>
-                        <ArrowRight className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))] mt-3 opacity-0 group-hover:opacity-100" style={{ transition: 'opacity 150ms ease' }} />
-                      </button>
-                    );
-                  })}
+
+                  <div className="grid grid-cols-3 gap-5">
+                    {/* Tracks list — 2/3 */}
+                    <div className="col-span-2 space-y-2.5">
+                      {TRACK_CARDS.map(t => {
+                        const isDone = trackCompletionStatus[t.id] === 'complete' || trackStatus[t.id] === 'done';
+                        const result = bleeder2TrackState[t.id]?.result;
+                        return (
+                          <button
+                            key={t.id}
+                            onClick={() => handleSelectTrack(t.id)}
+                            className={`group w-full text-left rounded-xl border border-border bg-card border-l-4 ${t.accent} card-hover btn-press relative px-4 py-3.5`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="text-[14px] font-semibold text-foreground">{t.name}</div>
+                                <div className="text-[12.5px] text-[#86868B] mt-0.5">{t.desc}</div>
+                                {isDone && result && (
+                                  <div className="text-[12px] text-[#1A7F3E] mt-1.5 font-mono-nums">
+                                    {result.bleeders?.length ?? 0} bleeders found · ${(result.totalSpend ?? 0).toFixed(0)} at risk
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                {isDone && (
+                                  <CheckCircle2 className="w-4 h-4" style={{ color: '#34C759' }} strokeWidth={2.2} />
+                                )}
+                                <ArrowRight className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))] opacity-0 group-hover:opacity-100" style={{ transition: 'opacity 150ms ease' }} />
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+
+                      {/* Session progress */}
+                      <div className="pt-3">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#86868B]">
+                            Session progress
+                          </span>
+                          <span className="text-[12px] font-mono-nums text-[#6E6E73]">
+                            {completedCount} of {totalCount} tracks complete
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full rounded-full bg-[#F0F0F2] overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-300"
+                            style={{
+                              width: `${(completedCount / totalCount) * 100}%`,
+                              background: completedCount === totalCount ? '#34C759' : '#0071E3',
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Current thresholds — 1/3 */}
+                    <div className="col-span-1">
+                      <div className="surface-card p-4 sticky top-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#86868B]">
+                            Current thresholds
+                          </h3>
+                          <button
+                            onClick={() => {
+                              setBleeder2ActiveTrack('SBSD');
+                              setBleeder2Stage('thresholds');
+                            }}
+                            className="text-[11px] font-medium text-[#0071E3] hover:underline btn-press"
+                          >
+                            Edit
+                          </button>
+                        </div>
+                        <div className="space-y-2.5 text-[12.5px]">
+                          <div className="flex justify-between items-baseline">
+                            <span className="text-[#6E6E73]">Target ACoS</span>
+                            <span className="font-mono-nums font-semibold text-[#1D1D1F]">{bleeder2Thresholds.targetACOS}%</span>
+                          </div>
+                          <div className="flex justify-between items-baseline">
+                            <span className="text-[#6E6E73]">SB/SD threshold</span>
+                            <span className="font-mono-nums font-semibold text-[#1D1D1F]">{bleeder2Thresholds.targetACOS + 10}%</span>
+                          </div>
+                          <div className="flex justify-between items-baseline">
+                            <span className="text-[#6E6E73]">SP threshold</span>
+                            <span className="font-mono-nums font-semibold text-[#1D1D1F]">{bleeder2Thresholds.targetACOS + 20}%</span>
+                          </div>
+                          <div className="flex justify-between items-baseline border-t border-[#F0F0F2] pt-2.5">
+                            <span className="text-[#6E6E73]">Orders ≤</span>
+                            <span className="font-mono-nums font-semibold text-[#1D1D1F]">{bleeder2Thresholds.fewerThanOrders}</span>
+                          </div>
+                          {bleeder2Thresholds.excludeRanking && (
+                            <div className="text-[11.5px] text-[#86868B] pt-1">
+                              · Ranking campaigns excluded
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {completedCount === totalCount && (
+                    <div className="flex items-center gap-2 rounded-lg p-3"
+                      style={{ background: 'rgba(52,199,89,0.08)', border: '1px solid rgba(52,199,89,0.25)' }}>
+                      <CheckCircle2 className="w-4 h-4" style={{ color: '#34C759' }} strokeWidth={2.2} />
+                      <span className="text-[13px] font-medium text-[#1A7F3E]">All tracks complete — session ready to archive</span>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* BLEEDERS 2.0 — Thresholds */}
             {bleeder2Stage === "thresholds" && activeModule === "bleeders_2" && bleeder2ActiveTrack && (
