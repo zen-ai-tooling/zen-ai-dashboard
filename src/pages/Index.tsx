@@ -28,6 +28,7 @@ import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { HomeScreen } from "@/components/layout/HomeScreen";
 import { SessionLogView } from "@/components/history/SessionLogView";
+import { AnalyzingView } from "@/components/shared/AnalyzingView";
 import * as XLSX from "xlsx";
 
 interface Message {
