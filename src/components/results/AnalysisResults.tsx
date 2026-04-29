@@ -315,11 +315,14 @@ export const AnalysisResults = ({
       <CompletionView
         fileName={generatedFileName}
         title="Workflow complete"
+        impactHeadline={`$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })} in at-risk spend addressed`}
+        impactSubtitle="The bleeders below were captured and packaged into your Amazon bulk file."
+        totalRows={allRows.length}
         summary={[
           { label: 'Bleeders found', value: allRows.length.toLocaleString() },
-          { label: 'At-risk spend', value: `$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}` },
           { label: 'Sheets processed', value: String(sheetsCount) },
           { label: 'Decisions made', value: `${decisionsMade}/${allRows.length}` },
+          { label: 'Avg spend per bleeder', value: `$${(totalSpend / Math.max(allRows.length, 1)).toFixed(2)}` },
         ]}
         breakdown={breakdown}
         onDownload={() => lastDownloadRef.current?.()}
