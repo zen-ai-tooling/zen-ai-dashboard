@@ -89,13 +89,23 @@ export const StandardUploadZone: React.FC<StandardUploadZoneProps> = ({
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
         className={cn(
-          'group relative rounded-xl bg-card cursor-pointer text-center px-6 py-10 btn-press transition-all duration-200',
-          'border-[1.5px] border-dashed',
-          isDragging ? 'border-primary' : 'border-[#D2D2D7] hover:border-primary/60'
+          'group relative rounded-xl cursor-pointer text-center px-6 py-10 btn-press transition-all duration-200',
+          isDragging
+            ? 'border-[1.5px] border-solid'
+            : 'border-[1.5px] border-dashed hover:border-[#0071E3]'
         )}
         style={{
           minHeight,
-          background: isDragging ? 'rgba(0, 113, 227, 0.03)' : '#FFFFFF',
+          borderColor: isDragging ? '#0071E3' : '#D2D2D7',
+          background: isDragging
+            ? 'rgba(0, 113, 227, 0.05)'
+            : '#FFFFFF',
+        }}
+        onMouseEnter={(e) => {
+          if (!isDragging) e.currentTarget.style.background = 'rgba(0, 113, 227, 0.02)';
+        }}
+        onMouseLeave={(e) => {
+          if (!isDragging) e.currentTarget.style.background = '#FFFFFF';
         }}
       >
         <input
@@ -107,11 +117,23 @@ export const StandardUploadZone: React.FC<StandardUploadZoneProps> = ({
         />
 
         <div className="mx-auto mb-4 flex items-center justify-center">
-          <Upload className="w-10 h-10 text-[#86868B] transition-transform duration-200 group-hover:-translate-y-0.5" strokeWidth={1.4} />
+          <Upload
+            className="transition-all duration-200 group-hover:-translate-y-0.5"
+            style={{
+              width: isDragging ? 44 : 40,
+              height: isDragging ? 44 : 40,
+              color: isDragging ? '#0071E3' : '#86868B',
+              transform: isDragging ? 'scale(1.1)' : 'scale(1)',
+            }}
+            strokeWidth={1.4}
+          />
         </div>
 
-        <p className="text-[16px] font-semibold text-[#1D1D1F] tracking-tight">
-          {isDragging ? 'Release to upload' : primaryText}
+        <p
+          className="text-[16px] font-semibold tracking-tight"
+          style={{ color: isDragging ? '#0071E3' : '#1D1D1F' }}
+        >
+          {isDragging ? 'Drop to upload' : primaryText}
         </p>
         <p className="text-[14px] mt-1.5">
           or <span className="text-[#0071E3] underline underline-offset-2">click to browse</span>
