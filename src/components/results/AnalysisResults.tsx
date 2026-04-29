@@ -436,29 +436,46 @@ export const AnalysisResults = ({
               </colgroup>
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-b border-border">
-                  <TableHead style={{ letterSpacing: '0.08em' }}>Campaign</TableHead>
-                  <TableHead style={{ letterSpacing: '0.08em' }}>Ad Group</TableHead>
-                  <TableHead style={{ letterSpacing: '0.08em' }}>Entity</TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'campaign'} dir={sortDir} onClick={() => toggleSort('campaign')}>Campaign</SortHeader>
+                  </TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'ad_group'} dir={sortDir} onClick={() => toggleSort('ad_group')}>Ad Group</SortHeader>
+                  </TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'entity'} dir={sortDir} onClick={() => toggleSort('entity')}>Entity</SortHeader>
+                  </TableHead>
                   <TableHead style={{ letterSpacing: '0.08em' }}>Match</TableHead>
-                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Clicks</TableHead>
-                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Spend</TableHead>
-                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Sales</TableHead>
-                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>ACoS</TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'clicks'} dir={sortDir} onClick={() => toggleSort('clicks')} align="right">Clicks</SortHeader>
+                  </TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'spend'} dir={sortDir} onClick={() => toggleSort('spend')} align="right">Spend</SortHeader>
+                  </TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'sales'} dir={sortDir} onClick={() => toggleSort('sales')} align="right">Sales</SortHeader>
+                  </TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'acos'} dir={sortDir} onClick={() => toggleSort('acos')} align="right">ACoS</SortHeader>
+                  </TableHead>
                   <TableHead style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {currentRows.map((row, rowIdx) => {
+                {sortedIndices.map((rowIdx, displayIdx) => {
+                  const row = currentRows[rowIdx];
                   const key = `${currentSheet}-ROWINDEX-${rowIdx}`;
                   const entityDisplay = row.customer_search_term || row.keyword_text || row.product_targeting || row.entity || '—';
                   const decision = decisions[key];
                   const indicatorClass = decisionRowClass(decision);
                   const isHighSpend = row.spend > decisionThresholdSpend;
+                  const acosNum = parseAcosNum(row.acos);
+                  const hasAcos = acosNum >= 0 && row.acos && row.acos !== '0' && row.acos !== '0%';
                   return (
                     <TableRow
                       key={rowIdx}
-                      className={`row-enter cursor-pointer hover:bg-[#F9F9FB] transition-colors ${rowIdx % 2 === 1 ? 'bg-secondary/30' : ''} ${indicatorClass}`}
-                      style={{ animationDelay: `${Math.min(rowIdx * 12, 240)}ms` }}
+                      className={`row-enter cursor-pointer hover:bg-[#F9F9FB] transition-colors ${displayIdx % 2 === 1 ? 'bg-secondary/30' : ''} ${indicatorClass}`}
+                      style={{ animationDelay: `${Math.min(displayIdx * 12, 240)}ms` }}
                     >
                       <TableCell className="truncate font-medium" title={row.campaign}>
                         {row.campaign || '—'}
@@ -482,12 +499,15 @@ export const AnalysisResults = ({
                         ${row.sales.toFixed(2)}
                       </TableCell>
                       <TableCell className="text-right">
-                        {row.acos && row.acos !== '0' && row.acos !== '0%' ? (
-                          <span className="inline-block text-[11px] font-mono-nums px-1.5 py-px rounded-md bg-destructive/10 text-destructive font-medium">
+                        {hasAcos ? (
+                          <span
+                            className="inline-block text-[11px] font-mono-nums px-2 py-0.5 rounded-full font-medium text-white"
+                            style={{ background: acosNum >= 100 ? '#FF3B30' : '#FF9500' }}
+                          >
                             {row.acos}
                           </span>
                         ) : (
-                          <span className="text-[13px] text-[hsl(var(--border-strong))]">—</span>
+                          <span className="text-[13px] text-[#D2D2D7]">—</span>
                         )}
                       </TableCell>
                       <TableCell className="px-2">
