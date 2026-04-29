@@ -515,3 +515,14 @@
 }
 
 .drag-pulse { animation: drag-pulse 1.4s ease-out infinite; }
+
+@keyframes row-flash-pause  { 0% { background: rgba(255, 59, 48, 0.16); } 100% { background: transparent; } }
+@keyframes row-flash-keep   { 0% { background: rgba(52, 199, 89, 0.16); } 100% { background: transparent; } }
+@keyframes row-flash-cut    { 0% { background: rgba(255, 149, 0, 0.16); } 100% { background: transparent; } }
+@keyframes row-flash-negate { 0% { background: rgba(0, 113, 227, 0.16); } 100% { background: transparent; } }
+
+@keyframes ready-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 113, 227, 0.45); }
+  50%      { box-shadow: 0 0 0 10px rgba(0, 113, 227, 0); }
+}
+
