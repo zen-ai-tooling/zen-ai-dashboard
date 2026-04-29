@@ -80,8 +80,33 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
     return [...result.bleeders].sort((a, b) => b.acos - a.acos).slice(0, 3);
   }, [result.bleeders]);
 
-  const showAdGroup = result.trackType === 'SBSD' || result.trackType === 'SP_KEYWORDS';
+  // Hide Ad Group dynamically — only show if at least one row has a non-empty value
+  const showAdGroupBase = result.trackType === 'SBSD' || result.trackType === 'SP_KEYWORDS';
+  const showAdGroup = showAdGroupBase && result.bleeders.some(b => b.adGroupName && b.adGroupName.trim() !== '' && b.adGroupName.trim() !== '—');
   const RANK_COLORS = ['hsl(45 90% 50%)', 'hsl(220 8% 60%)', 'hsl(28 60% 45%)'];
+
+  // Sortable
+  type SortKey = 'campaign' | 'adGroup' | 'entity' | 'spend' | 'orders' | 'acos';
+  const { sortKey, sortDir, toggle: toggleSort } = useSortable<SortKey>('spend', 'desc');
+  const sortedIndices = useMemo(() => {
+    const idx = result.bleeders.map((_, i) => i);
+    idx.sort((a, b) => {
+      const ra = result.bleeders[a]; const rb = result.bleeders[b];
+      let va: any; let vb: any;
+      switch (sortKey) {
+        case 'campaign': va = (ra.campaignName || '').toLowerCase(); vb = (rb.campaignName || '').toLowerCase(); break;
+        case 'adGroup':  va = (ra.adGroupName || '').toLowerCase();  vb = (rb.adGroupName || '').toLowerCase();  break;
+        case 'entity':   va = (ra.entity || '').toLowerCase();        vb = (rb.entity || '').toLowerCase();        break;
+        case 'spend':    va = ra.spend ?? 0; vb = rb.spend ?? 0; break;
+        case 'orders':   va = ra.orders ?? 0; vb = rb.orders ?? 0; break;
+        case 'acos':     va = ra.acos ?? 0; vb = rb.acos ?? 0; break;
+      }
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return idx;
+  }, [result.bleeders, sortKey, sortDir]);
 
   const handleSetAllPause = () => {
     const all: Record<number, string> = {};
