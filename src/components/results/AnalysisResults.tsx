@@ -117,6 +117,34 @@ export const AnalysisResults = ({
   const currentRows = rowsBySheet[currentSheet] || [];
   const decisionOptions = getDecisionOptions(currentSheet);
 
+  type SortKey = 'campaign' | 'ad_group' | 'entity' | 'clicks' | 'spend' | 'sales' | 'acos';
+  const { sortKey, sortDir, toggle: toggleSort } = useSortable<SortKey>('spend', 'desc');
+
+  const parseAcosNum = (s: string): number => {
+    if (!s) return -1;
+    const n = parseFloat(String(s).replace('%', ''));
+    return Number.isFinite(n) ? n : -1;
+  };
+
+  const sortedIndices = useMemo(() => {
+    const idx = currentRows.map((_, i) => i);
+    idx.sort((a, b) => {
+      const ra = currentRows[a]; const rb = currentRows[b];
+      let va: any; let vb: any;
+      if (sortKey === 'acos') { va = parseAcosNum(ra.acos); vb = parseAcosNum(rb.acos); }
+      else if (sortKey === 'clicks' || sortKey === 'spend' || sortKey === 'sales') {
+        va = ra[sortKey] ?? 0; vb = rb[sortKey] ?? 0;
+      } else {
+        va = String(ra[sortKey] ?? '').toLowerCase();
+        vb = String(rb[sortKey] ?? '').toLowerCase();
+      }
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return idx;
+  }, [currentRows, sortKey, sortDir]);
+
   const decisionsMade = useMemo(
     () => Object.values(decisions).filter(d => d && d !== '').length,
     [decisions]
