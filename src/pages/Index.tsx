@@ -995,6 +995,7 @@ const Index = () => {
                   thresholds={bleeder2Thresholds}
                   onChange={setBleeder2Thresholds}
                   onContinue={handleBleeder2ContinueFromThresholds}
+                  onBack={() => { setBleeder2ActiveTrack(null); setBleeder2Stage('picker'); }}
                   clientName={activeClient.name}
                 />
               </div>
