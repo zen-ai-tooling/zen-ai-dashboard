@@ -22,6 +22,8 @@ interface Bleeder2TrackResultsProps {
   decisionFile?: File | null;
   amazonFile?: { workbook: any; fileName: string } | null;
   onDownloadAmazon?: () => void;
+  onStartNew?: () => void;
+  acosThresholdLabel?: string;
 }
 
 const TRACK_LABELS: Record<Bleeder2TrackType, string> = {
