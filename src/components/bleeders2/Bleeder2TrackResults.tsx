@@ -275,11 +275,14 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
       <CompletionView
         fileName={amazonFile.fileName}
         title="Workflow complete"
+        impactHeadline={`$${result.totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })} in at-risk spend addressed`}
+        impactSubtitle={`${TRACK_LABELS[result.trackType]} captured into your Amazon bulk file.`}
+        totalRows={result.bleeders.length}
         summary={[
           { label: 'Bleeders found', value: result.bleeders.length.toLocaleString() },
-          { label: 'At-risk spend', value: `$${result.totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}` },
           { label: 'Average ACoS', value: `${avgAcos.toFixed(1)}%` },
           { label: 'Decisions made', value: `${decisionsMade}/${result.bleeders.length}` },
+          { label: 'Avg spend per bleeder', value: `$${(result.totalSpend / Math.max(result.bleeders.length, 1)).toFixed(2)}` },
           ...(acosThresholdLabel ? [{ label: 'Threshold used', value: acosThresholdLabel }] : []),
         ]}
         breakdown={[
