@@ -444,45 +444,68 @@ export const AnalysisResults = ({
           </div>
 
           {/* Bulk action bar */}
-          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-secondary/30">
-            <span className="text-[11px] text-[hsl(var(--text-tertiary))] mr-1 font-semibold uppercase tracking-[0.06em]">Bulk:</span>
-            <button
-              onClick={() => {
-                const next = { ...decisions };
-                currentRows.forEach((_, idx) => { next[`${currentSheet}-ROWINDEX-${idx}`] = decisionOptions.find(o => o === 'Pause') || decisionOptions[0]; });
-                setDecisions(next);
-              }}
-              className="text-[11px] h-6 px-2.5 rounded-md border border-border bg-card hover:bg-secondary btn-press inline-flex items-center gap-1.5"
-            >
-              <span className="decision-dot" style={{ background: 'hsl(var(--destructive))' }} />
-              Select all → Pause
-            </button>
-            <button
-              onClick={() => {
-                const next = { ...decisions };
-                currentRows.forEach((_, idx) => { next[`${currentSheet}-ROWINDEX-${idx}`] = 'Keep'; });
-                setDecisions(next);
-              }}
-              className="text-[11px] h-6 px-2.5 rounded-md border border-border bg-card hover:bg-secondary btn-press inline-flex items-center gap-1.5"
-            >
-              <span className="decision-dot" style={{ background: 'hsl(var(--success))' }} />
-              Select all → Keep
-            </button>
-            <button
-              onClick={() => {
-                const next = { ...decisions };
-                currentRows.forEach((_, idx) => { delete next[`${currentSheet}-ROWINDEX-${idx}`]; });
-                setDecisions(next);
-              }}
-              className="text-[11px] h-6 px-2.5 rounded-md text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press inline-flex items-center gap-1"
-            >
-              <XCircle className="w-3 h-3" />
-              Clear all
-            </button>
+          <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-border bg-[#FAFAFA]">
+            <div className="text-[12px] text-[hsl(var(--text-secondary))] truncate">
+              <span className="font-medium text-foreground">{shortTabLabel(currentSheet)}</span>
+              <span className="mx-1.5 text-[hsl(var(--text-tertiary))]">·</span>
+              <span className="font-mono-nums">{currentRows.length}</span> bleeders
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {decisionOptions.includes('Pause') && (
+                <button
+                  onClick={() => {
+                    const next = { ...decisions };
+                    currentRows.forEach((_, idx) => { next[`${currentSheet}-ROWINDEX-${idx}`] = 'Pause'; });
+                    setDecisions(next);
+                  }}
+                  className="bulk-btn btn-press"
+                >
+                  <span className="decision-dot" style={{ background: '#FF3B30' }} />
+                  Select all → Pause
+                </button>
+              )}
+              {decisionOptions.includes('Cut Bid 50%') && (
+                <button
+                  onClick={() => {
+                    const next = { ...decisions };
+                    currentRows.forEach((_, idx) => { next[`${currentSheet}-ROWINDEX-${idx}`] = 'Cut Bid 50%'; });
+                    setDecisions(next);
+                  }}
+                  className="bulk-btn btn-press"
+                >
+                  <span className="decision-dot" style={{ background: '#FF9500' }} />
+                  Select all → Cut Bid 50%
+                </button>
+              )}
+              {decisionOptions.includes('Keep') && (
+                <button
+                  onClick={() => {
+                    const next = { ...decisions };
+                    currentRows.forEach((_, idx) => { next[`${currentSheet}-ROWINDEX-${idx}`] = 'Keep'; });
+                    setDecisions(next);
+                  }}
+                  className="bulk-btn btn-press"
+                >
+                  <span className="decision-dot" style={{ background: '#34C759' }} />
+                  Select all → Keep
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  const next = { ...decisions };
+                  currentRows.forEach((_, idx) => { delete next[`${currentSheet}-ROWINDEX-${idx}`]; });
+                  setDecisions(next);
+                }}
+                className="bulk-btn bulk-btn-ghost btn-press"
+              >
+                <XCircle className="w-3 h-3" />
+                Clear
+              </button>
+            </div>
           </div>
 
-          {/* Table — scrollable area, action bar pinned below */}
-          <div className="w-full max-h-[58vh] overflow-auto">
+          {/* Table — scrollable area with sticky thead, action bar pinned below */}
+          <div className="w-full max-h-[58vh] overflow-auto table-sticky-header">
             <Table className="table-fixed w-full">
               <colgroup>
                 <col style={{ width: '20%' }} />
