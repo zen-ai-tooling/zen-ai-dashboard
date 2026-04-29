@@ -102,7 +102,18 @@ export const AnalysisResults = ({
   const [showFullResults, setShowFullResults] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [generatedFileName, setGeneratedFileName] = useState<string>('');
+  const [flashKey, setFlashKey] = useState<{ key: string; cls: string; ts: number } | null>(null);
   const lastDownloadRef = useRef<(() => void) | null>(null);
+
+  const setDecisionWithFlash = (key: string, val: string) => {
+    setDecisions(prev => ({ ...prev, [key]: val }));
+    let cls = '';
+    if (val === 'Pause') cls = 'row-flash-pause';
+    else if (val === 'Keep') cls = 'row-flash-keep';
+    else if (val.startsWith('Cut')) cls = 'row-flash-cut';
+    else if (val.startsWith('Negat')) cls = 'row-flash-negate';
+    if (cls) setFlashKey({ key, cls, ts: Date.now() });
+  };
 
   const rowsBySheet = useMemo(() => {
     const grouped: Record<string, NormalizedRow[]> = {};
