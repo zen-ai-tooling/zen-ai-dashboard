@@ -3,9 +3,10 @@ import { Download, Loader2, CheckCircle2, MoreHorizontal, AlertTriangle, FileSpr
 import { useState, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
-import { CompletionBanner } from "@/components/shared/CompletionBanner";
 import { CompactStatsBar } from "@/components/shared/CompactStatsBar";
 import { SortHeader, useSortable } from "@/components/shared/SortHeader";
+import { CompletionView } from "@/components/shared/CompletionView";
+import { suggestB1Row } from "@/lib/ui/bleeder1Suggestion";
 
 interface TopSpender {
   term: string;
@@ -97,6 +98,7 @@ export const AnalysisResults = ({
   const [decisions, setDecisions] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateDone, setGenerateDone] = useState(false);
+  const [showFullResults, setShowFullResults] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [generatedFileName, setGeneratedFileName] = useState<string>('');
   const lastDownloadRef = useRef<(() => void) | null>(null);
@@ -272,6 +274,40 @@ export const AnalysisResults = ({
   const sheetsCount = [...new Set(allRows.map(r => r.sheet))].length;
   const decisionThresholdSpend = totalSpend / Math.max(allRows.length, 1) * 1.5; // highlight only above 1.5x mean
 
+  // Decisions breakdown for completion view
+  const breakdown = useMemo(() => {
+    const counts: Record<string, number> = { Pause: 0, 'Cut Bid 50%': 0, Keep: 0, 'Negate (Exact)': 0, 'Negate (Phrase)': 0 };
+    Object.values(decisions).forEach(d => { if (d) counts[d] = (counts[d] ?? 0) + 1; });
+    const items = [
+      { label: 'Paused', count: counts['Pause'] ?? 0, color: '#FF3B30' },
+      { label: 'Cut Bid 50%', count: counts['Cut Bid 50%'] ?? 0, color: '#FF9500' },
+      { label: 'Negative', count: (counts['Negate (Exact)'] ?? 0) + (counts['Negate (Phrase)'] ?? 0), color: '#0071E3' },
+      { label: 'Keep', count: counts['Keep'] ?? 0, color: '#34C759' },
+      { label: 'No decision', count: Math.max(0, allRows.length - decisionsMade), color: '#D2D2D7' },
+    ];
+    return items;
+  }, [decisions, allRows.length, decisionsMade]);
+
+  // ── Completion view (replaces full results page after generation) ──
+  if (generateDone && generatedFileName && !showFullResults) {
+    return (
+      <CompletionView
+        fileName={generatedFileName}
+        title="Workflow complete"
+        summary={[
+          { label: 'Bleeders found', value: allRows.length.toLocaleString() },
+          { label: 'At-risk spend', value: `$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}` },
+          { label: 'Sheets processed', value: String(sheetsCount) },
+          { label: 'Decisions made', value: `${decisionsMade}/${allRows.length}` },
+        ]}
+        breakdown={breakdown}
+        onDownload={() => lastDownloadRef.current?.()}
+        onStartNew={handleStartNew}
+        onViewFullResults={() => setShowFullResults(true)}
+      />
+    );
+  }
+
   return (
     <div className="space-y-5">
       {/* Lifetime mode notice */}
@@ -285,6 +321,16 @@ export const AnalysisResults = ({
             </p>
           </div>
         </div>
+      )}
+
+      {/* Back to summary */}
+      {generateDone && showFullResults && (
+        <button
+          onClick={() => setShowFullResults(false)}
+          className="text-[12.5px] text-[#0071E3] hover:underline btn-press"
+        >
+          ← Back to summary
+        </button>
       )}
 
       {/* Compact stats + workflow steps — single unified container */}
@@ -302,14 +348,7 @@ export const AnalysisResults = ({
         ]}
       />
 
-      {/* Completion banner */}
-      {generateDone && generatedFileName && (
-        <CompletionBanner
-          fileName={generatedFileName}
-          onDownload={() => lastDownloadRef.current?.()}
-          onStartNew={handleStartNew}
-        />
-      )}
+      {/* Completion banner removed — replaced by full CompletionView page */}
 
       {/* Insights — collapsible top spenders */}
       {topSpenders.length > 0 && (
@@ -424,15 +463,16 @@ export const AnalysisResults = ({
           <div className="w-full max-h-[58vh] overflow-auto">
             <Table className="table-fixed w-full">
               <colgroup>
-                <col style={{ width: '22%' }} />
-                <col style={{ width: '18%' }} />
-                <col style={{ width: '14%' }} />
-                <col style={{ width: '8%' }} />
-                <col style={{ width: '7%' }} />
-                <col style={{ width: '9%' }} />
-                <col style={{ width: '8%' }} />
-                <col style={{ width: '7%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '16%' }} />
                 <col style={{ width: '13%' }} />
+                <col style={{ width: '7%' }} />
+                <col style={{ width: '6%' }} />
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '7%' }} />
+                <col style={{ width: '7%' }} />
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '8%' }} />
               </colgroup>
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-b border-border">
@@ -458,6 +498,7 @@ export const AnalysisResults = ({
                   <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
                     <SortHeader active={sortKey === 'acos'} dir={sortDir} onClick={() => toggleSort('acos')} align="right">ACoS</SortHeader>
                   </TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>Suggestion</TableHead>
                   <TableHead style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
                 </TableRow>
               </TableHeader>
@@ -509,6 +550,19 @@ export const AnalysisResults = ({
                         ) : (
                           <span className="text-[13px] text-[#D2D2D7]">—</span>
                         )}
+                      </TableCell>
+                      <TableCell>
+                        {(() => {
+                          const sug = suggestB1Row({ clicks: row.clicks ?? 0, spend: row.spend ?? 0, sales: row.sales ?? 0, orders: row.orders ?? 0 });
+                          return (
+                            <span
+                              className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full"
+                              style={{ background: sug.bg, color: sug.color, border: `1px solid ${sug.border}` }}
+                            >
+                              {sug.label}
+                            </span>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell className="px-2">
                         <DecisionSelect

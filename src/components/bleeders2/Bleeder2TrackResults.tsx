@@ -9,9 +9,9 @@ import { DecisionFileDropzone } from "./DecisionFileDropzone";
 import { suggestDecision, getConfidenceStyle } from '@/lib/ui/suggestionEngine';
 import type { Suggestion } from '@/lib/ui/suggestionEngine';
 import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
-import { CompletionBanner } from "@/components/shared/CompletionBanner";
 import { CompactStatsBar } from "@/components/shared/CompactStatsBar";
 import { SortHeader, useSortable } from "@/components/shared/SortHeader";
+import { CompletionView } from "@/components/shared/CompletionView";
 
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
@@ -22,6 +22,8 @@ interface Bleeder2TrackResultsProps {
   decisionFile?: File | null;
   amazonFile?: { workbook: any; fileName: string } | null;
   onDownloadAmazon?: () => void;
+  onStartNew?: () => void;
+  acosThresholdLabel?: string;
 }
 
 const TRACK_LABELS: Record<Bleeder2TrackType, string> = {
@@ -40,12 +42,13 @@ const TRACK_DECISIONS: Record<Bleeder2TrackType, string[]> = {
 
 export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
   result, onDownload, onUploadDecision, onAdjustThresholds, onUploadNewFile,
-  decisionFile, amazonFile, onDownloadAmazon
+  decisionFile, amazonFile, onDownloadAmazon, onStartNew, acosThresholdLabel
 }) => {
   const [decisions, setDecisions] = useState<Record<number, string>>({});
   const [cutBidPcts, setCutBidPcts] = useState<Record<number, number>>({});
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateDone, setGenerateDone] = useState(false);
+  const [showFullResults, setShowFullResults] = useState(false);
 
   const hasBleeders = result.bleeders.length > 0;
 
@@ -227,8 +230,52 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
     );
   }
 
+  // Decisions breakdown for completion view
+  const breakdownCounts = (() => {
+    const counts: Record<string, number> = {};
+    Object.values(decisions).forEach(d => { if (d) counts[d] = (counts[d] ?? 0) + 1; });
+    return counts;
+  })();
+
+  // ── Completion view (replaces full results page after generation) ──
+  if (amazonFile && !showFullResults) {
+    return (
+      <CompletionView
+        fileName={amazonFile.fileName}
+        title="Workflow complete"
+        summary={[
+          { label: 'Bleeders found', value: result.bleeders.length.toLocaleString() },
+          { label: 'At-risk spend', value: `$${result.totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}` },
+          { label: 'Average ACoS', value: `${avgAcos.toFixed(1)}%` },
+          { label: 'Decisions made', value: `${decisionsMade}/${result.bleeders.length}` },
+          ...(acosThresholdLabel ? [{ label: 'Threshold used', value: acosThresholdLabel }] : []),
+        ]}
+        breakdown={[
+          { label: 'Paused', count: breakdownCounts['Pause'] ?? 0, color: '#FF3B30' },
+          { label: 'Cut Bid', count: breakdownCounts['Cut Bid'] ?? 0, color: '#FF9500' },
+          { label: 'Negative', count: breakdownCounts['Negative'] ?? 0, color: '#0071E3' },
+          { label: 'Keep', count: breakdownCounts['Keep'] ?? 0, color: '#34C759' },
+          { label: 'No decision', count: Math.max(0, result.bleeders.length - decisionsMade), color: '#D2D2D7' },
+        ]}
+        onDownload={onDownloadAmazon}
+        onStartNew={onStartNew}
+        onViewFullResults={() => setShowFullResults(true)}
+      />
+    );
+  }
+
   return (
     <div className="space-y-5">
+      {/* Back to summary */}
+      {amazonFile && showFullResults && (
+        <button
+          onClick={() => setShowFullResults(false)}
+          className="text-[12.5px] text-[#0071E3] hover:underline btn-press"
+        >
+          ← Back to summary
+        </button>
+      )}
+
       {/* Compact stats + 4-step workflow — single unified container */}
       <CompactStatsBar
         accent="amber"
@@ -244,14 +291,6 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
           { label: 'Generate Amazon file', status: (generateDone || amazonFile) ? 'complete' : 'pending' },
         ]}
       />
-
-      {/* Workflow complete banner */}
-      {amazonFile && (
-        <CompletionBanner
-          fileName={amazonFile.fileName}
-          onDownload={onDownloadAmazon}
-        />
-      )}
 
       {/* Insights — Highest ACoS */}
       {topAcos.length > 0 && (
