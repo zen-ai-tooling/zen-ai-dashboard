@@ -793,17 +793,26 @@ const Index = () => {
               <HomeScreen onSelectModule={(mod) => { setShowHistoryView(false); handleSidebarModuleSelect(mod); }} />
             )}
 
-            {/* BLEEDERS 1.0 — UPLOAD (centered hero) */}
-            {activeModule === 'bleeders_1' && !analysisResults && !decisionResults && !validatorResults && (
-              <div className="max-w-[640px] mx-auto pt-4">
-                <div className="mb-5">
-                  <h2 className="text-[22px] font-semibold text-foreground tracking-tight">Upload your bulk file</h2>
-                  <p className="text-[13px] text-[hsl(var(--text-secondary))] mt-1.5">
-                    Bleeders 1.0 — find high-spend, zero-conversion targets across all campaigns.
-                  </p>
-                </div>
+            {/* BLEEDERS 1.0 — UPLOAD */}
+            {activeModule === 'bleeders_1' && chatState !== 'analyzing' && !analysisResults && !decisionResults && !validatorResults && (
+              <div className="max-w-[760px] mx-auto pt-4">
                 <UploadCard onFileUpload={handleFileUpload} isVisible={true} />
               </div>
+            )}
+
+            {/* BLEEDERS 1.0 — ANALYZING */}
+            {activeModule === 'bleeders_1' && chatState === 'analyzing' && (
+              <AnalyzingView
+                steps={[
+                  'Reading bulk file…',
+                  'Parsing Sponsored Products Campaigns…',
+                  'Parsing Sponsored Brands Campaigns…',
+                  'Scanning for bleeders…',
+                ]}
+                finalMessage={analysisResults ? `Found ${analysisResults.allRows?.length ?? 0} bleeders` : undefined}
+                workDone={!!analysisResults || !!decisionResults || !!validatorResults}
+                onComplete={() => { /* state will already have moved to "results" */ }}
+              />
             )}
 
             {activeModule === 'bleeders_1' && processorType === "report-creator" && analysisResults && (
