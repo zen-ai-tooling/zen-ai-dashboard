@@ -927,16 +927,34 @@ const Index = () => {
             )}
 
             {/* BLEEDERS 2.0 — Upload */}
-            {bleeder2Stage === "upload" && activeModule === "bleeders_2" && bleeder2ActiveTrack && (
+            {bleeder2Stage === "upload" && activeModule === "bleeders_2" && bleeder2ActiveTrack && !bleeder2TrackState[bleeder2ActiveTrack].isValidating && (
               <div className="pt-4 space-y-4">
                 <TrackUploader
                   track={bleeder2ActiveTrack}
                   onUpload={(track, file) => handleBleeder2TrackUpload(file, track)}
                   error={bleeder2TrackState[bleeder2ActiveTrack].validationError || undefined}
                   uploadedFile={bleeder2TrackState[bleeder2ActiveTrack].file}
-                  isValidating={bleeder2TrackState[bleeder2ActiveTrack].isValidating}
+                  isValidating={false}
                 />
               </div>
+            )}
+
+            {/* BLEEDERS 2.0 — Analyzing */}
+            {bleeder2Stage === "upload" && activeModule === "bleeders_2" && bleeder2ActiveTrack && bleeder2TrackState[bleeder2ActiveTrack].isValidating && (
+              <AnalyzingView
+                steps={[
+                  'Reading bulk file…',
+                  'Indexing campaign IDs…',
+                  'Parsing campaign sheets…',
+                  'Scanning for bleeders…',
+                ]}
+                finalMessage={
+                  bleeder2TrackState[bleeder2ActiveTrack].result
+                    ? `Found ${bleeder2TrackState[bleeder2ActiveTrack].result.bleeders.length} bleeders`
+                    : undefined
+                }
+                workDone={!!bleeder2TrackState[bleeder2ActiveTrack].result}
+              />
             )}
 
             {/* BLEEDERS 2.0 — Results */}
