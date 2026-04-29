@@ -12,6 +12,7 @@ import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSe
 import { CompactStatsBar } from "@/components/shared/CompactStatsBar";
 import { SortHeader, useSortable } from "@/components/shared/SortHeader";
 import { CompletionView } from "@/components/shared/CompletionView";
+import { DecisionProgressBar } from "@/components/shared/DecisionProgressBar";
 
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
