@@ -123,9 +123,29 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
     return idx;
   }, [result.bleeders, sortKey, sortDir]);
 
+  // Urgency quartiles based on Spend
+  const urgencyBands = useMemo(() => {
+    const spends = result.bleeders.map(b => b.spend || 0).slice().sort((a, b) => a - b);
+    if (spends.length === 0) return { high: Infinity, low: -Infinity };
+    const q = (p: number) => spends[Math.min(spends.length - 1, Math.floor(spends.length * p))];
+    return { high: q(0.75), low: q(0.25) };
+  }, [result.bleeders]);
+
   const handleSetAllPause = () => {
     const all: Record<number, string> = {};
     result.bleeders.forEach((_, idx) => { all[idx] = 'Pause'; });
+    setDecisions(all);
+  };
+
+  const handleSetAllKeep = () => {
+    const all: Record<number, string> = {};
+    result.bleeders.forEach((_, idx) => { all[idx] = 'Keep'; });
+    setDecisions(all);
+  };
+
+  const handleSetAllCutBid = () => {
+    const all: Record<number, string> = {};
+    result.bleeders.forEach((_, idx) => { all[idx] = 'Cut Bid'; });
     setDecisions(all);
   };
 
