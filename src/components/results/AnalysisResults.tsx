@@ -557,10 +557,28 @@ export const AnalysisResults = ({
                   const isHighSpend = row.spend > decisionThresholdSpend;
                   const acosNum = parseAcosNum(row.acos);
                   const hasAcos = acosNum >= 0 && row.acos && row.acos !== '0' && row.acos !== '0%';
+
+                  // Urgency: high (top 25% spend) or low (bottom 25%) — only when no decision yet
+                  const isHighUrgency = !decision && row.spend >= urgencyBands.high && row.spend > 0;
+                  const isLowUrgency = !decision && row.spend <= urgencyBands.low;
+                  const urgencyClass = decision
+                    ? ''
+                    : isHighUrgency
+                      ? 'row-urgency-high'
+                      : isLowUrgency
+                        ? 'row-urgency-low'
+                        : '';
+
+                  // Row flash on decision change (one-shot)
+                  const flashClass =
+                    flashKey && flashKey.key === key && Date.now() - flashKey.ts < 400
+                      ? flashKey.cls
+                      : '';
+
                   return (
                     <TableRow
-                      key={rowIdx}
-                      className={`row-enter cursor-pointer hover:bg-[#F9F9FB] transition-colors ${displayIdx % 2 === 1 ? 'bg-secondary/30' : ''} ${indicatorClass}`}
+                      key={`${rowIdx}-${flashKey?.key === key ? flashKey.ts : 'r'}`}
+                      className={`row-enter cursor-pointer hover:bg-[#F9F9FB] transition-colors ${displayIdx % 2 === 1 && !decision ? 'bg-secondary/30' : ''} ${urgencyClass} ${indicatorClass} ${flashClass}`}
                       style={{ animationDelay: `${Math.min(displayIdx * 12, 240)}ms` }}
                     >
                       <TableCell className="truncate font-medium" title={row.campaign}>
@@ -601,8 +619,13 @@ export const AnalysisResults = ({
                           const sug = suggestB1Row({ clicks: row.clicks ?? 0, spend: row.spend ?? 0, sales: row.sales ?? 0, orders: row.orders ?? 0 });
                           return (
                             <span
-                              className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full"
-                              style={{ background: sug.bg, color: sug.color, border: `1px solid ${sug.border}` }}
+                              className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full transition-opacity"
+                              style={{
+                                background: sug.bg,
+                                color: sug.color,
+                                border: `1px solid ${sug.border}`,
+                                opacity: decision ? 0.45 : 1,
+                              }}
                             >
                               {sug.label}
                             </span>
@@ -610,12 +633,17 @@ export const AnalysisResults = ({
                         })()}
                       </TableCell>
                       <TableCell className="px-2">
-                        <DecisionSelect
-                          value={decision}
-                          onChange={(val) => setDecisions(prev => ({ ...prev, [key]: val }))}
-                          options={decisionOptions}
-                          width="100%"
-                        />
+                        <div className="flex items-center gap-1.5">
+                          {decision && (
+                            <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#34C759' }} />
+                          )}
+                          <DecisionSelect
+                            value={decision}
+                            onChange={(val) => setDecisionWithFlash(key, val)}
+                            options={decisionOptions}
+                            width="100%"
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
