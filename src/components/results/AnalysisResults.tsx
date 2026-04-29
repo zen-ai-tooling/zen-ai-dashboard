@@ -259,29 +259,14 @@ export const AnalysisResults = ({
         </div>
       )}
 
-      {/* Stats bar — single horizontal row, module-tinted */}
-      <div className={`rounded-xl border border-border shadow-card overflow-hidden ${mode === 'lifetime' ? 'stat-accent-purple' : 'stat-accent-red'}`}>
-        <div className="grid grid-cols-3 divide-x divide-border">
-          <StatCell
-            icon={<AlertTriangle className="w-3.5 h-3.5" strokeWidth={1.8} />}
-            value={allRows.length.toLocaleString()}
-            label="Bleeders found"
-          />
-          <StatCell
-            icon={<DollarSign className="w-3.5 h-3.5" strokeWidth={1.8} />}
-            value={`$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
-            label="At-risk spend"
-          />
-          <StatCell
-            icon={<Layers className="w-3.5 h-3.5" strokeWidth={1.8} />}
-            value={String(sheetsCount)}
-            label="Sheets processed"
-          />
-        </div>
-      </div>
-
-      {/* Workflow stepper */}
-      <WorkflowSteps
+      {/* Compact stats + workflow steps — single unified container */}
+      <CompactStatsBar
+        accent={mode === 'lifetime' ? 'purple' : 'red'}
+        stats={[
+          { value: allRows.length.toLocaleString(), label: 'bleeders' },
+          { value: `$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}`, label: 'at risk' },
+          { value: String(sheetsCount), label: 'sheets' },
+        ]}
         steps={[
           { label: 'File analyzed', status: 'complete' },
           { label: 'Make decisions', status: generateDone ? 'complete' : 'active' },
