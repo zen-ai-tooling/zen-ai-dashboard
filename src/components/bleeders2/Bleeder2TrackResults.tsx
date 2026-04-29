@@ -327,34 +327,53 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
           </Button>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
+        {/* Table — scrollable with pinned footer below */}
+        <div className="max-h-[58vh] overflow-auto">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
-                <TableHead style={{ letterSpacing: '0.08em' }}>Campaign</TableHead>
+                <TableHead style={{ letterSpacing: '0.08em' }}>
+                  <SortHeader active={sortKey === 'campaign'} dir={sortDir} onClick={() => toggleSort('campaign')}>Campaign</SortHeader>
+                </TableHead>
                 {showAdGroup && (
-                  <TableHead style={{ letterSpacing: '0.08em' }}>Ad Group</TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'adGroup'} dir={sortDir} onClick={() => toggleSort('adGroup')}>Ad Group</SortHeader>
+                  </TableHead>
                 )}
                 <TableHead style={{ letterSpacing: '0.08em' }}>
-                  {result.trackType === 'SP' ? 'Search Term' : 'Entity'}
+                  <SortHeader active={sortKey === 'entity'} dir={sortDir} onClick={() => toggleSort('entity')}>
+                    {result.trackType === 'SP' ? 'Search Term' : 'Entity'}
+                  </SortHeader>
                 </TableHead>
                 <TableHead style={{ letterSpacing: '0.08em' }}>Match</TableHead>
-                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Spend</TableHead>
+                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                  <SortHeader active={sortKey === 'spend'} dir={sortDir} onClick={() => toggleSort('spend')} align="right">Spend</SortHeader>
+                </TableHead>
                 {result.trackType !== 'ACOS100' && (
-                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Orders</TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'orders'} dir={sortDir} onClick={() => toggleSort('orders')} align="right">Orders</SortHeader>
+                  </TableHead>
                 )}
-                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>ACoS</TableHead>
-                <TableHead style={{ letterSpacing: '0.08em' }}>Suggestion</TableHead>
+                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                  <SortHeader active={sortKey === 'acos'} dir={sortDir} onClick={() => toggleSort('acos')} align="right">ACoS</SortHeader>
+                </TableHead>
+                <TableHead className="w-[80px]" style={{ letterSpacing: '0.08em' }}>Suggestion</TableHead>
                 <TableHead className="w-[200px]" style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {result.bleeders.map((bleeder, idx) => {
+              {sortedIndices.map((idx) => {
+                const bleeder = result.bleeders[idx];
                 const suggestion = suggestions[idx];
-                const confStyle = getConfidenceStyle(suggestion.confidence);
                 const decision = decisions[idx];
                 const indicatorClass = decisionRowClass(decision);
+                const isKeep = suggestion.shortLabel?.toLowerCase().includes('keep');
+                const sugStyle = isKeep
+                  ? { background: 'rgba(52, 199, 89, 0.10)', color: '#1A7F3E', border: '1px solid rgba(52, 199, 89, 0.25)' }
+                  : { background: 'rgba(255, 149, 0, 0.10)', color: '#A35A00', border: '1px solid rgba(255, 149, 0, 0.25)' };
+                const acosVal = bleeder.acos;
+                const aboveThreshold = acosVal >= (result.acosThreshold ?? 0);
+                const acosBg = aboveThreshold ? '#FF3B30' : '#FF9500';
                 return (
                   <TableRow key={idx} className={`hover:bg-[#F9F9FB] transition-colors ${indicatorClass}`}>
                     <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.campaignName}>
@@ -384,20 +403,23 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                       </TableCell>
                     )}
                     <TableCell className="text-right">
-                      <span className="inline-block text-[11px] font-mono-nums px-1.5 py-0.5 rounded-full bg-destructive/10 text-destructive font-medium">
-                        {bleeder.acos.toFixed(1)}%
-                      </span>
+                      {acosVal > 0 ? (
+                        <span
+                          className="inline-block text-[11px] font-mono-nums px-2 py-0.5 rounded-full font-medium text-white"
+                          style={{ background: acosBg }}
+                        >
+                          {acosVal.toFixed(1)}%
+                        </span>
+                      ) : (
+                        <span className="text-[13px] text-[#D2D2D7]">—</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <button
                         onClick={() => setDecisions(prev => ({ ...prev, [idx]: suggestion.decision }))}
                         title={suggestion.reason}
                         className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium cursor-pointer transition-all hover:opacity-80"
-                        style={{
-                          background: confStyle.background,
-                          color: confStyle.color,
-                          border: `1px solid ${confStyle.border}`,
-                        }}
+                        style={sugStyle}
                       >
                         {suggestion.shortLabel}
                       </button>
