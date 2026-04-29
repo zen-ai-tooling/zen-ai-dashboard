@@ -98,6 +98,7 @@ export const AnalysisResults = ({
   const [decisions, setDecisions] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateDone, setGenerateDone] = useState(false);
+  const [showFullResults, setShowFullResults] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [generatedFileName, setGeneratedFileName] = useState<string>('');
   const lastDownloadRef = useRef<(() => void) | null>(null);
