@@ -9,9 +9,9 @@ import { DecisionFileDropzone } from "./DecisionFileDropzone";
 import { suggestDecision, getConfidenceStyle } from '@/lib/ui/suggestionEngine';
 import type { Suggestion } from '@/lib/ui/suggestionEngine';
 import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
-import { CompletionBanner } from "@/components/shared/CompletionBanner";
 import { CompactStatsBar } from "@/components/shared/CompactStatsBar";
 import { SortHeader, useSortable } from "@/components/shared/SortHeader";
+import { CompletionView } from "@/components/shared/CompletionView";
 
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
