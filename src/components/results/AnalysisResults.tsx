@@ -3,8 +3,9 @@ import { Download, Loader2, CheckCircle2, MoreHorizontal, AlertTriangle, FileSpr
 import { useState, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
-import { WorkflowSteps } from "@/components/shared/WorkflowSteps";
 import { CompletionBanner } from "@/components/shared/CompletionBanner";
+import { CompactStatsBar } from "@/components/shared/CompactStatsBar";
+import { SortHeader, useSortable } from "@/components/shared/SortHeader";
 
 interface TopSpender {
   term: string;
