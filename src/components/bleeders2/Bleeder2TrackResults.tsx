@@ -9,8 +9,9 @@ import { DecisionFileDropzone } from "./DecisionFileDropzone";
 import { suggestDecision, getConfidenceStyle } from '@/lib/ui/suggestionEngine';
 import type { Suggestion } from '@/lib/ui/suggestionEngine';
 import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
-import { WorkflowSteps } from "@/components/shared/WorkflowSteps";
 import { CompletionBanner } from "@/components/shared/CompletionBanner";
+import { CompactStatsBar } from "@/components/shared/CompactStatsBar";
+import { SortHeader, useSortable } from "@/components/shared/SortHeader";
 
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
@@ -79,8 +80,33 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
     return [...result.bleeders].sort((a, b) => b.acos - a.acos).slice(0, 3);
   }, [result.bleeders]);
 
-  const showAdGroup = result.trackType === 'SBSD' || result.trackType === 'SP_KEYWORDS';
+  // Hide Ad Group dynamically — only show if at least one row has a non-empty value
+  const showAdGroupBase = result.trackType === 'SBSD' || result.trackType === 'SP_KEYWORDS';
+  const showAdGroup = showAdGroupBase && result.bleeders.some(b => b.adGroupName && b.adGroupName.trim() !== '' && b.adGroupName.trim() !== '—');
   const RANK_COLORS = ['hsl(45 90% 50%)', 'hsl(220 8% 60%)', 'hsl(28 60% 45%)'];
+
+  // Sortable
+  type SortKey = 'campaign' | 'adGroup' | 'entity' | 'spend' | 'orders' | 'acos';
+  const { sortKey, sortDir, toggle: toggleSort } = useSortable<SortKey>('spend', 'desc');
+  const sortedIndices = useMemo(() => {
+    const idx = result.bleeders.map((_, i) => i);
+    idx.sort((a, b) => {
+      const ra = result.bleeders[a]; const rb = result.bleeders[b];
+      let va: any; let vb: any;
+      switch (sortKey) {
+        case 'campaign': va = (ra.campaignName || '').toLowerCase(); vb = (rb.campaignName || '').toLowerCase(); break;
+        case 'adGroup':  va = (ra.adGroupName || '').toLowerCase();  vb = (rb.adGroupName || '').toLowerCase();  break;
+        case 'entity':   va = (ra.entity || '').toLowerCase();        vb = (rb.entity || '').toLowerCase();        break;
+        case 'spend':    va = ra.spend ?? 0; vb = rb.spend ?? 0; break;
+        case 'orders':   va = ra.orders ?? 0; vb = rb.orders ?? 0; break;
+        case 'acos':     va = ra.acos ?? 0; vb = rb.acos ?? 0; break;
+      }
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return idx;
+  }, [result.bleeders, sortKey, sortDir]);
 
   const handleSetAllPause = () => {
     const all: Record<number, string> = {};
@@ -203,31 +229,16 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* Stats row — standardized 3-up like Bleeders 1.0, amber-tinted for B2.0 */}
-      <div className="rounded-xl border border-border shadow-card overflow-hidden stat-accent-amber">
-        <div className="grid grid-cols-3 divide-x divide-border">
-          <StatCellV2
-            icon={<AlertTriangle className="w-3.5 h-3.5" strokeWidth={1.8} />}
-            value={result.bleeders.length.toLocaleString()}
-            label="Bleeders found"
-          />
-          <StatCellV2
-            icon={<DollarSign className="w-3.5 h-3.5" strokeWidth={1.8} />}
-            value={`$${result.totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
-            label="At-risk spend"
-          />
-          <StatCellV2
-            icon={<Percent className="w-3.5 h-3.5" strokeWidth={1.8} />}
-            value={`${avgAcos.toFixed(1)}%`}
-            label="Average ACoS"
-            danger={avgAcos > 100}
-          />
-        </div>
-      </div>
-
-      {/* Workflow stepper (shared) */}
-      <WorkflowSteps
+      {/* Compact stats + 4-step workflow — single unified container */}
+      <CompactStatsBar
+        accent="amber"
+        stats={[
+          { value: result.bleeders.length.toLocaleString(), label: 'bleeders' },
+          { value: `$${result.totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}`, label: 'at risk' },
+          { value: `${avgAcos.toFixed(1)}%`, label: 'avg ACoS', danger: avgAcos > 100 },
+        ]}
         steps={[
+          { label: 'Thresholds set', status: 'complete' },
           { label: 'File analyzed', status: 'complete' },
           { label: 'Make decisions', status: (generateDone || amazonFile) ? 'complete' : 'active' },
           { label: 'Generate Amazon file', status: (generateDone || amazonFile) ? 'complete' : 'pending' },
@@ -316,34 +327,53 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
           </Button>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
+        {/* Table — scrollable with pinned footer below */}
+        <div className="max-h-[58vh] overflow-auto">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
-                <TableHead style={{ letterSpacing: '0.08em' }}>Campaign</TableHead>
+                <TableHead style={{ letterSpacing: '0.08em' }}>
+                  <SortHeader active={sortKey === 'campaign'} dir={sortDir} onClick={() => toggleSort('campaign')}>Campaign</SortHeader>
+                </TableHead>
                 {showAdGroup && (
-                  <TableHead style={{ letterSpacing: '0.08em' }}>Ad Group</TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'adGroup'} dir={sortDir} onClick={() => toggleSort('adGroup')}>Ad Group</SortHeader>
+                  </TableHead>
                 )}
                 <TableHead style={{ letterSpacing: '0.08em' }}>
-                  {result.trackType === 'SP' ? 'Search Term' : 'Entity'}
+                  <SortHeader active={sortKey === 'entity'} dir={sortDir} onClick={() => toggleSort('entity')}>
+                    {result.trackType === 'SP' ? 'Search Term' : 'Entity'}
+                  </SortHeader>
                 </TableHead>
                 <TableHead style={{ letterSpacing: '0.08em' }}>Match</TableHead>
-                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Spend</TableHead>
+                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                  <SortHeader active={sortKey === 'spend'} dir={sortDir} onClick={() => toggleSort('spend')} align="right">Spend</SortHeader>
+                </TableHead>
                 {result.trackType !== 'ACOS100' && (
-                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Orders</TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'orders'} dir={sortDir} onClick={() => toggleSort('orders')} align="right">Orders</SortHeader>
+                  </TableHead>
                 )}
-                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>ACoS</TableHead>
-                <TableHead style={{ letterSpacing: '0.08em' }}>Suggestion</TableHead>
+                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                  <SortHeader active={sortKey === 'acos'} dir={sortDir} onClick={() => toggleSort('acos')} align="right">ACoS</SortHeader>
+                </TableHead>
+                <TableHead className="w-[80px]" style={{ letterSpacing: '0.08em' }}>Suggestion</TableHead>
                 <TableHead className="w-[200px]" style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {result.bleeders.map((bleeder, idx) => {
+              {sortedIndices.map((idx) => {
+                const bleeder = result.bleeders[idx];
                 const suggestion = suggestions[idx];
-                const confStyle = getConfidenceStyle(suggestion.confidence);
                 const decision = decisions[idx];
                 const indicatorClass = decisionRowClass(decision);
+                const isKeep = suggestion.shortLabel?.toLowerCase().includes('keep');
+                const sugStyle = isKeep
+                  ? { background: 'rgba(52, 199, 89, 0.10)', color: '#1A7F3E', border: '1px solid rgba(52, 199, 89, 0.25)' }
+                  : { background: 'rgba(255, 149, 0, 0.10)', color: '#A35A00', border: '1px solid rgba(255, 149, 0, 0.25)' };
+                const acosVal = bleeder.acos;
+                const aboveThreshold = acosVal >= (result.acosThreshold ?? 0);
+                const acosBg = aboveThreshold ? '#FF3B30' : '#FF9500';
                 return (
                   <TableRow key={idx} className={`hover:bg-[#F9F9FB] transition-colors ${indicatorClass}`}>
                     <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.campaignName}>
@@ -373,20 +403,23 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                       </TableCell>
                     )}
                     <TableCell className="text-right">
-                      <span className="inline-block text-[11px] font-mono-nums px-1.5 py-0.5 rounded-full bg-destructive/10 text-destructive font-medium">
-                        {bleeder.acos.toFixed(1)}%
-                      </span>
+                      {acosVal > 0 ? (
+                        <span
+                          className="inline-block text-[11px] font-mono-nums px-2 py-0.5 rounded-full font-medium text-white"
+                          style={{ background: acosBg }}
+                        >
+                          {acosVal.toFixed(1)}%
+                        </span>
+                      ) : (
+                        <span className="text-[13px] text-[#D2D2D7]">—</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <button
                         onClick={() => setDecisions(prev => ({ ...prev, [idx]: suggestion.decision }))}
                         title={suggestion.reason}
                         className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium cursor-pointer transition-all hover:opacity-80"
-                        style={{
-                          background: confStyle.background,
-                          color: confStyle.color,
-                          border: `1px solid ${confStyle.border}`,
-                        }}
+                        style={sugStyle}
                       >
                         {suggestion.shortLabel}
                       </button>
@@ -421,8 +454,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
           </Table>
         </div>
 
-        {/* Table footer */}
-        <div className="p-4 border-t border-border bg-muted/30 space-y-2">
+        {/* Pinned action bar */}
+        <div className="sticky bottom-0 z-10 p-4 border-t border-border bg-card/95 backdrop-blur-sm space-y-2">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline gap-2">

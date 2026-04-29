@@ -124,6 +124,21 @@ export const UploadCard = ({ onFileUpload, isVisible }: UploadCardProps) => {
               ))}
             </div>
           </div>
+
+          {/* How it works — inline stepper */}
+          <div className="flex items-center gap-3 mt-5 px-1 text-[12px] text-[#86868B] flex-wrap">
+            {['Upload bulk file', 'Review bleeders', 'Generate decisions'].map((s, i, arr) => (
+              <div key={s} className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-4 h-4 rounded-full border border-[#D2D2D7] bg-card flex items-center justify-center text-[10px] font-semibold text-[#86868B] font-mono-nums">
+                    {i + 1}
+                  </span>
+                  <span>{s}</span>
+                </div>
+                {i < arr.length - 1 && <span className="text-[#D2D2D7]">→</span>}
+              </div>
+            ))}
+          </div>
         </>
       ) : (
         <div className="space-y-4 animate-fade-in">

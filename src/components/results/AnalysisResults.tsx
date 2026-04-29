@@ -3,8 +3,9 @@ import { Download, Loader2, CheckCircle2, MoreHorizontal, AlertTriangle, FileSpr
 import { useState, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
-import { WorkflowSteps } from "@/components/shared/WorkflowSteps";
 import { CompletionBanner } from "@/components/shared/CompletionBanner";
+import { CompactStatsBar } from "@/components/shared/CompactStatsBar";
+import { SortHeader, useSortable } from "@/components/shared/SortHeader";
 
 interface TopSpender {
   term: string;
@@ -115,6 +116,34 @@ export const AnalysisResults = ({
   const currentSheet = activeSheet || sheetNames[0] || '';
   const currentRows = rowsBySheet[currentSheet] || [];
   const decisionOptions = getDecisionOptions(currentSheet);
+
+  type SortKey = 'campaign' | 'ad_group' | 'entity' | 'clicks' | 'spend' | 'sales' | 'acos';
+  const { sortKey, sortDir, toggle: toggleSort } = useSortable<SortKey>('spend', 'desc');
+
+  const parseAcosNum = (s: string): number => {
+    if (!s) return -1;
+    const n = parseFloat(String(s).replace('%', ''));
+    return Number.isFinite(n) ? n : -1;
+  };
+
+  const sortedIndices = useMemo(() => {
+    const idx = currentRows.map((_, i) => i);
+    idx.sort((a, b) => {
+      const ra = currentRows[a]; const rb = currentRows[b];
+      let va: any; let vb: any;
+      if (sortKey === 'acos') { va = parseAcosNum(ra.acos); vb = parseAcosNum(rb.acos); }
+      else if (sortKey === 'clicks' || sortKey === 'spend' || sortKey === 'sales') {
+        va = ra[sortKey] ?? 0; vb = rb[sortKey] ?? 0;
+      } else {
+        va = String(ra[sortKey] ?? '').toLowerCase();
+        vb = String(rb[sortKey] ?? '').toLowerCase();
+      }
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return idx;
+  }, [currentRows, sortKey, sortDir]);
 
   const decisionsMade = useMemo(
     () => Object.values(decisions).filter(d => d && d !== '').length,
@@ -258,29 +287,14 @@ export const AnalysisResults = ({
         </div>
       )}
 
-      {/* Stats bar — single horizontal row, module-tinted */}
-      <div className={`rounded-xl border border-border shadow-card overflow-hidden ${mode === 'lifetime' ? 'stat-accent-purple' : 'stat-accent-red'}`}>
-        <div className="grid grid-cols-3 divide-x divide-border">
-          <StatCell
-            icon={<AlertTriangle className="w-3.5 h-3.5" strokeWidth={1.8} />}
-            value={allRows.length.toLocaleString()}
-            label="Bleeders found"
-          />
-          <StatCell
-            icon={<DollarSign className="w-3.5 h-3.5" strokeWidth={1.8} />}
-            value={`$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
-            label="At-risk spend"
-          />
-          <StatCell
-            icon={<Layers className="w-3.5 h-3.5" strokeWidth={1.8} />}
-            value={String(sheetsCount)}
-            label="Sheets processed"
-          />
-        </div>
-      </div>
-
-      {/* Workflow stepper */}
-      <WorkflowSteps
+      {/* Compact stats + workflow steps — single unified container */}
+      <CompactStatsBar
+        accent={mode === 'lifetime' ? 'purple' : 'red'}
+        stats={[
+          { value: allRows.length.toLocaleString(), label: 'bleeders' },
+          { value: `$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}`, label: 'at risk' },
+          { value: String(sheetsCount), label: 'sheets' },
+        ]}
         steps={[
           { label: 'File analyzed', status: 'complete' },
           { label: 'Make decisions', status: generateDone ? 'complete' : 'active' },
@@ -406,8 +420,8 @@ export const AnalysisResults = ({
             </button>
           </div>
 
-          {/* Table — fixed layout, no horizontal scroll on standard widths */}
-          <div className="w-full">
+          {/* Table — scrollable area, action bar pinned below */}
+          <div className="w-full max-h-[58vh] overflow-auto">
             <Table className="table-fixed w-full">
               <colgroup>
                 <col style={{ width: '22%' }} />
@@ -422,29 +436,46 @@ export const AnalysisResults = ({
               </colgroup>
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-b border-border">
-                  <TableHead style={{ letterSpacing: '0.08em' }}>Campaign</TableHead>
-                  <TableHead style={{ letterSpacing: '0.08em' }}>Ad Group</TableHead>
-                  <TableHead style={{ letterSpacing: '0.08em' }}>Entity</TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'campaign'} dir={sortDir} onClick={() => toggleSort('campaign')}>Campaign</SortHeader>
+                  </TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'ad_group'} dir={sortDir} onClick={() => toggleSort('ad_group')}>Ad Group</SortHeader>
+                  </TableHead>
+                  <TableHead style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'entity'} dir={sortDir} onClick={() => toggleSort('entity')}>Entity</SortHeader>
+                  </TableHead>
                   <TableHead style={{ letterSpacing: '0.08em' }}>Match</TableHead>
-                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Clicks</TableHead>
-                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Spend</TableHead>
-                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Sales</TableHead>
-                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>ACoS</TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'clicks'} dir={sortDir} onClick={() => toggleSort('clicks')} align="right">Clicks</SortHeader>
+                  </TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'spend'} dir={sortDir} onClick={() => toggleSort('spend')} align="right">Spend</SortHeader>
+                  </TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'sales'} dir={sortDir} onClick={() => toggleSort('sales')} align="right">Sales</SortHeader>
+                  </TableHead>
+                  <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                    <SortHeader active={sortKey === 'acos'} dir={sortDir} onClick={() => toggleSort('acos')} align="right">ACoS</SortHeader>
+                  </TableHead>
                   <TableHead style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {currentRows.map((row, rowIdx) => {
+                {sortedIndices.map((rowIdx, displayIdx) => {
+                  const row = currentRows[rowIdx];
                   const key = `${currentSheet}-ROWINDEX-${rowIdx}`;
                   const entityDisplay = row.customer_search_term || row.keyword_text || row.product_targeting || row.entity || '—';
                   const decision = decisions[key];
                   const indicatorClass = decisionRowClass(decision);
                   const isHighSpend = row.spend > decisionThresholdSpend;
+                  const acosNum = parseAcosNum(row.acos);
+                  const hasAcos = acosNum >= 0 && row.acos && row.acos !== '0' && row.acos !== '0%';
                   return (
                     <TableRow
                       key={rowIdx}
-                      className={`row-enter cursor-pointer hover:bg-[#F9F9FB] transition-colors ${rowIdx % 2 === 1 ? 'bg-secondary/30' : ''} ${indicatorClass}`}
-                      style={{ animationDelay: `${Math.min(rowIdx * 12, 240)}ms` }}
+                      className={`row-enter cursor-pointer hover:bg-[#F9F9FB] transition-colors ${displayIdx % 2 === 1 ? 'bg-secondary/30' : ''} ${indicatorClass}`}
+                      style={{ animationDelay: `${Math.min(displayIdx * 12, 240)}ms` }}
                     >
                       <TableCell className="truncate font-medium" title={row.campaign}>
                         {row.campaign || '—'}
@@ -468,12 +499,15 @@ export const AnalysisResults = ({
                         ${row.sales.toFixed(2)}
                       </TableCell>
                       <TableCell className="text-right">
-                        {row.acos && row.acos !== '0' && row.acos !== '0%' ? (
-                          <span className="inline-block text-[11px] font-mono-nums px-1.5 py-px rounded-md bg-destructive/10 text-destructive font-medium">
+                        {hasAcos ? (
+                          <span
+                            className="inline-block text-[11px] font-mono-nums px-2 py-0.5 rounded-full font-medium text-white"
+                            style={{ background: acosNum >= 100 ? '#FF3B30' : '#FF9500' }}
+                          >
                             {row.acos}
                           </span>
                         ) : (
-                          <span className="text-[13px] text-[hsl(var(--border-strong))]">—</span>
+                          <span className="text-[13px] text-[#D2D2D7]">—</span>
                         )}
                       </TableCell>
                       <TableCell className="px-2">
@@ -490,120 +524,106 @@ export const AnalysisResults = ({
               </TableBody>
             </Table>
           </div>
+
+          {/* Pinned action bar — sticky at the bottom of the table card */}
+          <div className="sticky bottom-0 z-10 border-t border-border bg-card/95 backdrop-blur-sm p-4">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[14px] font-semibold text-foreground font-mono-nums">
+                    {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{allRows.length}</span>
+                  </span>
+                  <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions made</span>
+                </div>
+                <div className="mt-1.5 h-1 w-full max-w-[280px] rounded-full bg-secondary overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all duration-300"
+                    style={{ width: `${(decisionsMade / Math.max(allRows.length, 1)) * 100}%` }}
+                  />
+                </div>
+                <p className="text-[12px] text-[#6E6E73] mt-1.5 inline-flex items-center gap-1.5">
+                  <Info className="w-3 h-3" />
+                  Pause on search terms auto-converts to Negate (Exact)
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 flex-shrink-0 relative">
+                <button
+                  onClick={() => setMoreOpen(o => !o)}
+                  className="h-9 w-9 rounded-md border border-border bg-card text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press flex items-center justify-center"
+                  aria-label="More actions"
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
+                {moreOpen && (
+                  <div className="absolute right-0 bottom-11 min-w-[240px] rounded-lg border border-border bg-popover shadow-pop p-1 z-20 animate-scale-in">
+                    <button
+                      onClick={() => { handleDownload(); setMoreOpen(false); }}
+                      className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
+                    >
+                      <FileSpreadsheet className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))]" />
+                      {formattedWorkbook ? 'Download formatted Excel' : 'Download combined CSV'}
+                      <span className="ml-auto text-[10px] text-[hsl(var(--text-tertiary))]">legacy</span>
+                    </button>
+                    {onProceedToProcessor && (
+                      <button
+                        onClick={() => { onProceedToProcessor(); setMoreOpen(false); }}
+                        className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
+                      >
+                        Proceed to Decision Processor →
+                      </button>
+                    )}
+                  </div>
+                )}
+                <button
+                  onClick={handleGenerateDecisionFile}
+                  disabled={decisionsMade === 0 || isGenerating}
+                  className={`btn-primary-action btn-press ${generateDone ? 'is-done' : ''}`}
+                >
+                  {isGenerating ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</>
+                  ) : generateDone ? (
+                    <><CheckCircle2 className="w-4 h-4" /> Downloaded ✓</>
+                  ) : (
+                    <>Generate Amazon file →</>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Action bar */}
+      {/* Manual decision upload — collapsed */}
       {allRows.length > 0 && (
-        <div className="rounded-xl border border-border bg-card shadow-card p-5">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            {/* Progress indicator */}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-baseline gap-2">
-                <span className="text-[14px] font-semibold text-foreground font-mono-nums">
-                  {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{allRows.length}</span>
-                </span>
-                <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions made</span>
-              </div>
-              <div className="mt-2 h-1 w-full max-w-[280px] rounded-full bg-secondary overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-primary transition-all duration-300"
-                  style={{ width: `${(decisionsMade / Math.max(allRows.length, 1)) * 100}%` }}
-                />
-              </div>
-              <p className="text-[12px] text-[hsl(var(--muted-foreground))] mt-2 inline-flex items-center gap-1.5">
-                <Info className="w-3 h-3" />
-                Pause on search terms auto-converts to Negate (Exact)
-              </p>
-            </div>
-
-            {/* Buttons */}
-            <div className="flex items-center gap-2 flex-shrink-0 relative">
-              <button
-                onClick={() => setMoreOpen(o => !o)}
-                className="h-9 w-9 rounded-md border border-border bg-card text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press flex items-center justify-center"
-                aria-label="More actions"
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </button>
-              {moreOpen && (
-                <div className="absolute right-0 top-11 min-w-[240px] rounded-lg border border-border bg-popover shadow-pop p-1 z-20 animate-scale-in">
-                  <button
-                    onClick={() => { handleDownload(); setMoreOpen(false); }}
-                    className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
-                  >
-                    <FileSpreadsheet className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))]" />
-                    {formattedWorkbook ? 'Download formatted Excel' : 'Download combined CSV'}
-                    <span className="ml-auto text-[10px] text-[hsl(var(--text-tertiary))]">legacy</span>
-                  </button>
-                  {onProceedToProcessor && (
-                    <button
-                      onClick={() => { onProceedToProcessor(); setMoreOpen(false); }}
-                      className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
-                    >
-                      Proceed to Decision Processor →
-                    </button>
-                  )}
-                </div>
-              )}
-              <button
-                onClick={handleGenerateDecisionFile}
-                disabled={decisionsMade === 0 || isGenerating}
-                className={`btn-primary-action btn-press ${generateDone ? 'is-done' : ''}`}
-              >
-                {isGenerating ? (
-                  <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</>
-                ) : generateDone ? (
-                  <><CheckCircle2 className="w-4 h-4" /> Downloaded ✓</>
-                ) : (
-                  <>Generate Amazon file →</>
-                )}
-              </button>
-            </div>
+        <details className="group">
+          <summary className="list-none select-none cursor-pointer inline-flex items-center gap-1.5 text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground transition-colors">
+            <ChevronDown className="w-3 h-3 transition-transform duration-200 group-open:rotate-180" />
+            Or upload a decision file manually
+          </summary>
+          <div className="mt-3 max-w-[480px]">
+            <label
+              htmlFor="manual-decision-upload-b1"
+              className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-4 py-3 cursor-pointer hover:border-primary/60 btn-press"
+            >
+              <Upload className="w-4 h-4 text-[hsl(var(--text-tertiary))]" />
+              <span className="text-[12.5px] text-[hsl(var(--text-secondary))]">
+                Drop or click to upload a pre-made decision file (.xlsx)
+              </span>
+              <input
+                id="manual-decision-upload-b1"
+                type="file"
+                accept=".xlsx,.xls,.csv"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleManualDecisionUpload(f);
+                }}
+              />
+            </label>
           </div>
-
-          {/* Manual decision upload — collapsed for parity with Bleeders 2.0 */}
-          <details className="group mt-4 pt-4 border-t border-border">
-            <summary className="list-none select-none cursor-pointer inline-flex items-center gap-1.5 text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground transition-colors">
-              <ChevronDown className="w-3 h-3 transition-transform duration-200 group-open:rotate-180" />
-              Or upload a decision file manually
-            </summary>
-            <div className="mt-3 max-w-[480px]">
-              <label
-                htmlFor="manual-decision-upload-b1"
-                className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-card px-4 py-3 cursor-pointer hover:border-primary/60 btn-press"
-              >
-                <Upload className="w-4 h-4 text-[hsl(var(--text-tertiary))]" />
-                <span className="text-[12.5px] text-[hsl(var(--text-secondary))]">
-                  Drop or click to upload a pre-made decision file (.xlsx)
-                </span>
-                <input
-                  id="manual-decision-upload-b1"
-                  type="file"
-                  accept=".xlsx,.xls,.csv"
-                  className="hidden"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) handleManualDecisionUpload(f);
-                  }}
-                />
-              </label>
-            </div>
-          </details>
-        </div>
+        </details>
       )}
     </div>
   );
 };
-
-const StatCell: React.FC<{ icon: React.ReactNode; value: string; label: string }> = ({ icon, value, label }) => (
-  <div className="px-5 py-4">
-    <div className="flex items-center gap-1.5 text-[hsl(var(--text-tertiary))] mb-1.5">
-      {icon}
-      <span className="text-[11px] font-semibold uppercase" style={{ letterSpacing: '0.08em' }}>{label}</span>
-    </div>
-    <div className="text-[28px] font-semibold leading-none text-foreground font-mono-nums tracking-tight">
-      {value}
-    </div>
-  </div>
-);
