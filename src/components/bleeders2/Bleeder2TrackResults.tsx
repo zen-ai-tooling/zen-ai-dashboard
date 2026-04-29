@@ -468,8 +468,20 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 const acosVal = bleeder.acos;
                 const aboveThreshold = acosVal >= (result.acosThreshold ?? 0);
                 const acosBg = aboveThreshold ? '#FF3B30' : '#FF9500';
+
+                const isHighUrgency = !decision && bleeder.spend >= urgencyBands.high && bleeder.spend > 0;
+                const isLowUrgency = !decision && bleeder.spend <= urgencyBands.low;
+                const urgencyClass = decision
+                  ? ''
+                  : isHighUrgency ? 'row-urgency-high' : isLowUrgency ? 'row-urgency-low' : '';
+                const flashClass =
+                  flashIdx && flashIdx.idx === idx && Date.now() - flashIdx.ts < 400 ? flashIdx.cls : '';
+
                 return (
-                  <TableRow key={idx} className={`hover:bg-[#F9F9FB] transition-colors ${indicatorClass}`}>
+                  <TableRow
+                    key={`${idx}-${flashIdx?.idx === idx ? flashIdx.ts : 'r'}`}
+                    className={`hover:bg-[#F9F9FB] transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
+                  >
                     <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.campaignName}>
                       {bleeder.campaignName}
                     </TableCell>
@@ -510,19 +522,22 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                     </TableCell>
                     <TableCell>
                       <button
-                        onClick={() => setDecisions(prev => ({ ...prev, [idx]: suggestion.decision }))}
+                        onClick={() => setDecisionWithFlash(idx, suggestion.decision)}
                         title={suggestion.reason}
                         className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium cursor-pointer transition-all hover:opacity-80"
-                        style={sugStyle}
+                        style={{ ...sugStyle, opacity: decision ? 0.45 : 1 }}
                       >
                         {suggestion.shortLabel}
                       </button>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1.5">
+                        {decision && (
+                          <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#34C759' }} />
+                        )}
                         <DecisionSelect
                           value={decision}
-                          onChange={(val) => setDecisions(prev => ({ ...prev, [idx]: val }))}
+                          onChange={(val) => setDecisionWithFlash(idx, val)}
                           options={getDecisionOptions()}
                           width="128px"
                         />
