@@ -719,7 +719,7 @@ export const AnalysisResults = ({
                 <button
                   onClick={handleGenerateDecisionFile}
                   disabled={decisionsMade === 0 || isGenerating}
-                  className={`btn-primary-action btn-press ${generateDone ? 'is-done' : ''}`}
+                  className={`btn-primary-action btn-press ${generateDone ? 'is-done' : ''} ${decisionsMade >= allRows.length && allRows.length > 0 && !generateDone ? 'is-ready-pulse' : ''}`}
                 >
                   {isGenerating ? (
                     <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</>
