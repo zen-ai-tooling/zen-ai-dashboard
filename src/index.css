@@ -393,6 +393,46 @@
 
   /* Step complete pop */
   .step-complete-pop { animation: step-pop 300ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+  /* Premium input focus ring */
+  input.h-10:focus-visible,
+  input[class*="rounded-lg"]:focus-visible,
+  .focus-ring:focus-visible {
+    outline: none;
+    border-color: #0071E3 !important;
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.10);
+  }
+
+  /* Computed number pulse on key change */
+  .num-transition {
+    transition: color 200ms ease, transform 200ms ease;
+    animation: num-pulse 220ms ease-out;
+  }
+
+  /* Track card colored hover tints */
+  .track-card-hover-red:hover    { background: rgba(255, 59, 48, 0.03); }
+  .track-card-hover-amber:hover  { background: rgba(255, 149, 0, 0.03); }
+  .track-card-hover-blue:hover   { background: rgba(0, 113, 227, 0.03); }
+  .track-card-hover-purple:hover { background: rgba(168, 85, 247, 0.03); }
+
+  /* Pulse dot for "Action needed" cells */
+  .action-pulse-dot {
+    width: 6px; height: 6px; border-radius: 999px; background: #0071E3;
+    animation: action-pulse 1.6s ease-out infinite;
+  }
+
+  /* Suggestion pills — unified */
+  .pill-suggest {
+    display: inline-flex; align-items: center;
+    padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+  }
+  .pill-suggest-red    { background: rgba(255,59,48,0.10);  color: #C7261C; }
+  .pill-suggest-amber  { background: rgba(255,149,0,0.12);  color: #B36A00; }
+  .pill-suggest-blue   { background: rgba(120,130,140,0.12); color: #4B5563; }
+  .pill-suggest-green  { background: rgba(52,199,89,0.12);  color: #1A7F3E; }
 }
 
 /* ── keyframes ── */
@@ -421,6 +461,17 @@
   0%   { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.45); }
   70%  { box-shadow: 0 0 0 6px hsl(var(--primary) / 0); }
   100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+}
+
+@keyframes num-pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes action-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 113, 227, 0.5); opacity: 1; }
+  50%      { box-shadow: 0 0 0 4px rgba(0, 113, 227, 0); opacity: 0.5; }
 }
 
 .drag-pulse { animation: drag-pulse 1.4s ease-out infinite; }
