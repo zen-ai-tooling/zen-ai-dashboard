@@ -551,6 +551,19 @@ export const AnalysisResults = ({
                           <span className="text-[13px] text-[#D2D2D7]">—</span>
                         )}
                       </TableCell>
+                      <TableCell>
+                        {(() => {
+                          const sug = suggestB1Row({ clicks: row.clicks ?? 0, spend: row.spend ?? 0, sales: row.sales ?? 0, orders: row.orders ?? 0 });
+                          return (
+                            <span
+                              className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full"
+                              style={{ background: sug.bg, color: sug.color, border: `1px solid ${sug.border}` }}
+                            >
+                              {sug.label}
+                            </span>
+                          );
+                        })()}
+                      </TableCell>
                       <TableCell className="px-2">
                         <DecisionSelect
                           value={decision}
