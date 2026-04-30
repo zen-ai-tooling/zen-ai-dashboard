@@ -324,7 +324,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
       {/* Spend distribution — collapsible visualization */}
       <SpendDistributionStrip
         items={bleeders.map((b) => ({
-          label: b.entity || b.campaign || 'Untitled',
+          label: b.keywordText || b.targetingText || b.campaignName || 'Untitled',
           spend: b.spend || 0,
         }))}
       />
