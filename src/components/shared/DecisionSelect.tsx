@@ -45,10 +45,10 @@ interface DecisionSelectProps {
 }
 
 export const DecisionSelect: React.FC<DecisionSelectProps> = ({
-  value, onChange, options, placeholder = 'Action', width = '128px',
+  value, onChange, options, placeholder = 'Action', width = '130px',
 }) => {
   // Inset left-border indicator: blue when undecided, decision color when set
-  const insetColor = value ? decisionTextColor(value) : '#0071E3';
+  const insetColor = value ? decisionTextColor(value) : '#3B82F6';
   const triggerRef = React.useRef<HTMLButtonElement>(null);
 
   const handleChange = (val: string) => {

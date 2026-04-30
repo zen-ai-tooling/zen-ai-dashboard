@@ -83,7 +83,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
               style={{
                 width: 120,
                 height: 120,
-                background: 'radial-gradient(circle, rgba(52, 199, 89, 0.08) 0%, transparent 70%)',
+                background: 'radial-gradient(circle, rgba(34, 197, 94, 0.06) 0%, transparent 70%)',
                 animation: 'cv-glow-fade 400ms ease-out both',
               }}
             />
@@ -138,7 +138,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
                 onClick={onStartNew}
                 className="rounded-[10px] btn-press inline-flex items-center gap-1.5"
                 style={{
-                  background: '#0071E3',
+                  background: '#2563EB',
                   color: '#fff',
                   padding: '12px 24px',
                   fontSize: 14,
