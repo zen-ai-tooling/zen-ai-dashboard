@@ -306,27 +306,9 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
       />
 
       {/* Decision table */}
-      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <div>
-            <h3 className="text-[14px] font-medium text-foreground font-display">
-              Bleeders — Lifetime Audit
-            </h3>
-            <p className="text-[12px] text-muted-foreground mt-0.5">
-              Select a decision per row then generate the Amazon file
-            </p>
-          </div>
-          {onDownloadDecisionSheet && (
-            <Button variant="outline" size="sm" onClick={onDownloadDecisionSheet} className="text-[11px] h-7 btn-press">
-              <Download className="w-3 h-3 mr-1" />
-              Download XLSX
-            </Button>
-          )}
-        </div>
-
+      <div className="decision-table-card">
         {/* Bulk actions */}
-        <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-border bg-[#FAFAFA]">
+        <div className="decision-table-bar flex items-center justify-between gap-2 px-4 py-2.5">
           <div className="text-[12px] text-[hsl(var(--text-secondary))] truncate">
             <span className="font-medium text-foreground">Lifetime Audit</span>
             <span className="mx-1.5 text-[hsl(var(--text-tertiary))]">·</span>
@@ -360,7 +342,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
         </div>
 
         {/* Table */}
-        <div className="max-h-[58vh] overflow-auto table-sticky-header">
+        <div className="max-h-[58vh] overflow-auto table-sticky-header decision-table">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
@@ -406,7 +388,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                 return (
                   <TableRow
                     key={`${idx}-${flashIdx?.idx === idx ? flashIdx.ts : 'r'}`}
-                    className={`hover:bg-[#F9F9FB] transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
+                    className={`transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
                   >
                     <TableCell className="text-[13px] max-w-[180px] truncate" title={b.campaignName}>
                       {b.campaignName}
@@ -417,7 +399,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                     <TableCell className="text-[13px] max-w-[200px] truncate" title={b.targetingText}>
                       {b.targetingText}
                     </TableCell>
-                    <TableCell className="text-[13px] text-muted-foreground">
+                    <TableCell className="col-nowrap-ellipsis text-[13px] text-muted-foreground" title={b.matchType || ''}>
                       {b.matchType || '—'}
                     </TableCell>
                     <TableCell className="text-right">
@@ -480,7 +462,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
         </div>
 
         {/* Pinned action bar */}
-        <div className="sticky bottom-0 z-10 p-4 border-t border-border bg-[#FAFAFA] space-y-2">
+        <div className="decision-table-footer p-4 space-y-2">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
               {decisionsMade >= bleeders.length && bleeders.length > 0 ? (
@@ -513,7 +495,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
               <button
                 onClick={handleGenerate}
                 disabled={decisionsMade === 0 || isGenerating || !!amazonFile}
-                className={`btn-primary-action btn-press ${amazonFile ? 'is-done' : ''} ${decisionsMade >= bleeders.length && bleeders.length > 0 && !amazonFile ? 'is-ready-pulse' : ''}`}
+                className={`btn-primary-action btn-press ${amazonFile ? 'is-done' : ''} ${decisionsMade >= bleeders.length && bleeders.length > 0 && !amazonFile ? 'is-ready' : ''}`}
               >
                 {isGenerating ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

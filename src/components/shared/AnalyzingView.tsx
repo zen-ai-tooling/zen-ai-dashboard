@@ -85,9 +85,9 @@ export const AnalyzingView: React.FC<AnalyzingViewProps> = ({
       className="flex flex-col items-center justify-center px-4"
       style={{ minHeight: 'calc(100vh - 180px)' }}
     >
-      <div className="w-full max-w-[640px]">
+      <div className="w-full max-w-[520px]">
         {/* Top progress bar — 4px */}
-        <div className="w-full overflow-hidden mb-12" style={{ height: 4, borderRadius: 2, background: '#E5E5EA' }}>
+        <div className="w-full overflow-hidden" style={{ height: 4, borderRadius: 2, background: '#E5E5EA' }}>
           <div
             style={{
               height: '100%',
@@ -99,19 +99,17 @@ export const AnalyzingView: React.FC<AnalyzingViewProps> = ({
           />
         </div>
 
-        <div className="text-center">
-          <div className="inline-flex items-center justify-center w-10 h-10 mb-4">
-            <Loader2 className="w-7 h-7 animate-spin" style={{ color: '#0071E3' }} strokeWidth={2} />
-          </div>
+        <div className="text-center" style={{ marginTop: 16 }}>
+          <Loader2 className="w-6 h-6 animate-spin mx-auto" style={{ color: '#0071E3' }} strokeWidth={2} />
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: '#1D1D1F', letterSpacing: '-0.3px' }}>
+          <h2 className="mt-3" style={{ fontSize: 20, fontWeight: 600, color: '#1D1D1F', letterSpacing: '-0.3px' }}>
             Analyzing your file
           </h2>
-          <p className="mt-1.5" style={{ fontSize: 14, color: '#6E6E73' }}>
+          <p className="mt-1" style={{ fontSize: 13, color: '#86868B' }}>
             This usually takes just a few seconds.
           </p>
 
-          <div className="mt-8 space-y-2 inline-block text-left min-w-[300px]">
+          <div className="space-y-1.5 inline-block text-left min-w-[280px]" style={{ marginTop: 16 }}>
             {steps.slice(0, stepIdx + 1).map((s, i) => {
               const isCurrent = i === stepIdx && !showFinal;
               const isDone = i < stepIdx || showFinal;
