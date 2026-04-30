@@ -423,7 +423,7 @@
   }
 
   /* ── Decision-table urgency banding ── */
-  .row-urgency-high  { box-shadow: inset 3px 0 0 #FF3B30; }
+  .row-urgency-high  { box-shadow: inset 4px 0 0 #EF4444; }
   .row-urgency-low td { color: #6E6E73; }
   /* When a decision is made, its color overrides urgency via more specific row-decision-* */
 
@@ -462,18 +462,18 @@
   }
   .bulk-btn-ghost:hover { background: #F5F5F7; color: #1D1D1F; }
 
-  /* Suggestion pills — unified, muted spec colors */
+  /* Suggestion pills — unified, muted spec colors (Tailwind-50/700 family) */
   .pill-suggest {
     display: inline-flex; align-items: center;
-    padding: 3px 10px; border-radius: 6px;
+    padding: 2px 8px; border-radius: 4px;
     font-size: 11px; font-weight: 600;
     line-height: 1.4;
     letter-spacing: 0.01em;
   }
-  .pill-suggest-red    { background: #FFE5E5; color: #CC0000; border: none; }
-  .pill-suggest-amber  { background: #FFF3E0; color: #CC7700; border: none; }
-  .pill-suggest-blue   { background: #E8EAF0; color: #555770; border: none; }
-  .pill-suggest-green  { background: rgba(52,199,89,0.12); color: #1A7F3E; border: none; }
+  .pill-suggest-red    { background: #FEF2F2; color: #B91C1C; border: none; }
+  .pill-suggest-amber  { background: #FFFBEB; color: #B45309; border: none; }
+  .pill-suggest-blue   { background: #F1F5F9; color: #475569; border: none; }
+  .pill-suggest-green  { background: #F0FDF4; color: #15803D; border: none; }
   .pill-suggest { transition: opacity 150ms ease; }
   /* Dim suggestion pill once a decision is made on this row */
   tr.row-decision-keep .pill-suggest,
@@ -487,13 +487,14 @@
     border-radius: 12px;
     overflow: hidden;
     background: #FFFFFF;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   }
   .decision-table-bar {
-    background: #FAFAFA;
+    background: #F9FAFB;
     border-bottom: 1px solid #E5E5EA;
   }
   .decision-table-footer {
-    background: #FAFAFA;
+    background: #F9FAFB;
     border-top: 1px solid #E5E5EA;
     position: sticky;
     bottom: 0;
@@ -506,7 +507,7 @@
     transition: background-color 100ms ease, box-shadow 150ms ease;
     border-bottom: 1px solid #F2F2F7;
   }
-  .decision-table table tbody tr:nth-child(even) { background: #FAFBFC; }
+  .decision-table table tbody tr:nth-child(even) { background: #F9FAFB; }
   .decision-table table tbody tr:hover,
   .decision-table table tbody tr:hover:nth-child(even) { background: #F0F5FF !important; }
   /* Ensure row cells have at least 14px vertical padding */
@@ -515,7 +516,7 @@
 
   /* Column header styling inside decision tables */
   .decision-table thead th {
-    background: #FAFAFA !important;
+    background: #F9FAFB !important;
     border-bottom: 1px solid #E5E5EA;
     text-transform: uppercase;
     font-size: 11px;
@@ -523,10 +524,13 @@
     letter-spacing: 0.8px;
     color: #86868B;
   }
+  /* Decision column — guarantee "Action" never truncates */
+  .decision-table th:last-child,
+  .decision-table td:last-child { min-width: 130px; }
 
   /* Tab bar area at the top of the B1 decision-table card */
   .decision-table-tabs {
-    background: #FAFAFA;
+    background: #F9FAFB;
     border-bottom: 1px solid #E5E5EA;
   }
 
