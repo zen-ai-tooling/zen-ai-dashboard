@@ -207,7 +207,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                 className="rounded-[10px] border border-[#E5E5EA] bg-white p-4 tile-hover flex items-start justify-between gap-3 cursor-pointer"
                 style={{
                   boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                  borderLeft: '3px solid rgba(0,113,227,0.3)',
+                  borderLeft: '3px solid rgba(0,113,227,0.2)',
                 }}
               >
                 <div className="min-w-0">
