@@ -456,7 +456,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                         <span className="text-[13px] text-[#D2D2D7]">—</span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => setDecisionWithFlash(idx, sug.decision)}
                         title={sug.reason}
@@ -471,7 +471,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                         {sug.label}
                       </button>
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-1.5">
                         {decision && (
                           <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#34C759' }} />
