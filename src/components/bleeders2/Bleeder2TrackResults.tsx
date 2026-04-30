@@ -379,6 +379,14 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         </details>
       )}
 
+      {/* Spend distribution — collapsible visualization */}
+      <SpendDistributionStrip
+        items={result.bleeders.map((b) => ({
+          label: b.entity || b.campaignName || 'Untitled',
+          spend: b.spend || 0,
+        }))}
+      />
+
       {/* Decision table */}
       <div className="decision-table-card">
 
