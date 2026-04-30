@@ -463,7 +463,7 @@ export const AnalysisResults = ({
       {sheetNames.length > 0 && (
         <div className="decision-table-card">
           {/* Tab segmented control */}
-          <div className="border-b border-border px-3 pt-3">
+          <div className="decision-table-tabs px-3 pt-3">
             <div className="flex items-end gap-0.5 overflow-x-auto -mb-px tab-scroll-fade text-[14px]">
               {sheetNames.map((name) => {
                 const count = rowsBySheet[name]?.length || 0;
