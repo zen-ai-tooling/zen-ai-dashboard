@@ -560,8 +560,8 @@ export const AnalysisResults = ({
           <div className="w-full max-h-[58vh] overflow-auto table-sticky-header decision-table">
             <Table className="table-fixed w-full">
               <colgroup>
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '16%' }} />
+                <col style={{ width: '17%' }} />
+                <col style={{ width: '15%' }} />
                 <col style={{ width: '13%' }} />
                 <col style={{ width: '7%' }} />
                 <col style={{ width: '6%' }} />
@@ -569,7 +569,7 @@ export const AnalysisResults = ({
                 <col style={{ width: '7%' }} />
                 <col style={{ width: '7%' }} />
                 <col style={{ width: '8%' }} />
-                <col style={{ width: '8%' }} />
+                <col style={{ minWidth: '120px', width: '12%' }} />
               </colgroup>
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-b border-border">
