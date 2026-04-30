@@ -83,7 +83,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
               style={{
                 width: 120,
                 height: 120,
-                background: 'radial-gradient(circle, rgba(52, 199, 89, 0.18) 0%, transparent 70%)',
+                background: 'radial-gradient(circle, rgba(52, 199, 89, 0.08) 0%, transparent 70%)',
                 animation: 'cv-glow-fade 400ms ease-out both',
               }}
             />
