@@ -1,8 +1,13 @@
 import React from "react";
 import { Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { StandardUploadZone } from "@/components/shared/StandardUploadZone";
 import { BulkBreadcrumb } from "@/components/shared/BulkBreadcrumb";
+import {
+  PipelineHeader,
+  WorkspaceCard,
+  SmartDropzone,
+  AssetInventory,
+} from "@/components/shared/UploadWorkspace";
 import type { Bleeder2Track } from "./TrackSelector";
 
 interface TrackUploaderProps {
@@ -13,11 +18,18 @@ interface TrackUploaderProps {
   isValidating?: boolean;
 }
 
-const trackTitles: Record<Bleeder2Track, string> = {
-  SBSD: 'SB/SD Bad Targets — find high-ACoS targets across Sponsored Brands & Display campaigns',
-  SP: 'SP Bad Search Terms — find wasteful customer search terms in Sponsored Products',
-  SP_KEYWORDS: 'SP Bad Targets — find underperforming keywords & product targets in Sponsored Products',
-  ACOS100: 'Campaigns ≥ 100% ACoS — find campaigns where spend exceeds sales',
+const trackVariant: Record<Bleeder2Track, string> = {
+  SBSD: 'SB/SD Bad Targets',
+  SP: 'SP Bad Search Terms',
+  SP_KEYWORDS: 'SP Bad Targets',
+  ACOS100: 'Campaigns ≥ 100% ACoS',
+};
+
+const trackDescriptions: Record<Bleeder2Track, string> = {
+  SBSD: 'Find high-ACoS targets across Sponsored Brands & Display campaigns.',
+  SP: 'Find wasteful customer search terms in Sponsored Products.',
+  SP_KEYWORDS: 'Find underperforming keywords & product targets in Sponsored Products.',
+  ACOS100: 'Find campaigns where spend exceeds sales (ACoS ≥ 100%).',
 };
 
 const trackExpectedSheets: Record<Bleeder2Track, string[]> = {
@@ -27,15 +39,27 @@ const trackExpectedSheets: Record<Bleeder2Track, string[]> = {
   ACOS100: ['Sponsored Products Campaigns', 'Sponsored Brands Campaigns', 'Sponsored Display Campaigns'],
 };
 
+const PIPELINE_STEPS = [
+  { id: 1, label: 'Upload bulk file' },
+  { id: 2, label: 'Review bleeders' },
+  { id: 3, label: 'Generate decisions' },
+];
+
 export const TrackUploader: React.FC<TrackUploaderProps> = ({ track, onUpload, error, uploadedFile, isValidating }) => {
+  const expected = trackExpectedSheets[track];
+  const isReady = !!uploadedFile && !error;
+
   return (
     <div className="w-full space-y-5">
       <BulkBreadcrumb />
 
-      <div>
-        <h2 className="text-[20px] font-semibold text-foreground tracking-tight">Upload your bulk file</h2>
-        <p className="text-[13px] text-[hsl(var(--text-secondary))] mt-1">{trackTitles[track]}</p>
-      </div>
+      <PipelineHeader
+        workflowName="Bleeders 2.0"
+        workflowVariant={trackVariant[track]}
+        description={trackDescriptions[track]}
+        steps={PIPELINE_STEPS}
+        activeStep={1}
+      />
 
       {error && (
         <Alert variant="destructive">
@@ -45,17 +69,35 @@ export const TrackUploader: React.FC<TrackUploaderProps> = ({ track, onUpload, e
       )}
 
       {isValidating ? (
-        <div className="rounded-xl border border-border bg-card p-6 flex items-center justify-center gap-2 shadow-card">
+        <div
+          style={{
+            background: '#FFFFFF',
+            border: '1px solid #E5E5EA',
+            borderRadius: 12,
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+            padding: 24,
+          }}
+          className="flex items-center justify-center gap-2"
+        >
           <Loader2 className="h-4 w-4 animate-spin text-primary" />
-          <span className="text-[13px] text-[hsl(var(--text-secondary))]">Validating file...</span>
+          <span style={{ fontSize: 13, color: '#6E6E73' }}>Validating file…</span>
         </div>
       ) : (
-        <StandardUploadZone
-          inputId={`track-upload-${track}`}
-          onFileSelect={(file) => onUpload(track, file)}
-          selectedFile={uploadedFile && !error ? { name: uploadedFile.name, size: uploadedFile.size } : null}
-          expectedSheets={trackExpectedSheets[track]}
-        />
+        <WorkspaceCard
+          sectionLabel="Amazon Ad Data Onboarding"
+          sidebar={
+            <AssetInventory
+              sheets={expected.map((name) => ({ name, detected: isReady }))}
+            />
+          }
+        >
+          <SmartDropzone
+            inputId={`track-upload-${track}`}
+            primaryText="Drop your Amazon Bulk Operations file here"
+            selectedFile={isReady && uploadedFile ? { name: uploadedFile.name, size: uploadedFile.size } : null}
+            onFileSelect={(file) => onUpload(track, file)}
+          />
+        </WorkspaceCard>
       )}
     </div>
   );

@@ -1,22 +1,32 @@
 /**
  * Lifetime Bleeders Two-File Upload Workflow Component
  *
- * Standardized upload UI that matches Bleeders 1.0/2.0 patterns:
- * - StandardUploadZone for both files (Lifetime Targeting Report + Reference Bulk File)
- * - Stacked vertically with Step 1 / Step 2 labels
- * - Subtle blue-gray info callout explaining "Why two files?"
- * - "How it works" stepper at the bottom
- * - "Analyze Files →" button enabled when both files are uploaded
+ * Re-architected to match the Data Onboarding Control Room pattern shared across
+ * Bleeders 1.0 and 2.0: PipelineHeader + WorkspaceCard + SmartDropzone + AssetInventory.
+ *
+ * Two dropzones are stacked inside the workspace (Step 1 + Step 2) and the sidebar
+ * lights up each file's "asset" pill as it is provided. Business logic untouched.
  */
 
 import * as React from 'react';
 import { Info, Loader2 } from 'lucide-react';
-import { StandardUploadZone } from '@/components/shared/StandardUploadZone';
+import {
+  PipelineHeader,
+  WorkspaceCard,
+  SmartDropzone,
+  AssetInventory,
+} from '@/components/shared/UploadWorkspace';
 
 interface LifetimeUploaderProps {
   onAnalyze: (lifetimeReport: File, bulkFile: File) => Promise<void>;
   isProcessing?: boolean;
 }
+
+const PIPELINE_STEPS = [
+  { id: 1, label: 'Upload files' },
+  { id: 2, label: 'Review bleeders' },
+  { id: 3, label: 'Generate decisions' },
+];
 
 export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
   onAnalyze,
@@ -55,18 +65,16 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
   const ready = !!lifetimeFile && !!bulkFile && !isProcessing;
 
   return (
-    <div className="w-full space-y-5 max-w-[760px] mx-auto">
-      {/* Title + subtitle */}
-      <div>
-        <h2 style={{ fontSize: 24, fontWeight: 700, color: '#1D1D1F', letterSpacing: '-0.3px' }}>
-          Upload your lifetime audit files
-        </h2>
-        <p className="mt-1.5" style={{ fontSize: 14, color: '#6E6E73' }}>
-          Lifetime Audit — find targets with high lifetime clicks and zero sales.
-        </p>
-      </div>
+    <div className="w-full space-y-5">
+      <PipelineHeader
+        workflowName="Lifetime Audit"
+        workflowVariant="Two-file workflow"
+        description="Find targets with high lifetime clicks and zero sales by combining a Lifetime Targeting Report with a Reference Bulk File."
+        steps={PIPELINE_STEPS}
+        activeStep={1}
+      />
 
-      {/* Why two files — subtle info callout (blue-gray, info icon) */}
+      {/* Why two files — subtle info callout */}
       <div
         className="rounded-lg p-3.5 flex items-start gap-2.5"
         style={{
@@ -83,65 +91,81 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
         </div>
       </div>
 
-      {/* Step 1 — Lifetime Targeting Report */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#0071E3] text-white text-[11px] font-semibold font-mono-nums">
-            1
-          </span>
-          <h3 className="text-[14px] font-semibold text-foreground">
-            Lifetime Targeting Report
-          </h3>
-          <span className="text-[12px] text-[#86868B]">
-            · Campaign Manager → Targeting → Lifetime filter → Export
-          </span>
-        </div>
-        <StandardUploadZone
-          inputId="lifetime-report-input"
-          onFileSelect={(f) => {
-            if (validateLifetime(f)) {
-              setLifetimeFile(f);
-              setError(null);
-            }
-          }}
-          selectedFile={lifetimeFile ? { name: lifetimeFile.name, size: lifetimeFile.size } : null}
-          onClear={() => setLifetimeFile(null)}
-          primaryText="Drop your Lifetime Targeting Report here"
-          formats={['.xlsx', '.xls', '.csv']}
-          minHeight={160}
-          showHowItWorks={false}
-        />
-      </div>
+      <WorkspaceCard
+        sectionLabel="Amazon Ad Data Onboarding"
+        sidebar={
+          <AssetInventory
+            title="Required Assets"
+            subtitle="Both files must be provided to continue."
+            sheets={[
+              { name: 'Lifetime Targeting Report', detected: !!lifetimeFile },
+              { name: 'Reference Bulk File', detected: !!bulkFile },
+            ]}
+          />
+        }
+      >
+        <div className="space-y-4">
+          {/* Step 1 — Lifetime Targeting Report */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#2563EB] text-white text-[11px] font-semibold font-mono-nums">
+                1
+              </span>
+              <h3 className="text-[14px] font-semibold text-foreground">
+                Lifetime Targeting Report
+              </h3>
+              <span className="text-[12px] text-[#86868B]">
+                · Campaign Manager → Targeting → Lifetime filter → Export
+              </span>
+            </div>
+            <SmartDropzone
+              inputId="lifetime-report-input"
+              primaryText="Drop your Lifetime Targeting Report here"
+              formats={['.xlsx', '.xls', '.csv']}
+              accept=".xlsx,.xls,.csv"
+              minHeight={160}
+              selectedFile={lifetimeFile ? { name: lifetimeFile.name, size: lifetimeFile.size } : null}
+              onFileSelect={(f) => {
+                if (validateLifetime(f)) {
+                  setLifetimeFile(f);
+                  setError(null);
+                }
+              }}
+              onClear={() => setLifetimeFile(null)}
+            />
+          </div>
 
-      {/* Step 2 — Reference Bulk File */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#0071E3] text-white text-[11px] font-semibold font-mono-nums">
-            2
-          </span>
-          <h3 className="text-[14px] font-semibold text-foreground">
-            Reference Bulk File
-          </h3>
-          <span className="text-[12px] text-[#86868B]">
-            · Amazon Ads → Bulk Operations → Create Spreadsheet (30-day)
-          </span>
+          {/* Step 2 — Reference Bulk File */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#2563EB] text-white text-[11px] font-semibold font-mono-nums">
+                2
+              </span>
+              <h3 className="text-[14px] font-semibold text-foreground">
+                Reference Bulk File
+              </h3>
+              <span className="text-[12px] text-[#86868B]">
+                · Amazon Ads → Bulk Operations → Create Spreadsheet (30-day)
+              </span>
+            </div>
+            <SmartDropzone
+              inputId="lifetime-bulk-input"
+              primaryText="Drop your Reference Bulk File here"
+              formats={['.xlsx', '.xls', '.csv', '.zip']}
+              accept=".xlsx,.xls,.csv,.zip"
+              minHeight={160}
+              selectedFile={bulkFile ? { name: bulkFile.name, size: bulkFile.size } : null}
+              onFileSelect={(f) => {
+                if (validateBulk(f)) {
+                  setBulkFile(f);
+                  setError(null);
+                }
+              }}
+              onClear={() => setBulkFile(null)}
+            />
+          </div>
         </div>
-        <StandardUploadZone
-          inputId="lifetime-bulk-input"
-          onFileSelect={(f) => {
-            if (validateBulk(f)) {
-              setBulkFile(f);
-              setError(null);
-            }
-          }}
-          selectedFile={bulkFile ? { name: bulkFile.name, size: bulkFile.size } : null}
-          onClear={() => setBulkFile(null)}
-          primaryText="Drop your Reference Bulk File here"
-          formats={['.xlsx', '.xls', '.csv', '.zip']}
-          minHeight={160}
-          showHowItWorks={false}
-        />
-      </div>
+      </WorkspaceCard>
 
       {/* Error */}
       {error && (
@@ -168,8 +192,16 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
         <button
           onClick={handleAnalyze}
           disabled={!ready}
-          className="h-9 px-5 rounded-md bg-primary text-primary-foreground text-[13px] font-semibold btn-press hover:bg-primary/92 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
-          style={{ minWidth: 168 }}
+          className="rounded-[10px] btn-press disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+          style={{
+            background: '#2563EB',
+            color: '#FFFFFF',
+            padding: '12px 24px',
+            fontSize: 14,
+            fontWeight: 600,
+            minWidth: 168,
+            justifyContent: 'center',
+          }}
         >
           {isProcessing ? (
             <>
@@ -180,21 +212,6 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
             <>Analyze Files →</>
           )}
         </button>
-      </div>
-
-      {/* How it works — inline stepper */}
-      <div className="flex items-center gap-3 pt-3 px-1 text-[12px] text-[#86868B] flex-wrap">
-        {['Upload files', 'Review bleeders', 'Generate decisions'].map((s, i, arr) => (
-          <React.Fragment key={s}>
-            <div className="flex items-center gap-1.5">
-              <span className="w-4 h-4 rounded-full border border-[#D2D2D7] bg-white flex items-center justify-center text-[10px] font-semibold text-[#86868B] font-mono-nums">
-                {i + 1}
-              </span>
-              <span>{s}</span>
-            </div>
-            {i < arr.length - 1 && <span className="text-[#D2D2D7]">→</span>}
-          </React.Fragment>
-        ))}
       </div>
     </div>
   );
