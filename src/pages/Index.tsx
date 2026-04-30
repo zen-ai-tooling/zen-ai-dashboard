@@ -23,6 +23,7 @@ import { type Bleeder2Track } from "@/components/bleeders2/TrackSelector";
 import { ThresholdConfig, type Bleeder2Thresholds } from "@/components/bleeders2/ThresholdConfig";
 import { TrackUploader } from "@/components/bleeders2/TrackUploader";
 import { LifetimeUploader } from "@/components/bleeders2/LifetimeUploader";
+import { LifetimeBleederResults } from "@/components/results/LifetimeBleederResults";
 import { parseCommand } from "@/lib/commandParser";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Topbar } from "@/components/layout/Topbar";
