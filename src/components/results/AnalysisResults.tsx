@@ -179,6 +179,20 @@ export const AnalysisResults = ({
     [allRows]
   );
 
+  // Spend split by decision status — drives the impact donut on completion view
+  const { addressedSpend, undecidedSpend } = useMemo(() => {
+    let addressed = 0;
+    let undecided = 0;
+    Object.entries(rowsBySheet).forEach(([sheet, rows]) => {
+      rows.forEach((row, idx) => {
+        const dec = decisions[`${sheet}-ROWINDEX-${idx}`];
+        if (dec) addressed += row.spend || 0;
+        else undecided += row.spend || 0;
+      });
+    });
+    return { addressedSpend: addressed, undecidedSpend: undecided };
+  }, [rowsBySheet, decisions]);
+
   const handleDownload = () => {
     if (formattedWorkbook) {
       formattedWorkbook.xlsx.writeBuffer().then((buffer: ArrayBuffer) => {
