@@ -23,6 +23,7 @@ import { type Bleeder2Track } from "@/components/bleeders2/TrackSelector";
 import { ThresholdConfig, type Bleeder2Thresholds } from "@/components/bleeders2/ThresholdConfig";
 import { TrackUploader } from "@/components/bleeders2/TrackUploader";
 import { LifetimeUploader } from "@/components/bleeders2/LifetimeUploader";
+import { LifetimeBleederResults } from "@/components/results/LifetimeBleederResults";
 import { parseCommand } from "@/lib/commandParser";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Topbar } from "@/components/layout/Topbar";
@@ -134,12 +135,11 @@ const Index = () => {
     ACOS100: { file: null, isValidating: false, validationError: null, result: null, decisionFile: null, amazonFile: null },
   });
 
-  // Lifetime state
-  type LifetimeStage = "upload" | "processing" | "results" | "decision-upload" | "decision-results";
+  // Lifetime state — inline workflow only (no decision-upload/decision-results stages)
+  type LifetimeStage = "upload" | "results";
   const [lifetimeStage, setLifetimeStage] = useState<LifetimeStage>("upload");
   const [lifetimeResult, setLifetimeResult] = useState<any | null>(null);
   const [lifetimeProcessing, setLifetimeProcessing] = useState(false);
-  const [lifetimeDecisionResult, setLifetimeDecisionResult] = useState<any | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -188,7 +188,6 @@ const Index = () => {
     setLifetimeStage("upload");
     setLifetimeResult(null);
     setLifetimeProcessing(false);
-    setLifetimeDecisionResult(null);
     toast({ title: "Session reset complete", description: "You can start a new workflow anytime." });
   };
 
@@ -373,62 +372,9 @@ const Index = () => {
     }
   };
 
-  const handleDownloadLifetimeDecisionSheet = async () => {
-    if (!lifetimeResult?.decisionWorkbook) return;
-    try {
-      const buffer = await lifetimeResult.decisionWorkbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = lifetimeResult.decisionFileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      setLifetimeStage("decision-upload");
-      toast({ title: "Decision file downloaded", description: "Edit the Decision column, then upload it back below." });
-    } catch (err: any) {
-      toast({ title: "Download failed", description: err.message, variant: "destructive" });
-    }
-  };
-
-  const handleLifetimeDecisionUpload = async (file: File) => {
-    try {
-      setLifetimeProcessing(true);
-      const { processLifetimeDecisionFile } = await import("@/lib/lifetimeBleederAnalysis");
-      const result = await processLifetimeDecisionFile(file);
-      setLifetimeDecisionResult(result);
-      setLifetimeStage("decision-results");
-      toast({ title: "Processing complete", description: `${result.pausedCount} targets to pause` });
-    } catch (err: any) {
-      toast({ title: "Processing failed", description: err.message, variant: "destructive" });
-    } finally {
-      setLifetimeProcessing(false);
-    }
-  };
-
-  const handleDownloadLifetimeBulkUpdate = () => {
-    if (!lifetimeDecisionResult?.workbook) return;
-    try {
-      const wbout = XLSX.write(lifetimeDecisionResult.workbook, { bookType: "xlsx", type: "array" });
-      const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = lifetimeDecisionResult.fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      toast({ title: "Amazon Bulk Update downloaded", description: lifetimeDecisionResult.fileName });
-    } catch (err: any) {
-      toast({ title: "Download failed", description: err.message, variant: "destructive" });
-    }
-  };
+  // (Old download-edit-reupload handlers removed — Lifetime now uses inline decisions)
 
   const handleProcessorReupload = () => {
-    setDecisionResults(null);
     setValidatorResults(null);
     setShowProcessorUpload(true);
     setShowValidatorUpload(false);
@@ -602,7 +548,6 @@ const Index = () => {
       setBleederMode('lifetime');
       setLifetimeStage('upload');
       setLifetimeResult(null);
-      setLifetimeDecisionResult(null);
       setChatState('awaiting-upload');
       setShowUpload(false);
     } else {
@@ -690,10 +635,8 @@ const Index = () => {
     }
 
     if (activeModule === 'lifetime_bleeders') {
-      if (lifetimeStage === 'results' || lifetimeStage === 'decision-upload') {
+      if (lifetimeStage === 'results') {
         crumbs.push({ label: 'Results' });
-      } else if (lifetimeStage === 'decision-results') {
-        crumbs.push({ label: 'Decision Results' });
       }
     }
 
@@ -737,8 +680,7 @@ const Index = () => {
     }
 
     if (activeModule === 'lifetime_bleeders') {
-      if (lifetimeStage === 'decision-results') return () => { setLifetimeDecisionResult(null); setLifetimeStage('decision-upload'); };
-      if (lifetimeStage === 'decision-upload' || lifetimeStage === 'results') return () => { setLifetimeResult(null); setLifetimeStage('upload'); };
+      if (lifetimeStage === 'results') return () => { setLifetimeResult(null); setLifetimeStage('upload'); };
       return () => handleSidebarModuleSelect(null);
     }
 
