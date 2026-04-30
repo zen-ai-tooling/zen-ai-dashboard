@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { CompactStatsBar } from '@/components/shared/CompactStatsBar';
 import { CompletionView } from '@/components/shared/CompletionView';
 import { DecisionProgressBar } from '@/components/shared/DecisionProgressBar';
+import { SpendDistributionStrip } from '@/components/shared/SpendDistributionStrip';
 import { DecisionSelect, decisionRowClass } from '@/components/shared/DecisionSelect';
 import { SortHeader, useSortable } from '@/components/shared/SortHeader';
 import { suggestLifetimeRow } from '@/lib/ui/lifetimeSuggestion';
