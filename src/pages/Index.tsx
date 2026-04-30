@@ -188,7 +188,6 @@ const Index = () => {
     setLifetimeStage("upload");
     setLifetimeResult(null);
     setLifetimeProcessing(false);
-    setLifetimeDecisionResult(null);
     toast({ title: "Session reset complete", description: "You can start a new workflow anytime." });
   };
 
