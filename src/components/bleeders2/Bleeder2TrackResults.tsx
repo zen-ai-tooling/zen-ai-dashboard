@@ -53,6 +53,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
   const [generateDone, setGenerateDone] = useState(false);
   const [showFullResults, setShowFullResults] = useState(false);
   const [flashIdx, setFlashIdx] = useState<{ idx: number; cls: string; ts: number } | null>(null);
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [panelComplete, setPanelComplete] = useState(false);
 
   const setDecisionWithFlash = (idx: number, val: string) => {
     setDecisions(prev => ({ ...prev, [idx]: val }));
