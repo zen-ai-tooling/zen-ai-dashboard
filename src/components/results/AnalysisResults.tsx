@@ -427,6 +427,14 @@ export const AnalysisResults = ({
         </details>
       )}
 
+      {/* Spend distribution — collapsible visualization */}
+      <SpendDistributionStrip
+        items={allRows.map((r) => ({
+          label: r.customer_search_term || r.keyword_text || r.product_targeting || r.campaign || 'Untitled',
+          spend: r.spend || 0,
+        }))}
+      />
+
       {/* Decision table */}
       {sheetNames.length > 0 && (
         <div className="decision-table-card">
