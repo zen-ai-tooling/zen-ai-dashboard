@@ -412,10 +412,13 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                 const flashClass =
                   flashIdx && flashIdx.idx === idx && Date.now() - flashIdx.ts < 400 ? flashIdx.cls : '';
 
+                const isPanelSelected = selectedIdx === idx;
+
                 return (
                   <TableRow
                     key={`${idx}-${flashIdx?.idx === idx ? flashIdx.ts : 'r'}`}
-                    className={`transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
+                    onClick={() => { setSelectedIdx(idx); setPanelComplete(false); }}
+                    className={`cursor-pointer transition-colors ${urgencyClass} ${indicatorClass} ${flashClass} ${isPanelSelected ? 'row-detail-selected' : ''}`}
                   >
                     <TableCell className="text-[13px] max-w-[180px] truncate" title={b.campaignName}>
                       {b.campaignName}
