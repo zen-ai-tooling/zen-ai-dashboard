@@ -81,65 +81,66 @@ export const AnalyzingView: React.FC<AnalyzingViewProps> = ({
   }, [workDone, progress, showFinal, finalMessage, onComplete]);
 
   return (
-    <div className="max-w-[640px] mx-auto py-16">
-      {/* Top progress bar — 4px in light track */}
-      <div className="h-1 w-full rounded-[2px] overflow-hidden mb-12" style={{ background: '#E5E5EA' }}>
-        <div
-          className="h-full rounded-[2px]"
-          style={{
-            width: `${progress}%`,
-            background: '#0071E3',
-            transition: 'width 200ms linear',
-          }}
-        />
-      </div>
-
-      <div className="text-center">
-        {/* File icon for visual identity */}
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-3"
-          style={{ background: '#F5F5F7' }}>
-          <FileSpreadsheet className="w-6 h-6" style={{ color: '#86868B' }} strokeWidth={1.6} />
-        </div>
-        <div className="inline-flex items-center justify-center w-10 h-10 mb-4">
-          <Loader2 className="w-7 h-7 animate-spin" style={{ color: '#0071E3' }} strokeWidth={2} />
+    <div
+      className="flex flex-col items-center justify-center px-4"
+      style={{ minHeight: 'calc(100vh - 180px)' }}
+    >
+      <div className="w-full max-w-[640px]">
+        {/* Top progress bar — 4px */}
+        <div className="w-full overflow-hidden mb-12" style={{ height: 4, borderRadius: 2, background: '#E5E5EA' }}>
+          <div
+            style={{
+              height: '100%',
+              borderRadius: 2,
+              width: `${progress}%`,
+              background: '#0071E3',
+              transition: 'width 200ms linear',
+            }}
+          />
         </div>
 
-        <h2 className="text-[22px] font-semibold text-[#1D1D1F] tracking-tight">
-          Analyzing your file
-        </h2>
-        <p className="text-[13px] text-[#86868B] mt-1.5">
-          This usually takes just a few seconds.
-        </p>
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-10 h-10 mb-4">
+            <Loader2 className="w-7 h-7 animate-spin" style={{ color: '#0071E3' }} strokeWidth={2} />
+          </div>
 
-        <div className="mt-8 space-y-2 inline-block text-left min-w-[300px]">
-          {steps.slice(0, stepIdx + 1).map((s, i) => {
-            const isCurrent = i === stepIdx && !showFinal;
-            const isDone = i < stepIdx || showFinal;
-            return (
-              <div
-                key={i}
-                className="flex items-center gap-2.5 animate-fade-in"
-                style={{ opacity: isCurrent || isDone ? 1 : 0.5 }}
-              >
-                <span
-                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                  style={{ background: isDone ? '#34C759' : '#0071E3' }}
-                />
-                <span className="text-[14px] text-[#6E6E73] inline-flex items-center">
-                  {s}
-                  {isCurrent && <ActivityDots />}
+          <h2 style={{ fontSize: 24, fontWeight: 700, color: '#1D1D1F', letterSpacing: '-0.3px' }}>
+            Analyzing your file
+          </h2>
+          <p className="mt-1.5" style={{ fontSize: 14, color: '#6E6E73' }}>
+            This usually takes just a few seconds.
+          </p>
+
+          <div className="mt-8 space-y-2 inline-block text-left min-w-[300px]">
+            {steps.slice(0, stepIdx + 1).map((s, i) => {
+              const isCurrent = i === stepIdx && !showFinal;
+              const isDone = i < stepIdx || showFinal;
+              return (
+                <div
+                  key={i}
+                  className="flex items-center gap-2.5 animate-fade-in"
+                  style={{ opacity: isCurrent || isDone ? 1 : 0.5 }}
+                >
+                  <span
+                    className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                    style={{ background: isDone ? '#34C759' : '#0071E3' }}
+                  />
+                  <span className="inline-flex items-center" style={{ fontSize: 14, color: '#6E6E73' }}>
+                    {s}
+                    {isCurrent && <ActivityDots />}
+                  </span>
+                </div>
+              );
+            })}
+            {showFinal && finalMessage && (
+              <div className="flex items-center gap-2.5 animate-fade-in pt-1">
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#34C759' }} />
+                <span style={{ fontSize: 14, fontWeight: 600, color: '#1D1D1F' }}>
+                  {finalMessage}
                 </span>
               </div>
-            );
-          })}
-          {showFinal && finalMessage && (
-            <div className="flex items-center gap-2.5 animate-fade-in pt-1">
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#34C759' }} />
-              <span className="text-[14px] font-semibold" style={{ color: '#1D1D1F' }}>
-                {finalMessage}
-              </span>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
