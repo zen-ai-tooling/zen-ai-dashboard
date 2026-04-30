@@ -310,6 +310,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         onStartNew={onStartNew}
         onViewFullResults={() => setShowFullResults(true)}
         accentColor="#FF9500"
+        addressedSpend={addressedSpend}
+        undecidedSpend={undecidedSpend}
       />
     );
   }
