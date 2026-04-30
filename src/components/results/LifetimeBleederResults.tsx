@@ -251,6 +251,19 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
   const breakdownCounts: Record<string, number> = {};
   Object.values(decisions).forEach((d) => { if (d) breakdownCounts[d] = (breakdownCounts[d] ?? 0) + 1; });
 
+  // Spend addressed vs. undecided — drives the impact donut
+  const { addressedSpend, undecidedSpend } = (() => {
+    let addressed = 0;
+    let undecided = 0;
+    bleeders.forEach((b, idx) => {
+      const dec = decisions[idx];
+      const spend = b.spend || 0;
+      if (dec) addressed += spend;
+      else undecided += spend;
+    });
+    return { addressedSpend: addressed, undecidedSpend: undecided };
+  })();
+
   if (amazonFile && !showFullResults) {
     return (
       <CompletionView
