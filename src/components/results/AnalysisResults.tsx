@@ -8,6 +8,7 @@ import { SortHeader, useSortable } from "@/components/shared/SortHeader";
 import { CompletionView } from "@/components/shared/CompletionView";
 import { DecisionProgressBar } from "@/components/shared/DecisionProgressBar";
 import { SpendDistributionStrip } from "@/components/shared/SpendDistributionStrip";
+import { RowDetailPanel, type DecisionButtonSpec, type RowDetail } from "@/components/shared/RowDetailPanel";
 import { suggestB1Row } from "@/lib/ui/bleeder1Suggestion";
 
 interface TopSpender {
