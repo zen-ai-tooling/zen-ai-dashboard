@@ -850,3 +850,6 @@
 /* Make every body row look clickable while the table is in inline-decision
    mode. The Action dropdown stops propagation so it stays usable. */
 .decision-table table tbody tr { cursor: pointer; }
+
+/* Workflow card start-arrow shift on hover */
+.workflow-card:hover .start-arrow { transform: translateX(4px); }
