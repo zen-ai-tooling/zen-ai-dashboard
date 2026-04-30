@@ -270,6 +270,19 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
     return counts;
   })();
 
+  // Spend addressed vs. undecided — drives the impact donut
+  const { addressedSpend, undecidedSpend } = (() => {
+    let addressed = 0;
+    let undecided = 0;
+    result.bleeders.forEach((b, idx) => {
+      const dec = decisions[`ROWINDEX-${idx}`];
+      const spend = b.spend || 0;
+      if (dec) addressed += spend;
+      else undecided += spend;
+    });
+    return { addressedSpend: addressed, undecidedSpend: undecided };
+  })();
+
   // ── Completion view (replaces full results page after generation) ──
   if (amazonFile && !showFullResults) {
     return (
