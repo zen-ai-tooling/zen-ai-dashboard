@@ -135,12 +135,11 @@ const Index = () => {
     ACOS100: { file: null, isValidating: false, validationError: null, result: null, decisionFile: null, amazonFile: null },
   });
 
-  // Lifetime state
-  type LifetimeStage = "upload" | "processing" | "results" | "decision-upload" | "decision-results";
+  // Lifetime state — inline workflow only (no decision-upload/decision-results stages)
+  type LifetimeStage = "upload" | "results";
   const [lifetimeStage, setLifetimeStage] = useState<LifetimeStage>("upload");
   const [lifetimeResult, setLifetimeResult] = useState<any | null>(null);
   const [lifetimeProcessing, setLifetimeProcessing] = useState(false);
-  const [lifetimeDecisionResult, setLifetimeDecisionResult] = useState<any | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
