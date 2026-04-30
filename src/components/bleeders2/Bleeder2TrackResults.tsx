@@ -14,6 +14,7 @@ import { SortHeader, useSortable } from "@/components/shared/SortHeader";
 import { CompletionView } from "@/components/shared/CompletionView";
 import { DecisionProgressBar } from "@/components/shared/DecisionProgressBar";
 import { SpendDistributionStrip } from "@/components/shared/SpendDistributionStrip";
+import { RowDetailPanel, type DecisionButtonSpec, type RowDetail } from "@/components/shared/RowDetailPanel";
 
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
