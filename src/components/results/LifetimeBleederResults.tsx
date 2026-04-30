@@ -1,0 +1,534 @@
+/**
+ * Lifetime Audit — Inline Decision Results
+ *
+ * Mirrors the Bleeders 1.0/2.0 inline decision-making pattern:
+ *  - Compact stat bar with bleeders count, at-risk spend, ranking excluded
+ *  - 3-step workflow indicator
+ *  - Decision table with Suggestion pills + per-row Decision dropdown
+ *  - Bulk action buttons + sticky footer with Generate Amazon file →
+ *  - CompletionView after generation
+ *
+ * Business logic (analyzer / Amazon bulk row construction) is reused via
+ * `lifetimeBleederAnalysis` + `amazonBulkBuilder`. Only UI/presentation is new.
+ */
+
+import * as React from 'react';
+import { useMemo, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { CheckCircle2, Loader2, XCircle, Download } from 'lucide-react';
+import { toast } from 'sonner';
+import { CompactStatsBar } from '@/components/shared/CompactStatsBar';
+import { CompletionView } from '@/components/shared/CompletionView';
+import { DecisionProgressBar } from '@/components/shared/DecisionProgressBar';
+import { DecisionSelect, decisionRowClass } from '@/components/shared/DecisionSelect';
+import { SortHeader, useSortable } from '@/components/shared/SortHeader';
+import { suggestLifetimeRow } from '@/lib/ui/lifetimeSuggestion';
+import type { LifetimeBleederResult, LifetimeBleederRow } from '@/lib/lifetimeBleederAnalysis';
+import {
+  buildBulkRowsFromCanonical,
+  bulkRowToArray,
+  BULK_UPDATE_HEADERS,
+  recordTypeToProductEntity,
+  type AmazonProduct,
+  type AmazonRecordType,
+  type CanonicalBulkInputRow,
+} from '@/lib/amazonBulkBuilder';
+import * as XLSX from 'xlsx';
+
+interface AmazonFileBundle {
+  workbook: XLSX.WorkBook;
+  fileName: string;
+}
+
+interface LifetimeBleederResultsProps {
+  result: LifetimeBleederResult;
+  /** Optional: also keep a download for the legacy decision XLSX (hidden by default) */
+  onDownloadDecisionSheet?: () => void;
+  onStartNew?: () => void;
+}
+
+const DECISION_OPTIONS = ['Pause', 'Cut Bid 50%', 'Keep'];
+
+/** Map a UI Decision label to canonical action + cutBidPercent */
+function decisionToAction(decision: string): { action: CanonicalBulkInputRow['action']; cutBidPercent?: number } | null {
+  if (decision === 'Pause') return { action: 'pause' };
+  if (decision === 'Keep') return { action: 'keep' };
+  if (decision === 'Cut Bid 50%') return { action: 'cutBid', cutBidPercent: 50 };
+  return null;
+}
+
+/** Determine Amazon record type for a Lifetime bleeder row */
+function getRecordType(b: LifetimeBleederRow): AmazonRecordType {
+  const isKeyword = (b.entityType || 'Keyword') === 'Keyword';
+  const src = (b.source || 'SP').toUpperCase();
+  if (src === 'SB') return isKeyword ? 'sponsoredBrandsKeyword' : 'sponsoredBrandsProductTargeting';
+  if (src === 'SD') return 'sponsoredDisplayProductTargeting';
+  return isKeyword ? 'sponsoredProductsKeyword' : 'sponsoredProductsProductTargeting';
+}
+
+export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
+  result,
+  onDownloadDecisionSheet,
+  onStartNew,
+}) => {
+  const bleeders = result.bleeders;
+  const hasBleeders = bleeders.length > 0;
+
+  const [decisions, setDecisions] = useState<Record<number, string>>({});
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [amazonFile, setAmazonFile] = useState<AmazonFileBundle | null>(null);
+  const [showFullResults, setShowFullResults] = useState(false);
+  const [flashIdx, setFlashIdx] = useState<{ idx: number; cls: string; ts: number } | null>(null);
+
+  const setDecisionWithFlash = (idx: number, val: string) => {
+    setDecisions((prev) => ({ ...prev, [idx]: val }));
+    let cls = '';
+    if (val === 'Pause') cls = 'row-flash-pause';
+    else if (val === 'Keep') cls = 'row-flash-keep';
+    else if (val.startsWith('Cut')) cls = 'row-flash-cut';
+    if (cls) setFlashIdx({ idx, cls, ts: Date.now() });
+  };
+
+  const suggestions = useMemo(
+    () => bleeders.map((b) => suggestLifetimeRow({ clicks: b.clicks, sales: b.sales, orders: b.orders })),
+    [bleeders],
+  );
+
+  const decisionsMade = useMemo(
+    () => Object.values(decisions).filter((d) => d && d !== '').length,
+    [decisions],
+  );
+
+  // Sortable
+  type SortKey = 'campaign' | 'adGroup' | 'entity' | 'spend' | 'clicks' | 'acos';
+  const { sortKey, sortDir, toggle: toggleSort } = useSortable<SortKey>('spend', 'desc');
+  const sortedIndices = useMemo(() => {
+    const idx = bleeders.map((_, i) => i);
+    idx.sort((a, b) => {
+      const ra = bleeders[a];
+      const rb = bleeders[b];
+      let va: any;
+      let vb: any;
+      switch (sortKey) {
+        case 'campaign': va = (ra.campaignName || '').toLowerCase(); vb = (rb.campaignName || '').toLowerCase(); break;
+        case 'adGroup': va = (ra.adGroupName || '').toLowerCase(); vb = (rb.adGroupName || '').toLowerCase(); break;
+        case 'entity': va = (ra.targetingText || '').toLowerCase(); vb = (rb.targetingText || '').toLowerCase(); break;
+        case 'spend': va = ra.spend ?? 0; vb = rb.spend ?? 0; break;
+        case 'clicks': va = ra.clicks ?? 0; vb = rb.clicks ?? 0; break;
+        case 'acos': va = ra.acos ?? 0; vb = rb.acos ?? 0; break;
+      }
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return idx;
+  }, [bleeders, sortKey, sortDir]);
+
+  // Urgency banding by spend
+  const urgencyBands = useMemo(() => {
+    const spends = bleeders.map((b) => b.spend || 0).slice().sort((a, b) => a - b);
+    if (spends.length === 0) return { high: Infinity, low: -Infinity };
+    const q = (p: number) => spends[Math.min(spends.length - 1, Math.floor(spends.length * p))];
+    return { high: q(0.75), low: q(0.25) };
+  }, [bleeders]);
+
+  // ── Bulk actions ──
+  const setAll = (val: string) => {
+    const all: Record<number, string> = {};
+    bleeders.forEach((_, idx) => { all[idx] = val; });
+    setDecisions(all);
+  };
+  const handleClearAll = () => setDecisions({});
+
+  // ── Generate Amazon file (inline) ──
+  const handleGenerate = async () => {
+    if (decisionsMade === 0 || isGenerating || amazonFile) return;
+    setIsGenerating(true);
+
+    try {
+      const inputs: CanonicalBulkInputRow[] = [];
+
+      bleeders.forEach((b, idx) => {
+        const decision = decisions[idx];
+        if (!decision) return;
+        const mapped = decisionToAction(decision);
+        if (!mapped || mapped.action === 'keep') return;
+
+        const recordType = getRecordType(b);
+        const isKeyword = (b.entityType || 'Keyword') === 'Keyword';
+
+        inputs.push({
+          recordType,
+          action: mapped.action,
+          campaignId: b.campaignId,
+          campaignName: b.campaignName,
+          adGroupId: b.adGroupId,
+          adGroupName: b.adGroupName,
+          keywordId: isKeyword ? b.keywordId : undefined,
+          keywordText: isKeyword ? b.targetingText : undefined,
+          matchType: b.matchType,
+          productTargetingId: !isKeyword ? (b.productTargetingId || b.targetingId) : undefined,
+          targetingId: !isKeyword ? (b.targetingId || b.productTargetingId) : undefined,
+          targetingText: !isKeyword ? b.targetingText : undefined,
+          // Cut Bid uses spend as a proxy for currentBid (Lifetime has no bid column)
+          // The Lifetime report doesn't carry bid info; cutBid will produce Bid = 0
+          // unless the analyzer is later extended. Keep this consistent with existing behavior.
+          cutBidPercent: mapped.cutBidPercent,
+        });
+      });
+
+      const inputsByProduct: Record<AmazonProduct, CanonicalBulkInputRow[]> = {
+        'Sponsored Products': [],
+        'Sponsored Brands': [],
+        'Sponsored Display': [],
+      };
+      for (const c of inputs) {
+        inputsByProduct[recordTypeToProductEntity(c.recordType).product].push(c);
+      }
+
+      const wb = XLSX.utils.book_new();
+      (['Sponsored Products', 'Sponsored Brands', 'Sponsored Display'] as AmazonProduct[]).forEach((product) => {
+        const subset = inputsByProduct[product];
+        if (!subset.length) return;
+        const built = buildBulkRowsFromCanonical(subset);
+        if (!built.length) return;
+        const rows: any[][] = [BULK_UPDATE_HEADERS, ...built.map(bulkRowToArray)];
+        const sheet = XLSX.utils.aoa_to_sheet(rows);
+        XLSX.utils.book_append_sheet(wb, sheet, product);
+      });
+
+      const today = new Date().toISOString().split('T')[0];
+      const fileName = `Amazon_Bulk_Operations_Lifetime_${today}.xlsx`;
+
+      setAmazonFile({ workbook: wb, fileName });
+      toast.success('Amazon file ready', {
+        description: `${decisionsMade} decisions exported`,
+        duration: 3000,
+      });
+    } catch (err: any) {
+      toast.error('Generation failed', { description: err?.message || 'Unknown error' });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleDownloadAmazon = () => {
+    if (!amazonFile) return;
+    try {
+      const wbout = XLSX.write(amazonFile.workbook, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = amazonFile.fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      toast.error('Download failed', { description: err?.message });
+    }
+  };
+
+  // ── No bleeders state ──
+  if (!hasBleeders) {
+    return (
+      <div className="rounded-lg border border-border bg-card p-6 max-w-[760px] mx-auto">
+        <div className="flex items-center gap-2 text-success mb-2">
+          <CheckCircle2 className="h-5 w-5" />
+          <span className="text-[13px] font-medium font-display">No action needed — 0 bleeders found</span>
+        </div>
+        <p className="text-[13px] text-muted-foreground">
+          Lifetime Audit returned no actionable rows under current thresholds.
+        </p>
+      </div>
+    );
+  }
+
+  // ── Completion view ──
+  const breakdownCounts: Record<string, number> = {};
+  Object.values(decisions).forEach((d) => { if (d) breakdownCounts[d] = (breakdownCounts[d] ?? 0) + 1; });
+
+  if (amazonFile && !showFullResults) {
+    return (
+      <CompletionView
+        fileName={amazonFile.fileName}
+        title="Workflow complete"
+        impactHeadline={`$${result.totalSpend.toLocaleString('en-US', { maximumFractionDigits: 2 })} in at-risk spend addressed`}
+        impactSubtitle="Lifetime audit captured into your Amazon bulk file."
+        totalRows={bleeders.length}
+        summary={[
+          { label: 'Bleeders found', value: bleeders.length.toLocaleString() },
+          { label: 'Decisions made', value: `${decisionsMade}/${bleeders.length}` },
+          { label: 'Avg spend per bleeder', value: `$${(result.totalSpend / Math.max(bleeders.length, 1)).toFixed(2)}` },
+          { label: 'Ranking excluded', value: result.excludedRankingCount.toLocaleString() },
+        ]}
+        breakdown={[
+          { label: 'Paused', count: breakdownCounts['Pause'] ?? 0, color: '#FF3B30' },
+          { label: 'Cut Bid', count: breakdownCounts['Cut Bid 50%'] ?? 0, color: '#FF9500' },
+          { label: 'Keep', count: breakdownCounts['Keep'] ?? 0, color: '#34C759' },
+          { label: 'No decision', count: Math.max(0, bleeders.length - decisionsMade), color: '#D2D2D7' },
+        ]}
+        onDownload={handleDownloadAmazon}
+        onStartNew={onStartNew}
+        onViewFullResults={() => setShowFullResults(true)}
+        accentColor="#FF3B30"
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      {/* Back to summary (when viewing full results from completion) */}
+      {amazonFile && showFullResults && (
+        <button
+          onClick={() => setShowFullResults(false)}
+          className="text-[12.5px] text-[#0071E3] hover:underline btn-press"
+        >
+          ← Back to summary
+        </button>
+      )}
+
+      {/* Compact stats + workflow */}
+      <CompactStatsBar
+        accent="red"
+        stats={[
+          { value: bleeders.length.toLocaleString(), label: 'bleeders' },
+          { value: `$${result.totalSpend.toLocaleString('en-US', { maximumFractionDigits: 2 })}`, label: 'at risk' },
+          { value: result.excludedRankingCount.toLocaleString(), label: 'ranking excluded' },
+        ]}
+        steps={[
+          { label: 'Files analyzed', status: 'complete' },
+          { label: 'Make decisions', status: amazonFile ? 'complete' : 'active' },
+          { label: 'Generate Amazon file', status: amazonFile ? 'complete' : 'pending' },
+        ]}
+      />
+
+      {/* Decision table */}
+      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <div>
+            <h3 className="text-[14px] font-medium text-foreground font-display">
+              Bleeders — Lifetime Audit
+            </h3>
+            <p className="text-[12px] text-muted-foreground mt-0.5">
+              Select a decision per row then generate the Amazon file
+            </p>
+          </div>
+          {onDownloadDecisionSheet && (
+            <Button variant="outline" size="sm" onClick={onDownloadDecisionSheet} className="text-[11px] h-7 btn-press">
+              <Download className="w-3 h-3 mr-1" />
+              Download XLSX
+            </Button>
+          )}
+        </div>
+
+        {/* Bulk actions */}
+        <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-border bg-[#FAFAFA]">
+          <div className="text-[12px] text-[hsl(var(--text-secondary))] truncate">
+            <span className="font-medium text-foreground">Lifetime Audit</span>
+            <span className="mx-1.5 text-[hsl(var(--text-tertiary))]">·</span>
+            <span className="font-mono-nums">{bleeders.length}</span> bleeders
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => {
+                const all: Record<number, string> = {};
+                suggestions.forEach((s, idx) => { all[idx] = s.decision; });
+                setDecisions(all);
+              }}
+              className="bulk-btn btn-press"
+            >
+              <span className="decision-dot" style={{ background: '#0071E3' }} />
+              Apply all suggestions
+            </button>
+            <button onClick={() => setAll('Pause')} className="bulk-btn btn-press">
+              <span className="decision-dot" style={{ background: '#FF3B30' }} />
+              Select all → Pause
+            </button>
+            <button onClick={() => setAll('Keep')} className="bulk-btn btn-press">
+              <span className="decision-dot" style={{ background: '#34C759' }} />
+              Select all → Keep
+            </button>
+            <button onClick={handleClearAll} className="bulk-btn bulk-btn-ghost btn-press">
+              <XCircle className="w-3 h-3" />
+              Clear
+            </button>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="max-h-[58vh] overflow-auto table-sticky-header">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent border-b border-border">
+                <TableHead style={{ letterSpacing: '0.08em' }}>
+                  <SortHeader active={sortKey === 'campaign'} dir={sortDir} onClick={() => toggleSort('campaign')}>Campaign</SortHeader>
+                </TableHead>
+                <TableHead style={{ letterSpacing: '0.08em' }}>
+                  <SortHeader active={sortKey === 'adGroup'} dir={sortDir} onClick={() => toggleSort('adGroup')}>Ad Group</SortHeader>
+                </TableHead>
+                <TableHead style={{ letterSpacing: '0.08em' }}>
+                  <SortHeader active={sortKey === 'entity'} dir={sortDir} onClick={() => toggleSort('entity')}>Entity</SortHeader>
+                </TableHead>
+                <TableHead style={{ letterSpacing: '0.08em' }}>Match</TableHead>
+                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                  <SortHeader active={sortKey === 'clicks'} dir={sortDir} onClick={() => toggleSort('clicks')} align="right">Clicks</SortHeader>
+                </TableHead>
+                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                  <SortHeader active={sortKey === 'spend'} dir={sortDir} onClick={() => toggleSort('spend')} align="right">Spend</SortHeader>
+                </TableHead>
+                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Sales</TableHead>
+                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
+                  <SortHeader active={sortKey === 'acos'} dir={sortDir} onClick={() => toggleSort('acos')} align="right">ACoS</SortHeader>
+                </TableHead>
+                <TableHead className="w-[80px]" style={{ letterSpacing: '0.08em' }}>Suggestion</TableHead>
+                <TableHead className="w-[180px]" style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {sortedIndices.map((idx) => {
+                const b = bleeders[idx];
+                const sug = suggestions[idx];
+                const decision = decisions[idx];
+                const indicatorClass = decisionRowClass(decision);
+
+                const isHighUrgency = !decision && b.spend >= urgencyBands.high && b.spend > 0;
+                const isLowUrgency = !decision && b.spend <= urgencyBands.low;
+                const urgencyClass = decision
+                  ? ''
+                  : isHighUrgency ? 'row-urgency-high' : isLowUrgency ? 'row-urgency-low' : '';
+                const flashClass =
+                  flashIdx && flashIdx.idx === idx && Date.now() - flashIdx.ts < 400 ? flashIdx.cls : '';
+
+                return (
+                  <TableRow
+                    key={`${idx}-${flashIdx?.idx === idx ? flashIdx.ts : 'r'}`}
+                    className={`hover:bg-[#F9F9FB] transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
+                  >
+                    <TableCell className="text-[13px] max-w-[180px] truncate" title={b.campaignName}>
+                      {b.campaignName}
+                    </TableCell>
+                    <TableCell className="text-[13px] max-w-[140px] truncate text-[hsl(var(--text-secondary))]" title={b.adGroupName}>
+                      {b.adGroupName || '—'}
+                    </TableCell>
+                    <TableCell className="text-[13px] max-w-[200px] truncate" title={b.targetingText}>
+                      {b.targetingText}
+                    </TableCell>
+                    <TableCell className="text-[13px] text-muted-foreground">
+                      {b.matchType || '—'}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className="text-[13px] font-mono-nums text-foreground">
+                        {b.clicks.toLocaleString()}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className="text-[13px] font-mono-nums text-foreground">
+                        ${b.spend.toFixed(2)}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className="text-[13px] font-mono-nums">
+                        ${b.sales.toFixed(2)}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {b.acos && b.acos > 0 ? (
+                        <span className="text-[13px] font-mono-nums text-destructive">
+                          {b.acos.toFixed(1)}%
+                        </span>
+                      ) : (
+                        <span className="text-[13px] text-[#D2D2D7]">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <button
+                        onClick={() => setDecisionWithFlash(idx, sug.decision)}
+                        title={sug.reason}
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium cursor-pointer transition-all hover:opacity-80"
+                        style={{
+                          background: sug.bg,
+                          color: sug.color,
+                          border: `1px solid ${sug.border}`,
+                          opacity: decision ? 0.45 : 1,
+                        }}
+                      >
+                        {sug.label}
+                      </button>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1.5">
+                        {decision && (
+                          <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#34C759' }} />
+                        )}
+                        <DecisionSelect
+                          value={decision}
+                          onChange={(val) => setDecisionWithFlash(idx, val)}
+                          options={DECISION_OPTIONS}
+                          width="128px"
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Pinned action bar */}
+        <div className="sticky bottom-0 z-10 p-4 border-t border-border bg-[#FAFAFA] space-y-2">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              {decisionsMade >= bleeders.length && bleeders.length > 0 ? (
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[14px] font-semibold font-mono-nums" style={{ color: '#34C759' }}>
+                    All {bleeders.length} decisions complete
+                  </span>
+                  <CheckCircle2 className="w-4 h-4" style={{ color: '#34C759' }} />
+                </div>
+              ) : (
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[14px] font-semibold text-foreground font-mono-nums">
+                    {decisionsMade}<span className="text-[hsl(var(--text-tertiary))]">/{bleeders.length}</span>
+                  </span>
+                  <span className="text-[12px] text-[hsl(var(--text-secondary))]">decisions</span>
+                </div>
+              )}
+              <div className="mt-2">
+                <DecisionProgressBar
+                  total={bleeders.length}
+                  segments={[
+                    { key: 'Pause', count: Object.values(decisions).filter((d) => d === 'Pause').length, color: '#FF3B30' },
+                    { key: 'Cut', count: Object.values(decisions).filter((d) => d === 'Cut Bid 50%').length, color: '#FF9500' },
+                    { key: 'Keep', count: Object.values(decisions).filter((d) => d === 'Keep').length, color: '#34C759' },
+                  ]}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={handleGenerate}
+                disabled={decisionsMade === 0 || isGenerating || !!amazonFile}
+                className={`btn-primary-action btn-press ${amazonFile ? 'is-done' : ''} ${decisionsMade >= bleeders.length && bleeders.length > 0 && !amazonFile ? 'is-ready-pulse' : ''}`}
+              >
+                {isGenerating ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : amazonFile ? (
+                  <><CheckCircle2 className="w-4 h-4" /> Downloaded ✓</>
+                ) : (
+                  <>Generate Amazon file →</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LifetimeBleederResults;
