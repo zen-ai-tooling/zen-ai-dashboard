@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { CheckCircle2, Download, ArrowRight, Info } from 'lucide-react';
+import { ImpactDonut } from './ImpactDonut';
 
 export interface CompletionSummaryItem {
   label: string;
@@ -26,6 +27,10 @@ interface CompletionViewProps {
   impactHeadline?: string;
   impactSubtitle?: string;
   totalRows?: number;
+  /** Optional: at-risk spend addressed via decisions, used to render the impact donut */
+  addressedSpend?: number;
+  /** Optional: at-risk spend on rows still without a decision */
+  undecidedSpend?: number;
 }
 
 export const CompletionView: React.FC<CompletionViewProps> = ({
@@ -40,6 +45,8 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
   impactHeadline,
   impactSubtitle,
   totalRows,
+  addressedSpend,
+  undecidedSpend,
 }) => {
   const decidedTotal = breakdown
     .filter((b) => !/no decision|undecided/i.test(b.label))
@@ -48,6 +55,10 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
   const noDecisionItem = breakdown.find((b) => /no decision|undecided/i.test(b.label));
   const allDecided = total > 0 && decidedTotal >= total;
   const noCount = noDecisionItem?.count ?? 0;
+
+  // Donut data — prefer spend if provided, otherwise fall back to row counts
+  const donutAddressed = addressedSpend ?? decidedTotal;
+  const donutUndecided = undecidedSpend ?? noCount;
 
   return (
     <div
