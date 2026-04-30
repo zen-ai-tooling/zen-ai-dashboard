@@ -52,7 +52,7 @@ export const UploadCard = ({ onFileUpload, isVisible }: UploadCardProps) => {
           <button
             onClick={handleClear}
             className="rounded-[10px] btn-press"
-            style={{ background: '#FFFFFF', border: '1px solid #D2D2D7', color: '#1D1D1F', padding: '10px 20px', fontSize: 14, fontWeight: 600 }}
+            style={{ background: '#FFFFFF', border: '1px solid #D2D2D7', color: '#1D1D1F', padding: '12px 24px', fontSize: 14, fontWeight: 600 }}
           >
             Cancel
           </button>
