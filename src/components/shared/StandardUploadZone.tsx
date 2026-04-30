@@ -99,12 +99,13 @@ export const StandardUploadZone: React.FC<StandardUploadZoneProps> = ({
         onDrop={handleDrop}
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
-        className={cn('group relative cursor-pointer text-center px-6 py-10 btn-press transition-all duration-200')}
+        className={cn('group relative cursor-pointer text-center px-6 py-10 btn-press')}
         style={{
           minHeight,
           borderRadius: 12,
           border: isDragging ? '2px solid #0071E3' : '1.5px dashed #C7C7CC',
           background: isDragging ? 'rgba(0, 113, 227, 0.05)' : '#FAFAFA',
+          transition: 'border-color 150ms ease, border-style 150ms ease, background-color 150ms ease, transform 150ms ease',
         }}
         onMouseEnter={(e) => {
           if (!isDragging) {
@@ -129,12 +130,12 @@ export const StandardUploadZone: React.FC<StandardUploadZoneProps> = ({
 
         <div className="mx-auto mb-4 flex items-center justify-center">
           <Upload
-            className="transition-all duration-200 group-hover:-translate-y-0.5 group-hover:text-[#0071E3]"
             style={{
-              width: isDragging ? 46 : 40,
-              height: isDragging ? 46 : 40,
+              width: 40,
+              height: 40,
               color: isDragging ? '#0071E3' : '#86868B',
               transform: isDragging ? 'scale(1.15)' : 'scale(1)',
+              transition: 'transform 200ms ease, color 150ms ease',
             }}
             strokeWidth={1.4}
           />
