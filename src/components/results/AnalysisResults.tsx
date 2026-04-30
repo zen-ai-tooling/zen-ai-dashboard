@@ -139,6 +139,23 @@ export const AnalysisResults = ({
   const [panelComplete, setPanelComplete] = useState(false);
   useEffect(() => { setSelectedRowIdx(null); setPanelComplete(false); }, [currentSheet]);
 
+  // Build the side-panel button spec from the active sheet's decision options.
+  const panelButtonSpecs: DecisionButtonSpec[] = useMemo(() => {
+    return decisionOptions.map((opt) => {
+      if (opt === 'Pause') {
+        return { value: 'Pause', label: 'Pause', bg: '#FFE5E5', color: '#CC0000', border: '#FFCCCC', hoverBg: '#FFCCCC' };
+      }
+      if (opt === 'Cut Bid 50%') {
+        return { value: 'Cut Bid 50%', label: 'Cut Bid 50%', bg: '#FFF3E0', color: '#CC7700', border: '#FFE0B2', hoverBg: '#FFE0B2' };
+      }
+      if (opt === 'Keep') {
+        return { value: 'Keep', label: 'Keep', bg: '#E8F5E9', color: '#1B7A2B', border: '#C8E6C9', hoverBg: '#C8E6C9' };
+      }
+      // Negate (Exact) / Negate (Phrase)
+      return { value: opt, label: opt, bg: '#E3F2FD', color: '#0D47A1', border: '#BBDEFB', hoverBg: '#BBDEFB' };
+    });
+  }, [decisionOptions]);
+
   type SortKey = 'campaign' | 'ad_group' | 'entity' | 'clicks' | 'spend' | 'sales' | 'acos';
   const { sortKey, sortDir, toggle: toggleSort } = useSortable<SortKey>('spend', 'desc');
 
