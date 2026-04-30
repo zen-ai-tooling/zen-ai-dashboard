@@ -13,6 +13,8 @@ interface StandardUploadZoneProps {
   helperText?: string;
   formats?: string[];
   minHeight?: number;
+  /** Set to false to suppress the inline "How it works" stepper. Defaults to true for back-compat. */
+  showHowItWorks?: boolean;
 }
 
 const DEFAULT_FORMATS = ['.xlsx', '.xls', '.csv', '.zip'];
@@ -28,6 +30,7 @@ export const StandardUploadZone: React.FC<StandardUploadZoneProps> = ({
   helperText,
   formats = DEFAULT_FORMATS,
   minHeight = 200,
+  showHowItWorks = true,
 }) => {
   const [isDragging, setIsDragging] = React.useState(false);
 
@@ -46,30 +49,38 @@ export const StandardUploadZone: React.FC<StandardUploadZoneProps> = ({
   if (selectedFile) {
     return (
       <div className="space-y-3 animate-fade-in">
-        <div className="relative rounded-xl border border-border bg-card p-4 shadow-card flex items-center justify-between overflow-hidden">
-          <span className="absolute left-0 top-0 bottom-0 w-[3px] bg-success" />
-          <div className="flex items-center gap-3 pl-2 min-w-0">
-            <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
-              <FileSpreadsheet className="w-4 h-4 text-[hsl(var(--text-secondary))]" strokeWidth={1.6} />
+        <div
+          className="flex items-center justify-between"
+          style={{
+            background: '#FFFFFF',
+            border: '1px solid #E5E5EA',
+            borderLeft: '3px solid #34C759',
+            borderRadius: 10,
+            padding: '12px 16px',
+          }}
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-lg bg-[#F5F5F7] flex items-center justify-center flex-shrink-0">
+              <FileSpreadsheet className="w-4 h-4 text-[#86868B]" strokeWidth={1.6} />
             </div>
             <div className="min-w-0">
-              <p className="text-[13px] font-medium text-foreground truncate" title={selectedFile.name}>
+              <p style={{ fontSize: 14, fontWeight: 600, color: '#1D1D1F' }} className="truncate" title={selectedFile.name}>
                 {selectedFile.name}
               </p>
-              <p className="text-[11.5px] text-[hsl(var(--text-tertiary))] mt-0.5 font-mono-nums">
+              <p className="mt-0.5 font-mono-nums" style={{ fontSize: 12, color: '#86868B' }}>
                 {(selectedFile.size / 1024).toFixed(1)} KB
               </p>
             </div>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
-            <span className="flex items-center gap-1.5 text-[11.5px] text-success font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+            <span className="flex items-center gap-1.5" style={{ fontSize: 12, color: '#34C759', fontWeight: 600 }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse" />
               Ready
             </span>
             {onClear && (
               <button
                 onClick={onClear}
-                className="w-6 h-6 rounded-md flex items-center justify-center text-[hsl(var(--text-tertiary))] hover:text-foreground hover:bg-secondary btn-press"
+                className="w-6 h-6 rounded-md flex items-center justify-center text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F5F5F7] btn-press"
                 aria-label="Remove file"
               >
                 <X className="w-3.5 h-3.5" />
@@ -88,24 +99,24 @@ export const StandardUploadZone: React.FC<StandardUploadZoneProps> = ({
         onDrop={handleDrop}
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
-        className={cn(
-          'group relative rounded-xl cursor-pointer text-center px-6 py-10 btn-press transition-all duration-200',
-          isDragging
-            ? 'border-[1.5px] border-solid'
-            : 'border-[1.5px] border-dashed hover:border-[#0071E3]'
-        )}
+        className={cn('group relative cursor-pointer text-center px-6 py-10 btn-press transition-all duration-200')}
         style={{
           minHeight,
-          borderColor: isDragging ? '#0071E3' : '#D2D2D7',
-          background: isDragging
-            ? 'rgba(0, 113, 227, 0.05)'
-            : '#FFFFFF',
+          borderRadius: 12,
+          border: isDragging ? '2px solid #0071E3' : '1.5px dashed #C7C7CC',
+          background: isDragging ? 'rgba(0, 113, 227, 0.05)' : '#FAFAFA',
         }}
         onMouseEnter={(e) => {
-          if (!isDragging) e.currentTarget.style.background = 'rgba(0, 113, 227, 0.02)';
+          if (!isDragging) {
+            e.currentTarget.style.background = 'rgba(0, 113, 227, 0.02)';
+            e.currentTarget.style.border = '1.5px dashed #0071E3';
+          }
         }}
         onMouseLeave={(e) => {
-          if (!isDragging) e.currentTarget.style.background = '#FFFFFF';
+          if (!isDragging) {
+            e.currentTarget.style.background = '#FAFAFA';
+            e.currentTarget.style.border = '1.5px dashed #C7C7CC';
+          }
         }}
       >
         <input
@@ -118,35 +129,33 @@ export const StandardUploadZone: React.FC<StandardUploadZoneProps> = ({
 
         <div className="mx-auto mb-4 flex items-center justify-center">
           <Upload
-            className="transition-all duration-200 group-hover:-translate-y-0.5"
+            className="transition-all duration-200 group-hover:-translate-y-0.5 group-hover:text-[#0071E3]"
             style={{
-              width: isDragging ? 44 : 40,
-              height: isDragging ? 44 : 40,
+              width: isDragging ? 46 : 40,
+              height: isDragging ? 46 : 40,
               color: isDragging ? '#0071E3' : '#86868B',
-              transform: isDragging ? 'scale(1.1)' : 'scale(1)',
+              transform: isDragging ? 'scale(1.15)' : 'scale(1)',
             }}
             strokeWidth={1.4}
           />
         </div>
 
-        <p
-          className="text-[16px] font-semibold tracking-tight"
-          style={{ color: isDragging ? '#0071E3' : '#1D1D1F' }}
-        >
-          {isDragging ? 'Drop to upload' : primaryText}
+        <p style={{ fontSize: 16, fontWeight: 600, color: isDragging ? '#0071E3' : '#1D1D1F' }}>
+          {isDragging ? 'Release to upload' : primaryText}
         </p>
-        <p className="text-[14px] mt-1.5">
-          or <span className="text-[#0071E3] underline underline-offset-2">click to browse</span>
+        <p className="mt-1.5" style={{ fontSize: 14, color: '#0071E3' }}>
+          or <span className="underline underline-offset-2">click to browse</span>
         </p>
         {helperText && (
-          <p className="text-[12px] text-[hsl(var(--text-tertiary))] mt-2">{helperText}</p>
+          <p className="mt-2" style={{ fontSize: 12, color: '#86868B' }}>{helperText}</p>
         )}
 
         <div className="flex items-center justify-center gap-1.5 mt-5">
           {formats.map((fmt) => (
             <span
               key={fmt}
-              className="text-[12px] font-mono-nums bg-[#F5F5F7] rounded-md px-2 py-0.5 text-[hsl(var(--text-secondary))]"
+              className="font-mono-nums"
+              style={{ fontSize: 12, background: '#F0F0F0', borderRadius: 4, padding: '2px 8px', color: '#6E6E73' }}
             >
               {fmt}
             </span>
@@ -158,7 +167,7 @@ export const StandardUploadZone: React.FC<StandardUploadZoneProps> = ({
         const useRow = expectedSheets.length <= 2;
         return (
           <div className="px-1">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--text-tertiary))] mb-2">
+            <p className="mb-2" style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', color: '#86868B' }}>
               Expected sheets
             </p>
             <div
@@ -171,13 +180,23 @@ export const StandardUploadZone: React.FC<StandardUploadZoneProps> = ({
               {expectedSheets.map((sheet) => {
                 const detected = detectedSheets.includes(sheet);
                 return (
-                  <div key={sheet} className="flex items-center gap-2 text-[13px] text-[hsl(var(--text-secondary))]">
+                  <div key={sheet} className="flex items-center gap-2" style={{ fontSize: 13, color: '#6E6E73' }}>
                     {detected ? (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-success flex-shrink-0" strokeWidth={2.2} />
+                      <span
+                        className="flex-shrink-0 inline-flex items-center justify-center"
+                        style={{ width: 16, height: 16, borderRadius: 999, background: '#34C759' }}
+                      >
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                          <path d="M2 5L4 7L8 3" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </span>
                     ) : (
-                      <Circle className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))] opacity-50 flex-shrink-0" strokeWidth={1.5} />
+                      <span
+                        className="flex-shrink-0 inline-block"
+                        style={{ width: 16, height: 16, borderRadius: 999, border: '1.5px solid #D2D2D7' }}
+                      />
                     )}
-                    <span className={detected ? 'text-foreground' : ''}>{sheet}</span>
+                    <span className={detected ? 'text-[#1D1D1F]' : ''}>{sheet}</span>
                   </div>
                 );
               })}
@@ -186,20 +205,25 @@ export const StandardUploadZone: React.FC<StandardUploadZoneProps> = ({
         );
       })()}
 
-      {/* How it works — inline stepper */}
-      <div className="flex items-center gap-3 pt-3 px-1 text-[12px] text-[#86868B] flex-wrap">
-        {['Upload bulk file', 'Review bleeders', 'Generate decisions'].map((s, i, arr) => (
-          <React.Fragment key={s}>
-            <div className="flex items-center gap-1.5">
-              <span className="w-4 h-4 rounded-full border border-[#D2D2D7] bg-white flex items-center justify-center text-[10px] font-semibold text-[#86868B] font-mono-nums">
-                {i + 1}
-              </span>
-              <span>{s}</span>
-            </div>
-            {i < arr.length - 1 && <span className="text-[#D2D2D7]">→</span>}
-          </React.Fragment>
-        ))}
-      </div>
+      {/* How it works — inline stepper. Suppressible to avoid duplicates on multi-zone uploaders. */}
+      {showHowItWorks && (
+        <div className="flex items-center gap-3 pt-3 px-1 flex-wrap" style={{ fontSize: 13, color: '#6E6E73' }}>
+          {['Upload bulk file', 'Review bleeders', 'Generate decisions'].map((s, i, arr) => (
+            <React.Fragment key={s}>
+              <div className="flex items-center gap-1.5">
+                <span
+                  className="inline-flex items-center justify-center font-mono-nums"
+                  style={{ width: 20, height: 20, borderRadius: 999, border: '1.5px solid #D2D2D7', background: '#FFFFFF', fontSize: 12, fontWeight: 600, color: '#86868B' }}
+                >
+                  {i + 1}
+                </span>
+                <span>{s}</span>
+              </div>
+              {i < arr.length - 1 && <span style={{ color: '#D2D2D7' }}>→</span>}
+            </React.Fragment>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
