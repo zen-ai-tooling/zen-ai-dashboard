@@ -462,18 +462,70 @@
   }
   .bulk-btn-ghost:hover { background: #F5F5F7; color: #1D1D1F; }
 
-  /* Suggestion pills — unified */
+  /* Suggestion pills — unified, muted spec colors */
   .pill-suggest {
     display: inline-flex; align-items: center;
-    padding: 2px 8px; border-radius: 4px;
+    padding: 3px 10px; border-radius: 6px;
     font-size: 11px; font-weight: 600;
     line-height: 1.4;
     letter-spacing: 0.01em;
   }
-  .pill-suggest-red    { background: rgba(255,59,48,0.10);  color: #C7261C; }
-  .pill-suggest-amber  { background: rgba(255,149,0,0.12);  color: #B36A00; }
-  .pill-suggest-blue   { background: rgba(120,130,140,0.12); color: #4B5563; }
-  .pill-suggest-green  { background: rgba(52,199,89,0.12);  color: #1A7F3E; }
+  .pill-suggest-red    { background: #FFE5E5; color: #CC0000; }
+  .pill-suggest-amber  { background: #FFF3E0; color: #CC7700; }
+  .pill-suggest-blue   { background: #E8EAF0; color: #555770; }
+  .pill-suggest-green  { background: rgba(52,199,89,0.12); color: #1A7F3E; }
+
+  /* ── Decision table polish ── */
+  .decision-table-card {
+    border: 1px solid #E5E5EA;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #FFFFFF;
+  }
+  .decision-table-bar {
+    background: #FAFAFA;
+    border-bottom: 1px solid #E5E5EA;
+  }
+  .decision-table-footer {
+    background: #FAFAFA;
+    border-top: 1px solid #E5E5EA;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+  }
+
+  /* Alternating rows + hover (scoped to decision tables) */
+  .decision-table tbody tr {
+    background: #FFFFFF;
+    transition: background-color 100ms ease;
+    border-bottom: 1px solid #F2F2F7;
+  }
+  .decision-table tbody tr:nth-child(even) { background: #FAFBFC; }
+  .decision-table tbody tr:hover { background: #F0F5FF; }
+  /* When a decision class adds a flash background animation, it overrides via animation */
+
+  /* Column header styling inside decision tables */
+  .decision-table thead th {
+    background: #FAFAFA !important;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    color: #86868B;
+  }
+
+  /* Generate button "ready" glow — replaces aggressive pulse */
+  .btn-primary-action.is-ready {
+    box-shadow: 0 0 12px rgba(0, 113, 227, 0.30);
+  }
+
+  /* Match column nowrap for Lifetime audit */
+  .col-nowrap-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+  }
 }
 
 /* ── keyframes ── */
