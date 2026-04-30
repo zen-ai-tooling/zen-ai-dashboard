@@ -374,8 +374,7 @@ const Index = () => {
 
   // (Old download-edit-reupload handlers removed — Lifetime now uses inline decisions)
 
-
-    setDecisionResults(null);
+  const handleProcessorReupload = () => {
     setValidatorResults(null);
     setShowProcessorUpload(true);
     setShowValidatorUpload(false);
