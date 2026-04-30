@@ -342,7 +342,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
         </div>
 
         {/* Table */}
-        <div className="max-h-[58vh] overflow-auto table-sticky-header">
+        <div className="max-h-[58vh] overflow-auto table-sticky-header decision-table">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
