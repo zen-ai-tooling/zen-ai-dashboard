@@ -10,11 +10,19 @@ export function decisionDotColor(d: string | undefined | null): string {
   return '#86868B';
 }
 
+/**
+ * Spec colors:
+ *  Pause   → #FF3B30 (red)
+ *  Cut Bid → #FF9500 (amber)
+ *  Keep    → #34C759 (green)
+ *  Negative→ #0071E3 (blue)
+ *  Action  → #86868B (gray, no decision)
+ */
 export function decisionTextColor(d: string | undefined | null): string {
   if (!d) return '#86868B';
-  if (d === 'Keep') return '#1A7F3E';
-  if (d === 'Pause') return '#C5281C';
-  if (d.startsWith('Cut')) return '#A35A00';
+  if (d === 'Keep') return '#34C759';
+  if (d === 'Pause') return '#FF3B30';
+  if (d.startsWith('Cut')) return '#FF9500';
   if (d.startsWith('Negat')) return '#0071E3';
   return '#1D1D1F';
 }
@@ -39,11 +47,22 @@ interface DecisionSelectProps {
 export const DecisionSelect: React.FC<DecisionSelectProps> = ({
   value, onChange, options, placeholder = 'Action', width = '128px',
 }) => {
+  // Inset left-border indicator: blue when undecided, decision color when set
+  const insetColor = value ? decisionTextColor(value) : '#0071E3';
   return (
     <Select value={value || ''} onValueChange={onChange}>
       <SelectTrigger
-        className="h-7 text-[12px] rounded-md px-2 font-medium"
-        style={{ width, color: decisionTextColor(value) }}
+        className="text-[13px] font-medium"
+        style={{
+          width,
+          color: decisionTextColor(value),
+          height: 30,
+          padding: '6px 12px',
+          background: '#FFFFFF',
+          border: '1.5px solid #D2D2D7',
+          borderRadius: 8,
+          boxShadow: `inset 3px 0 0 ${insetColor}`,
+        }}
       >
         {value ? (
           <span className="flex items-center gap-1.5 truncate" style={{ color: decisionTextColor(value) }}>

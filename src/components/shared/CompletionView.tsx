@@ -28,21 +28,6 @@ interface CompletionViewProps {
   totalRows?: number;
 }
 
-const Sparkle: React.FC<{ color: string; style?: React.CSSProperties; delay?: number }> = ({ color, style, delay = 0 }) => (
-  <span
-    aria-hidden
-    className="absolute rounded-full"
-    style={{
-      width: 6,
-      height: 6,
-      background: color,
-      opacity: 0,
-      animation: `sparkle-fade 2.4s ease-in-out ${delay}ms infinite`,
-      ...style,
-    }}
-  />
-);
-
 export const CompletionView: React.FC<CompletionViewProps> = ({
   fileName,
   title = 'Workflow complete',
@@ -62,43 +47,51 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
   const total = totalRows ?? breakdown.reduce((s, b) => s + b.count, 0);
   const noDecisionItem = breakdown.find((b) => /no decision|undecided/i.test(b.label));
   const allDecided = total > 0 && decidedTotal >= total;
+  const noCount = noDecisionItem?.count ?? 0;
 
   return (
-    <div className="min-h-[calc(100vh-180px)] flex items-center justify-center px-4 py-8">
+    <div
+      className="flex flex-col items-center justify-center px-4 py-8"
+      style={{ minHeight: 'calc(100vh - 52px)' }}
+    >
       <div className="w-full max-w-[760px] animate-fade-in">
         <style>{`
           @keyframes hero-pop { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
           @keyframes title-fade { from { opacity: 0; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
-          @keyframes sparkle-fade { 0%, 100% { opacity: 0; transform: scale(0.6);} 50% { opacity: 0.85; transform: scale(1);} }
           @keyframes impact-fade { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
         `}</style>
 
         {/* Hero */}
         <div className="text-center">
-          <div className="relative inline-block">
+          <div className="relative inline-block mb-5">
+            {/* Soft radial glow */}
             <div
-              className="w-16 h-16 rounded-full flex items-center justify-center mb-5 mx-auto"
+              aria-hidden
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
               style={{
-                background: 'rgba(52, 199, 89, 0.12)',
-                boxShadow: '0 0 24px rgba(52, 199, 89, 0.2)',
-                animation: 'hero-pop 360ms cubic-bezier(0.34, 1.56, 0.64, 1) both',
+                width: 120,
+                height: 120,
+                background: 'radial-gradient(circle, rgba(52, 199, 89, 0.08) 0%, transparent 70%)',
+              }}
+            />
+            <div
+              className="relative w-[72px] h-[72px] rounded-full flex items-center justify-center mx-auto"
+              style={{
+                background: '#34C759',
+                animation: 'hero-pop 300ms cubic-bezier(0.34, 1.56, 0.64, 1) both',
               }}
             >
-              <CheckCircle2 className="w-10 h-10" strokeWidth={2.2} style={{ color: '#34C759' }} />
+              <CheckCircle2 className="w-10 h-10 text-white" strokeWidth={2.4} />
             </div>
-            <Sparkle color="#34C759" style={{ top: -2, left: -10 }} delay={300} />
-            <Sparkle color="#0071E3" style={{ top: 6, right: -14 }} delay={700} />
-            <Sparkle color="#FF9500" style={{ bottom: 18, left: -14 }} delay={1100} />
-            <Sparkle color="#34C759" style={{ bottom: 4, right: -8 }} delay={1500} />
           </div>
 
           <h1
-            className="text-[28px] font-semibold text-[#1D1D1F] tracking-tight"
-            style={{ animation: 'title-fade 320ms ease-out 200ms both' }}
+            className="font-bold text-[#1D1D1F]"
+            style={{ fontSize: 24, letterSpacing: '-0.3px', animation: 'title-fade 320ms ease-out 200ms both' }}
           >
             {title}
           </h1>
-          <p className="text-[13px] font-mono-nums text-[#86868B] mt-1.5 truncate" title={fileName}>
+          <p className="text-[12px] font-mono-nums text-[#86868B] mt-1.5 truncate" title={fileName}>
             {fileName}
           </p>
 
@@ -106,40 +99,68 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
             {onDownload && (
               <button
                 onClick={onDownload}
-                className="h-10 px-5 rounded-md border bg-white text-[13px] font-medium text-[#1D1D1F] hover:bg-[#F5F5F7] btn-press inline-flex items-center gap-1.5"
-                style={{ borderColor: '#D2D2D7' }}
+                className="rounded-[10px] btn-press inline-flex items-center gap-1.5"
+                style={{
+                  background: '#FFFFFF',
+                  border: '1px solid #D2D2D7',
+                  color: '#1D1D1F',
+                  padding: '12px 24px',
+                  fontSize: 14,
+                  fontWeight: 600,
+                }}
               >
-                <Download className="w-3.5 h-3.5" />
+                <Download className="w-4 h-4" />
                 Download
               </button>
             )}
             {onStartNew && (
               <button
                 onClick={onStartNew}
-                className="h-10 px-5 rounded-md text-[13px] font-semibold btn-press inline-flex items-center gap-1.5"
-                style={{ background: '#0071E3', color: '#fff' }}
+                className="rounded-[10px] btn-press inline-flex items-center gap-1.5"
+                style={{
+                  background: '#0071E3',
+                  color: '#fff',
+                  padding: '12px 24px',
+                  fontSize: 14,
+                  fontWeight: 600,
+                }}
               >
                 Start new session
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-4 h-4" />
               </button>
             )}
           </div>
         </div>
 
-        {/* Session impact — accent top, headline number */}
+        {/* Session impact */}
         <div
-          className="surface-card mt-8 p-6"
-          style={{ borderTop: `2px solid ${accentColor}`, animation: 'impact-fade 360ms ease-out 280ms both' }}
+          className="mt-8 p-6"
+          style={{
+            background: '#FFFFFF',
+            border: '1px solid #E5E5EA',
+            borderTop: `2px solid ${accentColor}`,
+            borderRadius: 12,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.04)',
+            animation: 'impact-fade 360ms ease-out 280ms both',
+          }}
         >
-          <h3 className="type-section-eyebrow mb-3 text-center">Session impact</h3>
+          <h3
+            className="mb-3 text-center"
+            style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', color: '#86868B' }}
+          >
+            Session impact
+          </h3>
 
           {impactHeadline && (
             <div className="text-center mb-5">
-              <div className="text-[32px] font-semibold font-mono-nums tracking-tight text-[#1D1D1F] leading-none">
+              <div
+                className="font-mono-nums text-[#1D1D1F] leading-none"
+                style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-1px' }}
+              >
                 {impactHeadline}
               </div>
               {impactSubtitle && (
-                <div className="text-[13px] text-[#6E6E73] mt-2">{impactSubtitle}</div>
+                <div className="text-[13px] text-[#6E6E73] mt-2.5">{impactSubtitle}</div>
               )}
             </div>
           )}
@@ -147,8 +168,10 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
           <div className="grid grid-cols-2 gap-x-8 gap-y-3 pt-4 border-t border-[#F0F0F2]">
             {summary.map((s) => (
               <div key={s.label} className="flex items-baseline justify-between">
-                <span className="text-[12.5px] text-[#6E6E73]">{s.label}</span>
-                <span className="text-[14px] font-semibold font-mono-nums text-[#1D1D1F] text-right">{s.value}</span>
+                <span style={{ fontSize: 13, color: '#6E6E73' }}>{s.label}</span>
+                <span className="font-mono-nums text-right" style={{ fontSize: 16, fontWeight: 600, color: '#1D1D1F' }}>
+                  {s.value}
+                </span>
               </div>
             ))}
           </div>
@@ -156,11 +179,25 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
 
         {/* Decisions breakdown */}
         {breakdown.length > 0 && (
-          <div className="surface-card mt-4 p-6">
-            <h3 className="type-section-eyebrow mb-4">Decisions breakdown</h3>
+          <div
+            className="mt-4 p-6"
+            style={{
+              background: '#FFFFFF',
+              border: '1px solid #E5E5EA',
+              borderTop: `2px solid ${accentColor}`,
+              borderRadius: 12,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.04)',
+            }}
+          >
+            <h3
+              className="mb-4"
+              style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', color: '#86868B' }}
+            >
+              Decisions breakdown
+            </h3>
 
             {/* Bar — 16px tall, rounded ends */}
-            <div className="flex h-4 w-full rounded-full overflow-hidden bg-[#F0F0F2] mb-4">
+            <div className="flex w-full overflow-hidden bg-[#F0F0F2] mb-4" style={{ height: 16, borderRadius: 8 }}>
               {breakdown.map((b) => {
                 const pct = total > 0 ? (b.count / total) * 100 : 0;
                 if (pct === 0) return null;
@@ -188,21 +225,26 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
                       className="rounded-full"
                       style={{ width: 8, height: 8, background: isUndecided ? '#E5E5EA' : b.color }}
                     />
-                    <span className={`text-[13px] ${isUndecided ? 'text-[#86868B]' : 'text-[#6E6E73]'}`}>{b.label}</span>
-                    <span className="text-[13px] font-mono-nums font-semibold text-[#1D1D1F]">{b.count}</span>
+                    <span style={{ fontSize: 13, color: isUndecided ? '#86868B' : '#6E6E73' }}>{b.label}</span>
+                    <span className="font-mono-nums" style={{ fontSize: 13, fontWeight: 600, color: '#1D1D1F' }}>
+                      {b.count}
+                    </span>
                   </div>
                 );
               })}
             </div>
 
             {allDecided ? (
-              <p className="text-[12.5px] mt-4 inline-flex items-center gap-1.5 font-medium" style={{ color: '#34C759' }}>
+              <p
+                className="mt-4 inline-flex items-center gap-1.5"
+                style={{ fontSize: 13, color: '#34C759', fontWeight: 600 }}
+              >
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Every bleeder has been addressed
               </p>
-            ) : noDecisionItem && noDecisionItem.count > 0 ? (
-              <p className="text-[12.5px] text-[#86868B] mt-4">
-                {noDecisionItem.count} row{noDecisionItem.count === 1 ? '' : 's'} were left at their current state
+            ) : noCount > 0 ? (
+              <p className="mt-4" style={{ fontSize: 13, color: '#86868B' }}>
+                {noCount === 1 ? '1 row was left at its current state' : `${noCount} rows were left at their current state`}
               </p>
             ) : null}
           </div>
@@ -210,11 +252,12 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
 
         {/* What's next */}
         <div
-          className="mt-4 rounded-xl p-5 flex items-start gap-3"
+          className="mt-4 flex items-start gap-3"
           style={{
-            background: '#F4F7FB',
-            border: '1px solid #E2E8F0',
+            background: '#F0F5FF',
             borderLeft: '3px solid #0071E3',
+            borderRadius: 8,
+            padding: '16px 20px',
           }}
         >
           <div
@@ -224,11 +267,16 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
             <Info className="w-4 h-4" style={{ color: '#0071E3' }} />
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="type-section-eyebrow mb-1.5">What's next</h4>
-            <p className="text-[13.5px] text-[#1D1D1F] leading-snug">
+            <h4
+              className="mb-1.5"
+              style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', color: '#86868B' }}
+            >
+              What's next
+            </h4>
+            <p style={{ fontSize: 14, color: '#1D1D1F', lineHeight: 1.45 }}>
               Your Amazon bulk file is ready to upload back into Campaign Manager.
             </p>
-            <p className="text-[12.5px] text-[#6E6E73] mt-1.5 font-mono-nums">
+            <p className="mt-1.5 font-mono-nums" style={{ fontSize: 12, color: '#6E6E73' }}>
               Amazon Ads → Campaign Manager → Bulk Operations → Upload
             </p>
           </div>
@@ -238,7 +286,8 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
           <div className="text-center mt-6">
             <button
               onClick={onViewFullResults}
-              className="text-[13px] font-medium text-[#0071E3] hover:underline btn-press"
+              className="hover:underline btn-press"
+              style={{ fontSize: 13, fontWeight: 500, color: '#0071E3' }}
             >
               View full results → Review all {total} bleeders and decisions
             </button>

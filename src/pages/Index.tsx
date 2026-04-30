@@ -723,7 +723,7 @@ const Index = () => {
 
         <main className="flex-1 overflow-y-auto bg-white" style={{ padding: '24px 40px 56px' }}>
           <div
-            className={`${(!activeModule && !showHistoryView) ? 'max-w-[1080px]' : 'max-w-[1200px]'} mx-auto page-enter`}
+            className="max-w-[1100px] mx-auto page-enter"
             key={`${activeModule ?? 'home'}-${bleeder2Stage}-${bleeder2ActiveTrack ?? ''}-${showHistoryView}`}
           >
             {/* SESSION LOG */}

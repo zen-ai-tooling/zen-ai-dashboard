@@ -75,7 +75,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
 
   return (
     <div className="flex flex-col">
-      <div className="pt-12 pb-10">
+      <div className="pb-10" style={{ paddingTop: 40 }}>
         {/* Greeting — make it a moment */}
         <div className="mb-12">
           <p className="type-eyebrow">{getTimeString()}</p>
@@ -124,14 +124,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                 <div className="type-card-title">{m.name}</div>
                 <p className="type-card-desc mt-2 flex-1">{m.desc}</p>
                 <div className="flex items-center justify-between mt-5 pt-4 border-t border-[#F0F0F2]">
-                  <span
-                    className={`flex items-center gap-1.5 text-[12px] ${
-                      lastRun ? 'text-[#1D1D1F] font-medium' : 'text-[#A1A1A6]'
-                    }`}
-                  >
-                    <Clock className="w-3 h-3" strokeWidth={1.8} />
-                    {lastRun ? `Last run ${formatRelative(lastRun)}` : 'No runs yet'}
-                  </span>
+                  {lastRun ? (
+                    <span className="flex items-center gap-1.5 text-[12px] text-[#1D1D1F] font-medium">
+                      <Clock className="w-3 h-3" strokeWidth={1.8} />
+                      Last run {formatRelative(lastRun)}
+                    </span>
+                  ) : (
+                    <span />
+                  )}
                   <ArrowUpRight className="w-3.5 h-3.5 text-[#86868B] opacity-0 group-hover:opacity-100 transition-all duration-150" />
                 </div>
               </button>
@@ -207,7 +207,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                 className="rounded-[10px] border border-[#E5E5EA] bg-white p-4 tile-hover flex items-start justify-between gap-3 cursor-pointer"
                 style={{
                   boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                  borderLeft: '3px solid rgba(0,113,227,0.3)',
+                  borderLeft: '3px solid rgba(0,113,227,0.2)',
                 }}
               >
                 <div className="min-w-0">

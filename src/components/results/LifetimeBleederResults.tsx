@@ -273,7 +273,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
         onDownload={handleDownloadAmazon}
         onStartNew={onStartNew}
         onViewFullResults={() => setShowFullResults(true)}
-        accentColor="#FF3B30"
+        accentColor="#A855F7"
       />
     );
   }
