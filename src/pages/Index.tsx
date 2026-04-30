@@ -997,73 +997,12 @@ const Index = () => {
               </div>
             )}
 
-            {activeModule === "lifetime_bleeders" && (lifetimeStage === "results" || lifetimeStage === "decision-upload" || lifetimeStage === "decision-results") && lifetimeResult && (
-              <div className="space-y-4 pt-4">
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="rounded-lg bg-secondary p-4">
-                    <div className="text-[22px] font-medium font-mono-nums text-foreground">{lifetimeResult.bleeders.length}</div>
-                    <div className="text-[11px] text-[hsl(var(--text-tertiary))]">Bleeders Found</div>
-                  </div>
-                  <div className="rounded-lg bg-secondary p-4">
-                    <div className="text-[22px] font-medium font-mono-nums text-destructive">${lifetimeResult.totalSpend.toFixed(2)}</div>
-                    <div className="text-[11px] text-[hsl(var(--text-tertiary))]">Wasted Spend</div>
-                  </div>
-                  <div className="rounded-lg bg-secondary p-4">
-                    <div className="text-[22px] font-medium font-mono-nums text-foreground">{lifetimeResult.excludedRankingCount}</div>
-                    <div className="text-[11px] text-[hsl(var(--text-tertiary))]">Ranking Excluded</div>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <Button onClick={handleDownloadLifetimeDecisionSheet} className="flex-1 btn-press">
-                    <Download className="mr-2 h-4 w-4" />
-                    Download Decision File
-                  </Button>
-                </div>
-
-                {/* Decision upload */}
-                {(lifetimeStage === "decision-upload" || lifetimeStage === "results") && (
-                  <div className="rounded-lg border border-dashed border-border/60 p-6 text-center cursor-pointer hover:bg-muted/30 transition-colors"
-                    onDrop={(e) => { e.preventDefault(); if (lifetimeProcessing) return; const file = e.dataTransfer.files[0]; if (file) handleLifetimeDecisionUpload(file); }}
-                    onDragOver={(e) => e.preventDefault()}
-                    onClick={() => { if (lifetimeProcessing) return; document.getElementById("lifetime-decision-input")?.click(); }}
-                  >
-                    <input id="lifetime-decision-input" type="file" accept=".xlsx,.xls" onChange={(e) => { const file = e.target.files?.[0]; if (file) handleLifetimeDecisionUpload(file); e.target.value = ""; }} className="hidden" disabled={lifetimeProcessing} />
-                    {lifetimeProcessing ? (
-                      <div className="flex items-center justify-center gap-2 text-[13px] text-muted-foreground">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Processing decisions...
-                      </div>
-                    ) : (
-                      <div>
-                        <Upload className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
-                        <p className="text-[13px] font-medium">Upload edited Decision File</p>
-                        <p className="text-[12px] text-muted-foreground mt-1">Drag & drop or click to browse</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Decision results */}
-                {lifetimeStage === "decision-results" && lifetimeDecisionResult && (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="rounded-lg bg-secondary p-4">
-                        <div className="text-[22px] font-medium font-mono-nums text-destructive">{lifetimeDecisionResult.pausedCount}</div>
-                        <div className="text-[11px] text-[hsl(var(--text-tertiary))]">Targets to Pause</div>
-                      </div>
-                      <div className="rounded-lg bg-secondary p-4">
-                        <div className="text-[22px] font-medium font-mono-nums text-foreground">{lifetimeDecisionResult.keptCount}</div>
-                        <div className="text-[11px] text-[hsl(var(--text-tertiary))]">Targets Kept</div>
-                      </div>
-                    </div>
-                    <Button onClick={handleDownloadLifetimeBulkUpdate} className="w-full btn-press">
-                      <Download className="mr-2 h-4 w-4" />
-                      Download Amazon Bulk Update
-                    </Button>
-                  </div>
-                )}
+            {activeModule === "lifetime_bleeders" && lifetimeStage === "results" && lifetimeResult && (
+              <div className="pt-4">
+                <LifetimeBleederResults
+                  result={lifetimeResult}
+                  onStartNew={() => { setLifetimeResult(null); setLifetimeStage("upload"); }}
+                />
               </div>
             )}
 
