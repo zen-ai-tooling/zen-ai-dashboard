@@ -24,6 +24,7 @@ import { DecisionProgressBar } from '@/components/shared/DecisionProgressBar';
 import { SpendDistributionStrip } from '@/components/shared/SpendDistributionStrip';
 import { DecisionSelect, decisionRowClass } from '@/components/shared/DecisionSelect';
 import { SortHeader, useSortable } from '@/components/shared/SortHeader';
+import { RowDetailPanel, type DecisionButtonSpec, type RowDetail } from '@/components/shared/RowDetailPanel';
 import { suggestLifetimeRow } from '@/lib/ui/lifetimeSuggestion';
 import type { LifetimeBleederResult, LifetimeBleederRow } from '@/lib/lifetimeBleederAnalysis';
 import {
@@ -81,6 +82,8 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
   const [amazonFile, setAmazonFile] = useState<AmazonFileBundle | null>(null);
   const [showFullResults, setShowFullResults] = useState(false);
   const [flashIdx, setFlashIdx] = useState<{ idx: number; cls: string; ts: number } | null>(null);
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [panelComplete, setPanelComplete] = useState(false);
 
   const setDecisionWithFlash = (idx: number, val: string) => {
     setDecisions((prev) => ({ ...prev, [idx]: val }));
