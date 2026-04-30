@@ -490,10 +490,13 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 const flashClass =
                   flashIdx && flashIdx.idx === idx && Date.now() - flashIdx.ts < 400 ? flashIdx.cls : '';
 
+                const isPanelSelected = selectedIdx === idx;
+
                 return (
                   <TableRow
                     key={`${idx}-${flashIdx?.idx === idx ? flashIdx.ts : 'r'}`}
-                    className={`transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
+                    onClick={() => { setSelectedIdx(idx); setPanelComplete(false); }}
+                    className={`cursor-pointer transition-colors ${urgencyClass} ${indicatorClass} ${flashClass} ${isPanelSelected ? 'row-detail-selected' : ''}`}
                   >
                     <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.campaignName}>
                       {bleeder.campaignName}
@@ -533,7 +536,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                         <span className="text-[13px] text-[#D2D2D7]">—</span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => setDecisionWithFlash(idx, suggestion.decision)}
                         title={suggestion.reason}
@@ -543,7 +546,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                         {suggestion.shortLabel}
                       </button>
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-1.5">
                         {decision && (
                           <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#34C759' }} />
