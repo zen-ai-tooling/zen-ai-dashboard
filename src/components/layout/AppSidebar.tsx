@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Clock, Plus, Check } from 'lucide-react';
+import { ArrowLeft, Clock, Plus, Check, ChevronsUpDown } from 'lucide-react';
 import { useClient } from '@/context/ClientContext';
 import type { Bleeder2Track } from '@/components/bleeders2/TrackSelector';
 
@@ -180,19 +180,20 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         </div>
       </nav>
 
-      {/* Client switcher — distinct footer zone */}
+      {/* Workspace switcher — first-class footer zone */}
       <div className="p-4 border-t border-white/[0.08] relative">
         <button
           onClick={() => setClientDropdownOpen(prev => !prev)}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/[0.05] border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/[0.15] btn-press"
+          className="w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-white/[0.06] border border-white/[0.10] hover:bg-white/[0.10] hover:border-white/[0.18] btn-press transition-colors"
         >
-          <div className="w-8 h-8 rounded-full bg-primary/25 flex items-center justify-center text-[12px] font-semibold text-white">
+          <div className="w-10 h-10 rounded-full bg-primary/25 flex items-center justify-center text-[13px] font-semibold text-white flex-shrink-0">
             {activeClient.initials}
           </div>
           <div className="text-left min-w-0 flex-1">
-            <div className="text-[14px] font-semibold text-white truncate leading-tight">{activeClient.name}</div>
-            <div className="text-[12px] text-[#86868B] mt-0.5">Active client</div>
+            <div className="text-[15px] font-semibold text-white truncate leading-tight">{activeClient.name}</div>
+            <div className="text-[11px] text-[#86868B] mt-0.5 uppercase" style={{ letterSpacing: '0.08em' }}>Active workspace</div>
           </div>
+          <ChevronsUpDown className="w-4 h-4 text-[#86868B] flex-shrink-0" strokeWidth={1.8} />
         </button>
 
         {clientDropdownOpen && (

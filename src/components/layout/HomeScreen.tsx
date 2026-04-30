@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Clock, ChevronRight, CheckCircle2, AlertTriangle, HelpCircle, SlidersHorizontal, FileText } from 'lucide-react';
+import { Clock, ChevronRight, ArrowRight, CheckCircle2, AlertTriangle, HelpCircle, SlidersHorizontal, FileText, Sparkles } from 'lucide-react';
 import { useHistory } from '@/context/HistoryContext';
 
 type ActiveModule = 'bleeders_1' | 'bleeders_2' | 'lifetime_bleeders' | null;
@@ -18,15 +18,27 @@ const getGreeting = () => {
 const getTimeString = () =>
   new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
+const getUserFirstName = (): string | null => {
+  try {
+    const raw =
+      localStorage.getItem('gno-adops-user-profile') ||
+      localStorage.getItem('user-profile');
+    if (raw) {
+      const p = JSON.parse(raw);
+      const name: string | undefined =
+        p?.firstName || p?.first_name || p?.given_name || (p?.name ? String(p.name).split(' ')[0] : undefined);
+      if (name && name.trim()) return name.trim();
+    }
+  } catch {}
+  return null;
+};
+
 const MODULES = [
   {
     id: 'bleeders_1' as const,
     name: 'Bleeders 1.0',
     desc: 'Find targets with zero sales that are wasting your budget',
     dot: 'hsl(var(--destructive))',
-    accent: '#EF4444',
-    gradient: 'linear-gradient(180deg, rgba(239, 68, 68, 0.06) 0%, #FFFFFF 50%)',
-    borderColor: '#E5E5EA',
     tag: 'Standard',
     historyKey: 'bleeders_1',
   },
@@ -35,9 +47,6 @@ const MODULES = [
     name: 'Bleeders 2.0',
     desc: 'Find low-performing targets with high ACoS and low sales',
     dot: 'hsl(var(--amber))',
-    accent: '#F59E0B',
-    gradient: 'linear-gradient(180deg, rgba(245, 158, 11, 0.06) 0%, #FFFFFF 50%)',
-    borderColor: 'rgba(245,158,11,0.3)',
     tag: 'Recommended',
     historyKey: 'bleeders_2',
   },
@@ -46,9 +55,6 @@ const MODULES = [
     name: 'Lifetime Audit',
     desc: 'Find targets that have never converted across their entire lifetime',
     dot: 'hsl(265 70% 60%)',
-    accent: '#8B5CF6',
-    gradient: 'linear-gradient(180deg, rgba(139, 92, 246, 0.06) 0%, #FFFFFF 50%)',
-    borderColor: '#E5E5EA',
     tag: 'Audit',
     historyKey: 'lifetime',
   },
@@ -78,8 +84,17 @@ const formatRelative = (iso: string) => {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
+const decisionsSummary = (e: { pausedCount: number; negativesCreated: number; bidsCutCount: number }) => {
+  const parts: string[] = [];
+  if (e.pausedCount) parts.push(`${e.pausedCount} paused`);
+  if (e.bidsCutCount) parts.push(`${e.bidsCutCount} bid${e.bidsCutCount === 1 ? '' : 's'} cut`);
+  if (e.negativesCreated) parts.push(`${e.negativesCreated} negative${e.negativesCreated === 1 ? '' : 's'}`);
+  return parts.length ? parts.join(', ') : 'No decisions recorded';
+};
+
 export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
   const { entries } = useHistory();
+  const firstName = getUserFirstName();
 
   const lastRunByModule: Record<string, string | undefined> = {};
   entries.forEach((e) => {
@@ -99,13 +114,24 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
   }, [entries]);
 
   const hasSessions = entries.length > 0;
+  const greetingHeadline = firstName ? `${getGreeting()}, ${firstName}` : getGreeting();
 
   return (
     <div className="flex flex-col" style={{ paddingTop: 40 }}>
       {/* Greeting + value hook */}
       <div>
-        <p className="type-eyebrow">{getTimeString()}</p>
-        <h1 className="type-page-title mt-2">{getGreeting()}, operator</h1>
+        <p
+          style={{
+            fontSize: 11,
+            fontWeight: 500,
+            letterSpacing: '0.12em',
+            color: '#A1A1A6',
+            textTransform: 'uppercase',
+          }}
+        >
+          {getTimeString()}
+        </p>
+        <h1 className="type-page-title mt-2">{greetingHeadline}</h1>
         {hasSessions ? (
           <p
             className="mt-3 max-w-2xl"
@@ -115,26 +141,26 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
             <span style={{ fontSize: 24, fontWeight: 700, color: '#1D1D1F' }}>
               ${Math.round(monthStats.totalSpend).toLocaleString()}
             </span>{' '}
-            in at-risk spend across{' '}
-            <span style={{ fontSize: 16, fontWeight: 600, color: '#1D1D1F' }}>
-              {monthStats.sessions} session{monthStats.sessions === 1 ? '' : 's'}
-            </span>{' '}
-            this month
+            in at-risk spend across {monthStats.sessions} session{monthStats.sessions === 1 ? '' : 's'} this month
           </p>
         ) : (
-          <p className="type-page-sub mt-3 max-w-md">
-            Start your first session to begin identifying wasted ad spend.
+          <p
+            className="mt-3 max-w-2xl"
+            style={{ fontSize: 16, fontWeight: 400, color: '#6E6E73', lineHeight: 1.5 }}
+          >
+            Run your first workflow to start tracking at-risk spend.
           </p>
         )}
       </div>
 
-      {/* Workflows — 48px from greeting */}
+      {/* Workflows */}
       <div style={{ marginTop: 48 }}>
         <p className="type-section-eyebrow mb-4">Workflows</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {MODULES.map((m) => {
             const lastRun = lastRunByModule[m.historyKey];
             const isRecommended = m.tag === 'Recommended';
+            const isEmptyState = !hasSessions && isRecommended;
             return (
               <button
                 key={m.id}
@@ -143,11 +169,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                 style={{
                   minHeight: '180px',
                   cursor: 'pointer',
-                  borderColor: m.borderColor,
-                  background: m.gradient,
-                  boxShadow: isRecommended
-                    ? '0 4px 16px rgba(0,0,0,0.08)'
-                    : '0 1px 3px rgba(0,0,0,0.04)',
+                  borderColor: isRecommended ? 'rgba(99, 102, 241, 0.25)' : '#E5E5EA',
+                  background: '#FFFFFF',
+                  boxShadow: isEmptyState
+                    ? '0 6px 20px rgba(99, 102, 241, 0.10)'
+                    : isRecommended
+                      ? '0 2px 8px rgba(0,0,0,0.04)'
+                      : '0 1px 3px rgba(0,0,0,0.04)',
                   transition: 'transform 200ms ease, box-shadow 200ms ease',
                 }}
                 onMouseEnter={(ev) => {
@@ -156,17 +184,38 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                 }}
                 onMouseLeave={(ev) => {
                   ev.currentTarget.style.transform = 'translateY(0)';
-                  ev.currentTarget.style.boxShadow = isRecommended
-                    ? '0 4px 16px rgba(0,0,0,0.08)'
-                    : '0 1px 3px rgba(0,0,0,0.04)';
+                  ev.currentTarget.style.boxShadow = isEmptyState
+                    ? '0 6px 20px rgba(99, 102, 241, 0.10)'
+                    : isRecommended
+                      ? '0 2px 8px rgba(0,0,0,0.04)'
+                      : '0 1px 3px rgba(0,0,0,0.04)';
                 }}
               >
+                {/* Recommended top accent line */}
+                {isRecommended && (
+                  <span
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: 3,
+                      background: 'linear-gradient(90deg, #6366F1 0%, #4F46E5 100%)',
+                    }}
+                  />
+                )}
+
                 <div className="flex items-start justify-between mb-4">
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: m.dot }} />
                   {isRecommended ? (
                     <span
-                      className="text-[10px] font-semibold uppercase text-white px-2.5 py-1 rounded-full"
-                      style={{ background: 'hsl(var(--amber))', letterSpacing: '0.08em' }}
+                      className="text-[10px] font-semibold uppercase px-2 py-[3px] rounded-full"
+                      style={{
+                        background: 'rgba(99, 102, 241, 0.10)',
+                        color: '#4F46E5',
+                        letterSpacing: '0.08em',
+                      }}
                     >
                       Recommended
                     </span>
@@ -182,59 +231,65 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                 <div className="type-card-title">{m.name}</div>
                 <p className="type-card-desc mt-2 flex-1">{m.desc}</p>
 
-                {lastRun ? (
-                  <div className="flex items-center justify-between mt-5 pt-4 border-t border-[#F0F0F2]">
+                {isEmptyState && (
+                  <div
+                    className="mt-3 flex items-center gap-1.5 text-[11.5px] font-medium"
+                    style={{ color: '#4F46E5' }}
+                  >
+                    <Sparkles style={{ width: 12, height: 12 }} strokeWidth={2} />
+                    Recommended first workflow
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between mt-5 pt-4 border-t border-[#F0F0F2]">
+                  {lastRun ? (
                     <span className="flex items-center gap-1.5 text-[12px] text-[#1D1D1F] font-medium">
                       <Clock className="w-3 h-3" strokeWidth={1.8} />
                       Last run {formatRelative(lastRun)}
                     </span>
-                    <span
-                      className="text-[12px] font-semibold flex items-center gap-1"
-                      style={{ color: m.accent }}
-                    >
-                      Start{' '}
-                      <span
-                        className="start-arrow inline-block"
-                        style={{ transition: 'transform 200ms ease' }}
-                      >
-                        →
-                      </span>
-                    </span>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-end mt-5">
-                    <span
-                      className="text-[12px] font-semibold flex items-center gap-1"
-                      style={{ color: m.accent }}
-                    >
-                      Start{' '}
-                      <span
-                        className="start-arrow inline-block"
-                        style={{ transition: 'transform 200ms ease' }}
-                      >
-                        →
-                      </span>
-                    </span>
-                  </div>
-                )}
+                  ) : (
+                    <span className="text-[12px] text-[#A1A1A6]">Not yet run</span>
+                  )}
+                  <span
+                    className="text-[12px] font-semibold flex items-center gap-1"
+                    style={{ color: 'hsl(var(--primary))' }}
+                  >
+                    Start{' '}
+                    <ArrowRight
+                      className="start-arrow"
+                      style={{ width: 13, height: 13, transition: 'transform 200ms ease' }}
+                      strokeWidth={2.2}
+                    />
+                  </span>
+                </div>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Recent activity — 40px from workflows */}
+      {/* Recent activity */}
       <div style={{ marginTop: 40 }}>
-        <p className="type-section-eyebrow mb-4">Recent activity</p>
+        <div className="flex items-end justify-between mb-4">
+          <p className="type-section-eyebrow">Recent activity</p>
+          {recent.length > 0 && (
+            <button
+              type="button"
+              className="text-[12px] font-medium flex items-center gap-1 hover:underline"
+              style={{ color: 'hsl(var(--primary))' }}
+            >
+              View all <ArrowRight style={{ width: 12, height: 12 }} strokeWidth={2.2} />
+            </button>
+          )}
+        </div>
         {recent.length === 0 ? (
           <div
             className="rounded-[10px] border border-[#E5E5EA] bg-white px-5 py-10 text-center"
             style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}
           >
             <Clock className="w-4 h-4 mx-auto text-[#86868B] opacity-60" strokeWidth={1.6} />
-            <p className="text-[13px] text-[#6E6E73] mt-2 font-medium">No sessions yet</p>
-            <p className="text-[12px] text-[#86868B] mt-1">
-              Pick a workflow above to get started.
+            <p className="text-[13px] text-[#86868B] mt-2">
+              Your completed sessions will appear here.
             </p>
           </div>
         ) : (
@@ -246,13 +301,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
               return (
                 <div
                   key={e.id}
-                  className="rounded-[10px] border border-[#E5E5EA] bg-white px-5 py-4 flex items-center gap-3 cursor-pointer"
+                  className="rounded-[10px] border border-[#E5E5EA] bg-white px-5 py-4 flex items-center gap-4 cursor-pointer"
                   style={{
                     boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
                     borderLeft: `3px solid ${accent}`,
                     transition: 'background 150ms ease',
                   }}
-                  onMouseEnter={(ev) => (ev.currentTarget.style.background = '#F3F4F6')}
+                  onMouseEnter={(ev) => (ev.currentTarget.style.background = '#F9FAFB')}
                   onMouseLeave={(ev) => (ev.currentTarget.style.background = '#FFFFFF')}
                 >
                   <div className="flex-1 min-w-0">
@@ -273,6 +328,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                     </div>
                     <p className="text-[12px] text-[#86868B] truncate mt-0.5 ml-5">
                       {e.clientName} · {e.fileName}
+                    </p>
+                    <p className="text-[12px] text-[#6E6E73] truncate mt-0.5 ml-5">
+                      {decisionsSummary(e)}
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
@@ -299,9 +357,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
         )}
       </div>
 
-      {/* Quick start — 32px from recent activity (related secondary section) */}
+      {/* Learn the basics */}
       <div style={{ marginTop: 32 }}>
-        <p className="type-section-eyebrow mb-4">Quick start</p>
+        <p className="type-section-eyebrow mb-4">Learn the basics</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
             { title: 'What are bleeders?', desc: 'Targets with high spend and zero or near-zero conversions.', Icon: HelpCircle },
@@ -341,16 +399,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
         </div>
       </div>
 
-      {/* Footer — 48px from quick start */}
+      {/* Footer */}
       <div
         className="border-t border-[#F0F0F2] py-4 flex items-center justify-between"
-        style={{ marginTop: 48 }}
+        style={{ marginTop: 48, opacity: 0.75 }}
       >
-        <span className="text-[12px] text-[#86868B]">Zen AI · Amazon Ads Workflow</span>
+        <span style={{ fontSize: 11, color: '#A1A1A6' }}>Zen AI · Amazon Ads Workflow</span>
         <div className="flex items-center gap-4">
           <a
             href="mailto:feedback@adprune.com"
-            className="text-[12px] text-[#86868B] hover:text-[#1D1D1F] transition-colors"
+            style={{ fontSize: 11, color: '#A1A1A6' }}
+            className="hover:text-[#1D1D1F] transition-colors"
           >
             Feedback
           </a>
@@ -358,11 +417,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
             href="https://docs.lovable.dev"
             target="_blank"
             rel="noreferrer"
-            className="text-[12px] text-[#86868B] hover:text-[#1D1D1F] transition-colors"
+            style={{ fontSize: 11, color: '#A1A1A6' }}
+            className="hover:text-[#1D1D1F] transition-colors"
           >
             Changelog
           </a>
-          <span className="text-[12px] text-[#A1A1A6] font-mono-nums">v2.0</span>
+          <span style={{ fontSize: 11, color: '#A1A1A6' }} className="font-mono-nums">v2.0</span>
         </div>
       </div>
     </div>
