@@ -610,10 +610,13 @@ export const AnalysisResults = ({
                       ? flashKey.cls
                       : '';
 
+                  const isPanelSelected = selectedRowIdx === rowIdx;
+
                   return (
                     <TableRow
                       key={`${rowIdx}-${flashKey?.key === key ? flashKey.ts : 'r'}`}
-                      className={`row-enter cursor-pointer transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
+                      onClick={() => { setSelectedRowIdx(rowIdx); setPanelComplete(false); }}
+                      className={`row-enter cursor-pointer transition-colors ${urgencyClass} ${indicatorClass} ${flashClass} ${isPanelSelected ? 'row-detail-selected' : ''}`}
                       style={{ animationDelay: `${Math.min(displayIdx * 12, 240)}ms` }}
                     >
                       <TableCell className="truncate font-medium" title={row.campaign}>
@@ -667,7 +670,7 @@ export const AnalysisResults = ({
                           );
                         })()}
                       </TableCell>
-                      <TableCell className="px-2">
+                      <TableCell className="px-2" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-1.5">
                           {decision && (
                             <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#34C759' }} />
