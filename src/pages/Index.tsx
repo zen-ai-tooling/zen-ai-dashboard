@@ -721,7 +721,7 @@ const Index = () => {
           onBack={getBackHandler()}
         />
 
-        <main className="flex-1 overflow-y-auto bg-white" style={{ padding: '24px 40px 56px' }}>
+        <main className="flex-1 overflow-y-auto" style={{ padding: '24px 40px 56px', background: '#F9FAFB' }}>
           <div
             className="max-w-[1100px] mx-auto page-enter"
             key={`${activeModule ?? 'home'}|${bleeder2Stage}|${bleeder2ActiveTrack ?? ''}|${lifetimeStage ?? ''}|${chatState}|${analysisResults ? 'a' : ''}${decisionResults ? 'd' : ''}${validatorResults ? 'v' : ''}|${showHistoryView ? 'h' : ''}`}
