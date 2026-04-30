@@ -268,6 +268,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
             borderLeft: '3px solid #0071E3',
             borderRadius: 8,
             padding: '16px 20px',
+            animation: 'cv-slide-up 200ms ease-out 1000ms both',
           }}
         >
           <div
@@ -293,7 +294,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
         </div>
 
         {onViewFullResults && (
-          <div className="text-center mt-6">
+          <div className="text-center mt-6" style={{ animation: 'cv-fade-in 150ms ease-out 1100ms both' }}>
             <button
               onClick={onViewFullResults}
               className="hover:underline btn-press"
