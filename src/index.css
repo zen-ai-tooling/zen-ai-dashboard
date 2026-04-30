@@ -470,10 +470,16 @@
     line-height: 1.4;
     letter-spacing: 0.01em;
   }
-  .pill-suggest-red    { background: #FFE5E5; color: #CC0000; }
-  .pill-suggest-amber  { background: #FFF3E0; color: #CC7700; }
-  .pill-suggest-blue   { background: #E8EAF0; color: #555770; }
-  .pill-suggest-green  { background: rgba(52,199,89,0.12); color: #1A7F3E; }
+  .pill-suggest-red    { background: #FFE5E5; color: #CC0000; border: none; }
+  .pill-suggest-amber  { background: #FFF3E0; color: #CC7700; border: none; }
+  .pill-suggest-blue   { background: #E8EAF0; color: #555770; border: none; }
+  .pill-suggest-green  { background: rgba(52,199,89,0.12); color: #1A7F3E; border: none; }
+  .pill-suggest { transition: opacity 150ms ease; }
+  /* Dim suggestion pill once a decision is made on this row */
+  tr.row-decision-keep .pill-suggest,
+  tr.row-decision-pause .pill-suggest,
+  tr.row-decision-cut .pill-suggest,
+  tr.row-decision-negate .pill-suggest { opacity: 0.5; }
 
   /* ── Decision table polish ── */
   .decision-table-card {
