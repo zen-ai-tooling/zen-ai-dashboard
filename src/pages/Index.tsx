@@ -680,8 +680,7 @@ const Index = () => {
     }
 
     if (activeModule === 'lifetime_bleeders') {
-      if (lifetimeStage === 'decision-results') return () => { setLifetimeDecisionResult(null); setLifetimeStage('decision-upload'); };
-      if (lifetimeStage === 'decision-upload' || lifetimeStage === 'results') return () => { setLifetimeResult(null); setLifetimeStage('upload'); };
+      if (lifetimeStage === 'results') return () => { setLifetimeResult(null); setLifetimeStage('upload'); };
       return () => handleSidebarModuleSelect(null);
     }
 
