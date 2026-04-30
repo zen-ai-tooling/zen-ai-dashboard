@@ -11,6 +11,8 @@ export interface LifetimeSuggestion {
   color: string;
   border: string;
   reason: string;
+  /** One-line rationale shown in the row detail side panel. */
+  rationale: string;
 }
 
 interface LifetimeSuggestionInput {
@@ -40,6 +42,7 @@ export function suggestLifetimeRow(row: LifetimeSuggestionInput): LifetimeSugges
       color: '#B71C1C',
       border: 'rgba(255, 59, 48, 0.25)',
       reason: '20+ lifetime clicks with 0 sales',
+      rationale: `${clicks} lifetime clicks with zero conversions — strong pause candidate`,
     };
   }
 
@@ -52,6 +55,7 @@ export function suggestLifetimeRow(row: LifetimeSuggestionInput): LifetimeSugges
       color: '#A35A00',
       border: 'rgba(255, 149, 0, 0.25)',
       reason: '10-19 lifetime clicks with 0 sales',
+      rationale: `${clicks} lifetime clicks with no conversions — review before deciding`,
     };
   }
 
@@ -63,5 +67,6 @@ export function suggestLifetimeRow(row: LifetimeSuggestionInput): LifetimeSugges
     color: '#1A7F3E',
     border: 'rgba(52, 199, 89, 0.25)',
     reason: 'Below review threshold',
+    rationale: 'Lifetime activity below review threshold — keep and monitor',
   };
 }

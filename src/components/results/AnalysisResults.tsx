@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Download, Loader2, CheckCircle2, MoreHorizontal, AlertTriangle, FileSpreadsheet, Layers, ChevronDown, Percent, DollarSign, Info, XCircle, Upload } from "lucide-react";
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
 import { CompactStatsBar } from "@/components/shared/CompactStatsBar";
@@ -8,6 +8,7 @@ import { SortHeader, useSortable } from "@/components/shared/SortHeader";
 import { CompletionView } from "@/components/shared/CompletionView";
 import { DecisionProgressBar } from "@/components/shared/DecisionProgressBar";
 import { SpendDistributionStrip } from "@/components/shared/SpendDistributionStrip";
+import { RowDetailPanel, type DecisionButtonSpec, type RowDetail } from "@/components/shared/RowDetailPanel";
 import { suggestB1Row } from "@/lib/ui/bleeder1Suggestion";
 
 interface TopSpender {
@@ -131,6 +132,29 @@ export const AnalysisResults = ({
   const currentSheet = activeSheet || sheetNames[0] || '';
   const currentRows = rowsBySheet[currentSheet] || [];
   const decisionOptions = getDecisionOptions(currentSheet);
+
+  // Master/detail panel state — selectedRowIdx is an index into currentRows
+  // (the active sheet's rows). Resets when the active sheet changes.
+  const [selectedRowIdx, setSelectedRowIdx] = useState<number | null>(null);
+  const [panelComplete, setPanelComplete] = useState(false);
+  useEffect(() => { setSelectedRowIdx(null); setPanelComplete(false); }, [currentSheet]);
+
+  // Build the side-panel button spec from the active sheet's decision options.
+  const panelButtonSpecs: DecisionButtonSpec[] = useMemo(() => {
+    return decisionOptions.map((opt) => {
+      if (opt === 'Pause') {
+        return { value: 'Pause', label: 'Pause', bg: '#FFE5E5', color: '#CC0000', border: '#FFCCCC', hoverBg: '#FFCCCC' };
+      }
+      if (opt === 'Cut Bid 50%') {
+        return { value: 'Cut Bid 50%', label: 'Cut Bid 50%', bg: '#FFF3E0', color: '#CC7700', border: '#FFE0B2', hoverBg: '#FFE0B2' };
+      }
+      if (opt === 'Keep') {
+        return { value: 'Keep', label: 'Keep', bg: '#E8F5E9', color: '#1B7A2B', border: '#C8E6C9', hoverBg: '#C8E6C9' };
+      }
+      // Negate (Exact) / Negate (Phrase)
+      return { value: opt, label: opt, bg: '#E3F2FD', color: '#0D47A1', border: '#BBDEFB', hoverBg: '#BBDEFB' };
+    });
+  }, [decisionOptions]);
 
   type SortKey = 'campaign' | 'ad_group' | 'entity' | 'clicks' | 'spend' | 'sales' | 'acos';
   const { sortKey, sortDir, toggle: toggleSort } = useSortable<SortKey>('spend', 'desc');
@@ -603,10 +627,13 @@ export const AnalysisResults = ({
                       ? flashKey.cls
                       : '';
 
+                  const isPanelSelected = selectedRowIdx === rowIdx;
+
                   return (
                     <TableRow
                       key={`${rowIdx}-${flashKey?.key === key ? flashKey.ts : 'r'}`}
-                      className={`row-enter cursor-pointer transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
+                      onClick={() => { setSelectedRowIdx(rowIdx); setPanelComplete(false); }}
+                      className={`row-enter cursor-pointer transition-colors ${urgencyClass} ${indicatorClass} ${flashClass} ${isPanelSelected ? 'row-detail-selected' : ''}`}
                       style={{ animationDelay: `${Math.min(displayIdx * 12, 240)}ms` }}
                     >
                       <TableCell className="truncate font-medium" title={row.campaign}>
@@ -660,7 +687,7 @@ export const AnalysisResults = ({
                           );
                         })()}
                       </TableCell>
-                      <TableCell className="px-2">
+                      <TableCell className="px-2" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-1.5">
                           {decision && (
                             <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#34C759' }} />
@@ -793,6 +820,96 @@ export const AnalysisResults = ({
           </div>
         </details>
       )}
+
+      {/* Master/detail side panel */}
+      {(() => {
+        const idx = selectedRowIdx;
+        const row = idx != null ? currentRows[idx] : null;
+        const detailKey = idx != null ? `${currentSheet}-ROWINDEX-${idx}` : null;
+        const decision = detailKey ? decisions[detailKey] : undefined;
+        const detail: RowDetail | null = row && detailKey ? (() => {
+          const sug = suggestB1Row({ clicks: row.clicks ?? 0, spend: row.spend ?? 0, sales: row.sales ?? 0, orders: row.orders ?? 0 });
+          const acosNum = parseAcosNum(row.acos);
+          const hasAcos = acosNum >= 0 && row.acos && row.acos !== '0' && row.acos !== '0%';
+          const isHighSpend = row.spend > urgencyBands.high && row.spend > 0;
+          const cpc = (row.clicks && row.clicks > 0) ? row.spend / row.clicks : 0;
+          return {
+            key: detailKey,
+            campaign: row.campaign || '—',
+            adGroup: row.ad_group || undefined,
+            entity: row.customer_search_term || row.keyword_text || row.product_targeting || row.entity || '—',
+            matchType: row.match_type || undefined,
+            metrics: [
+              { label: 'Clicks', value: (row.clicks ?? 0).toLocaleString() },
+              { label: 'Spend', value: `$${(row.spend ?? 0).toFixed(2)}`, color: isHighSpend ? '#FF3B30' : undefined },
+              { label: 'Sales', value: `$${(row.sales ?? 0).toFixed(2)}` },
+              hasAcos
+                ? { label: 'ACoS', value: row.acos, pill: true, pillBg: acosNum >= 100 ? '#FF3B30' : '#FF9500' }
+                : { label: 'ACoS', value: '—' },
+              { label: 'CPC', value: cpc > 0 ? `$${cpc.toFixed(2)}` : '—' },
+            ],
+            suggestion: { label: sug.label, bg: sug.bg, color: sug.color, border: sug.border },
+            rationale: sug.rationale,
+          };
+        })() : null;
+
+        const moveTo = (delta: number) => {
+          if (idx == null || currentRows.length === 0) return;
+          // Walk through the sortedIndices order so up/down matches what's displayed
+          const displayPos = sortedIndices.indexOf(idx);
+          if (displayPos === -1) return;
+          const nextPos = (displayPos + delta + sortedIndices.length) % sortedIndices.length;
+          setSelectedRowIdx(sortedIndices[nextPos]);
+          setPanelComplete(false);
+        };
+
+        const advanceToNextUndecided = () => {
+          if (idx == null) { setPanelComplete(true); return; }
+          const start = sortedIndices.indexOf(idx);
+          for (let i = 1; i <= sortedIndices.length; i++) {
+            const probe = sortedIndices[(start + i) % sortedIndices.length];
+            const probeKey = `${currentSheet}-ROWINDEX-${probe}`;
+            if (!decisions[probeKey]) {
+              setSelectedRowIdx(probe);
+              setPanelComplete(false);
+              // Ensure the row is visible
+              window.requestAnimationFrame(() => {
+                const trs = document.querySelectorAll('.decision-table table tbody tr');
+                trs.forEach((tr) => {
+                  if (tr.classList.contains('row-detail-selected')) {
+                    tr.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                  }
+                });
+              });
+              return;
+            }
+          }
+          setPanelComplete(true);
+        };
+
+        return (
+          <RowDetailPanel
+            open={idx != null}
+            detail={detail}
+            currentDecision={decision}
+            buttons={panelButtonSpecs}
+            allComplete={panelComplete}
+            onSelectDecision={(val) => {
+              if (!detailKey) return;
+              setDecisionWithFlash(detailKey, val);
+              window.setTimeout(advanceToNextUndecided, 520);
+            }}
+            onClose={() => { setSelectedRowIdx(null); setPanelComplete(false); }}
+            onPrev={() => moveTo(-1)}
+            onNext={() => moveTo(1)}
+            onGenerate={() => {
+              setSelectedRowIdx(null);
+              setPanelComplete(false);
+              handleGenerateDecisionFile();
+            }}
+          />
+        );
+      })()}
     </div>
   );
 };

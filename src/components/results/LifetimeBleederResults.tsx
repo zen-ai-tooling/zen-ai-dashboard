@@ -24,6 +24,7 @@ import { DecisionProgressBar } from '@/components/shared/DecisionProgressBar';
 import { SpendDistributionStrip } from '@/components/shared/SpendDistributionStrip';
 import { DecisionSelect, decisionRowClass } from '@/components/shared/DecisionSelect';
 import { SortHeader, useSortable } from '@/components/shared/SortHeader';
+import { RowDetailPanel, type DecisionButtonSpec, type RowDetail } from '@/components/shared/RowDetailPanel';
 import { suggestLifetimeRow } from '@/lib/ui/lifetimeSuggestion';
 import type { LifetimeBleederResult, LifetimeBleederRow } from '@/lib/lifetimeBleederAnalysis';
 import {
@@ -81,6 +82,8 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
   const [amazonFile, setAmazonFile] = useState<AmazonFileBundle | null>(null);
   const [showFullResults, setShowFullResults] = useState(false);
   const [flashIdx, setFlashIdx] = useState<{ idx: number; cls: string; ts: number } | null>(null);
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [panelComplete, setPanelComplete] = useState(false);
 
   const setDecisionWithFlash = (idx: number, val: string) => {
     setDecisions((prev) => ({ ...prev, [idx]: val }));
@@ -409,10 +412,13 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                 const flashClass =
                   flashIdx && flashIdx.idx === idx && Date.now() - flashIdx.ts < 400 ? flashIdx.cls : '';
 
+                const isPanelSelected = selectedIdx === idx;
+
                 return (
                   <TableRow
                     key={`${idx}-${flashIdx?.idx === idx ? flashIdx.ts : 'r'}`}
-                    className={`transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
+                    onClick={() => { setSelectedIdx(idx); setPanelComplete(false); }}
+                    className={`cursor-pointer transition-colors ${urgencyClass} ${indicatorClass} ${flashClass} ${isPanelSelected ? 'row-detail-selected' : ''}`}
                   >
                     <TableCell className="text-[13px] max-w-[180px] truncate" title={b.campaignName}>
                       {b.campaignName}
@@ -450,7 +456,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                         <span className="text-[13px] text-[#D2D2D7]">—</span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => setDecisionWithFlash(idx, sug.decision)}
                         title={sug.reason}
@@ -465,7 +471,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                         {sug.label}
                       </button>
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-1.5">
                         {decision && (
                           <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#34C759' }} />
@@ -533,6 +539,90 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Master/detail side panel */}
+      {(() => {
+        const idx = selectedIdx;
+        const b = idx != null ? bleeders[idx] : null;
+        const decision = idx != null ? decisions[idx] : undefined;
+
+        const buttonSpecs: DecisionButtonSpec[] = [
+          { value: 'Pause',       label: 'Pause',       bg: '#FFE5E5', color: '#CC0000', border: '#FFCCCC', hoverBg: '#FFCCCC' },
+          { value: 'Cut Bid 50%', label: 'Cut Bid 50%', bg: '#FFF3E0', color: '#CC7700', border: '#FFE0B2', hoverBg: '#FFE0B2' },
+          { value: 'Keep',        label: 'Keep',        bg: '#E8F5E9', color: '#1B7A2B', border: '#C8E6C9', hoverBg: '#C8E6C9' },
+        ];
+
+        const detail: RowDetail | null = b && idx != null ? (() => {
+          const sug = suggestions[idx];
+          const isHighSpend = b.spend >= urgencyBands.high && b.spend > 0;
+          const cpc = (b.clicks && b.clicks > 0) ? b.spend / b.clicks : 0;
+          const acosVal = b.acos ?? 0;
+          return {
+            key: idx,
+            campaign: b.campaignName || '—',
+            adGroup: b.adGroupName || undefined,
+            entity: b.targetingText || '—',
+            matchType: b.matchType || undefined,
+            metrics: [
+              { label: 'Clicks', value: (b.clicks ?? 0).toLocaleString() },
+              { label: 'Spend', value: `$${b.spend.toFixed(2)}`, color: isHighSpend ? '#FF3B30' : undefined },
+              { label: 'Sales', value: `$${b.sales.toFixed(2)}` },
+              acosVal > 0
+                ? { label: 'ACoS', value: `${acosVal.toFixed(1)}%`, pill: true, pillBg: acosVal >= 100 ? '#FF3B30' : '#FF9500' }
+                : { label: 'ACoS', value: '—' },
+              { label: 'CPC', value: cpc > 0 ? `$${cpc.toFixed(2)}` : '—' },
+            ],
+            suggestion: { label: sug.label, bg: sug.bg, color: sug.color, border: sug.border },
+            rationale: sug.rationale,
+          };
+        })() : null;
+
+        const moveTo = (delta: number) => {
+          if (idx == null || sortedIndices.length === 0) return;
+          const pos = sortedIndices.indexOf(idx);
+          if (pos === -1) return;
+          const next = (pos + delta + sortedIndices.length) % sortedIndices.length;
+          setSelectedIdx(sortedIndices[next]);
+          setPanelComplete(false);
+        };
+
+        const advanceToNextUndecided = () => {
+          if (idx == null) { setPanelComplete(true); return; }
+          const start = sortedIndices.indexOf(idx);
+          for (let i = 1; i <= sortedIndices.length; i++) {
+            const probe = sortedIndices[(start + i) % sortedIndices.length];
+            if (!decisions[probe]) {
+              setSelectedIdx(probe);
+              setPanelComplete(false);
+              return;
+            }
+          }
+          setPanelComplete(true);
+        };
+
+        return (
+          <RowDetailPanel
+            open={idx != null}
+            detail={detail}
+            currentDecision={decision}
+            buttons={buttonSpecs}
+            allComplete={panelComplete}
+            onSelectDecision={(val) => {
+              if (idx == null) return;
+              setDecisionWithFlash(idx, val);
+              window.setTimeout(advanceToNextUndecided, 520);
+            }}
+            onClose={() => { setSelectedIdx(null); setPanelComplete(false); }}
+            onPrev={() => moveTo(-1)}
+            onNext={() => moveTo(1)}
+            onGenerate={() => {
+              setSelectedIdx(null);
+              setPanelComplete(false);
+              handleGenerate();
+            }}
+          />
+        );
+      })()}
     </div>
   );
 };
