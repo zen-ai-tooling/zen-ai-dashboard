@@ -495,13 +495,14 @@
   }
 
   /* Alternating rows + hover (scoped to decision tables) */
-  .decision-table tbody tr {
+  .decision-table table tbody tr {
     background: #FFFFFF;
     transition: background-color 100ms ease;
     border-bottom: 1px solid #F2F2F7;
   }
-  .decision-table tbody tr:nth-child(even) { background: #FAFBFC; }
-  .decision-table tbody tr:hover { background: #F0F5FF; }
+  .decision-table table tbody tr:nth-child(even) { background: #FAFBFC; }
+  .decision-table table tbody tr:hover,
+  .decision-table table tbody tr:hover:nth-child(even) { background: #F0F5FF !important; }
   /* When a decision class adds a flash background animation, it overrides via animation */
 
   /* Column header styling inside decision tables */
