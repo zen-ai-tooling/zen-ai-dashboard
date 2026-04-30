@@ -109,6 +109,7 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
           primaryText="Drop your Lifetime Targeting Report here"
           formats={['.xlsx', '.xls', '.csv']}
           minHeight={160}
+          showHowItWorks={false}
         />
       </div>
 
@@ -138,6 +139,7 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
           primaryText="Drop your Reference Bulk File here"
           formats={['.xlsx', '.xls', '.csv', '.zip']}
           minHeight={160}
+          showHowItWorks={false}
         />
       </div>
 
