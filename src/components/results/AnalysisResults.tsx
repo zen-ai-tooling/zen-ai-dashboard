@@ -344,6 +344,8 @@ export const AnalysisResults = ({
         onStartNew={handleStartNew}
         onViewFullResults={() => setShowFullResults(true)}
         accentColor="#FF3B30"
+        addressedSpend={addressedSpend}
+        undecidedSpend={undecidedSpend}
       />
     );
   }
