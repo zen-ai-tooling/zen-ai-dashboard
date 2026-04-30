@@ -26,7 +26,8 @@ export const DecisionProgressBar: React.FC<DecisionProgressBarProps> = ({
 
   return (
     <div
-      className={`flex h-2 w-full max-w-[280px] rounded-full overflow-hidden bg-[#E5E5EA] ${className}`}
+      className={`flex w-full max-w-[280px] overflow-hidden bg-[#E5E5EA] ${className}`}
+      style={{ height: 8, borderRadius: 4 }}
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={total}

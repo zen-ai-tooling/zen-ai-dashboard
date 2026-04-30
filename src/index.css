@@ -267,11 +267,12 @@
             mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 24px), transparent 100%);
   }
 
-  /* Decision row indicators */
-  .row-decision-keep { box-shadow: inset 3px 0 0 hsl(var(--success)); }
-  .row-decision-pause { box-shadow: inset 3px 0 0 hsl(var(--destructive)); }
-  .row-decision-cut { box-shadow: inset 3px 0 0 hsl(var(--amber)); }
-  .row-decision-negate { box-shadow: inset 3px 0 0 hsl(var(--destructive)); }
+  /* Decision row indicators — match spec colors */
+  .row-decision-keep   { box-shadow: inset 3px 0 0 #34C759; }
+  .row-decision-pause  { box-shadow: inset 3px 0 0 #FF3B30; }
+  .row-decision-cut    { box-shadow: inset 3px 0 0 #FF9500; }
+  .row-decision-negate { box-shadow: inset 3px 0 0 #0071E3; }
+
 
   /* Page enter — premium fade + lift */
   .page-enter { animation: page-enter 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
