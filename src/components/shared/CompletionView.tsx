@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { CheckCircle2, Download, ArrowRight, Info } from 'lucide-react';
+import { ImpactDonut } from './ImpactDonut';
 
 export interface CompletionSummaryItem {
   label: string;
@@ -26,6 +27,10 @@ interface CompletionViewProps {
   impactHeadline?: string;
   impactSubtitle?: string;
   totalRows?: number;
+  /** Optional: at-risk spend addressed via decisions, used to render the impact donut */
+  addressedSpend?: number;
+  /** Optional: at-risk spend on rows still without a decision */
+  undecidedSpend?: number;
 }
 
 export const CompletionView: React.FC<CompletionViewProps> = ({
@@ -40,6 +45,8 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
   impactHeadline,
   impactSubtitle,
   totalRows,
+  addressedSpend,
+  undecidedSpend,
 }) => {
   const decidedTotal = breakdown
     .filter((b) => !/no decision|undecided/i.test(b.label))
@@ -48,6 +55,10 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
   const noDecisionItem = breakdown.find((b) => /no decision|undecided/i.test(b.label));
   const allDecided = total > 0 && decidedTotal >= total;
   const noCount = noDecisionItem?.count ?? 0;
+
+  // Donut data — prefer spend if provided, otherwise fall back to row counts
+  const donutAddressed = addressedSpend ?? decidedTotal;
+  const donutUndecided = undecidedSpend ?? noCount;
 
   return (
     <div
@@ -161,16 +172,19 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
           </h3>
 
           {impactHeadline && (
-            <div className="text-center mb-5">
-              <div
-                className="font-mono-nums text-[#1D1D1F] leading-none"
-                style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-1px' }}
-              >
-                {impactHeadline}
+            <div className="flex items-center justify-center gap-5 mb-5">
+              <ImpactDonut addressed={donutAddressed} undecided={donutUndecided} size={80} />
+              <div className="text-left">
+                <div
+                  className="font-mono-nums text-[#1D1D1F] leading-none"
+                  style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-1px' }}
+                >
+                  {impactHeadline}
+                </div>
+                {impactSubtitle && (
+                  <div className="text-[13px] text-[#6E6E73] mt-2.5">{impactSubtitle}</div>
+                )}
               </div>
-              {impactSubtitle && (
-                <div className="text-[13px] text-[#6E6E73] mt-2.5">{impactSubtitle}</div>
-              )}
             </div>
           )}
 
@@ -206,22 +220,40 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
               Decisions breakdown
             </h3>
 
-            {/* Bar — 16px tall, rounded ends */}
-            <div className="flex w-full overflow-hidden bg-[#F0F0F2] mb-4" style={{ height: 16, borderRadius: 8 }}>
+            {/* Bar — 16px tall, rounded ends, white gaps between segments, inline % when wide enough */}
+            <div
+              className="flex w-full overflow-hidden bg-[#F0F0F2] mb-4"
+              style={{ height: 16, borderRadius: 8, gap: 1 }}
+            >
               {breakdown.map((b) => {
                 const pct = total > 0 ? (b.count / total) * 100 : 0;
                 if (pct === 0) return null;
                 const isUndecided = /no decision|undecided/i.test(b.label);
+                const showLabel = pct >= 15;
                 return (
                   <div
                     key={b.label}
+                    className="flex items-center justify-center"
                     style={{
                       width: `${pct}%`,
                       background: isUndecided ? '#E5E5EA' : b.color,
                       transition: 'width 320ms ease',
                     }}
-                    title={`${b.label}: ${b.count}`}
-                  />
+                    title={`${b.label}: ${b.count} (${pct.toFixed(0)}%)`}
+                  >
+                    {showLabel && (
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          color: isUndecided ? '#6E6E73' : '#FFFFFF',
+                          letterSpacing: 0.2,
+                        }}
+                      >
+                        {pct.toFixed(0)}%
+                      </span>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -229,6 +261,8 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
             <div className="flex flex-wrap gap-x-6 gap-y-2">
               {breakdown.map((b) => {
                 const isUndecided = /no decision|undecided/i.test(b.label);
+                const pct = total > 0 ? (b.count / total) * 100 : 0;
+                const showPctInLegend = pct > 0 && pct < 15;
                 return (
                   <div key={b.label} className="flex items-center gap-2">
                     <span
@@ -239,6 +273,11 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
                     <span className="font-mono-nums" style={{ fontSize: 13, fontWeight: 600, color: '#1D1D1F' }}>
                       {b.count}
                     </span>
+                    {showPctInLegend && (
+                      <span className="font-mono-nums" style={{ fontSize: 11, color: '#86868B' }}>
+                        ({pct.toFixed(0)}%)
+                      </span>
+                    )}
                   </div>
                 );
               })}

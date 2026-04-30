@@ -7,6 +7,7 @@ import { CompactStatsBar } from "@/components/shared/CompactStatsBar";
 import { SortHeader, useSortable } from "@/components/shared/SortHeader";
 import { CompletionView } from "@/components/shared/CompletionView";
 import { DecisionProgressBar } from "@/components/shared/DecisionProgressBar";
+import { SpendDistributionStrip } from "@/components/shared/SpendDistributionStrip";
 import { suggestB1Row } from "@/lib/ui/bleeder1Suggestion";
 
 interface TopSpender {
@@ -178,6 +179,20 @@ export const AnalysisResults = ({
     [allRows]
   );
 
+  // Spend split by decision status — drives the impact donut on completion view
+  const { addressedSpend, undecidedSpend } = useMemo(() => {
+    let addressed = 0;
+    let undecided = 0;
+    Object.entries(rowsBySheet).forEach(([sheet, rows]) => {
+      rows.forEach((row, idx) => {
+        const dec = decisions[`${sheet}-ROWINDEX-${idx}`];
+        if (dec) addressed += row.spend || 0;
+        else undecided += row.spend || 0;
+      });
+    });
+    return { addressedSpend: addressed, undecidedSpend: undecided };
+  }, [rowsBySheet, decisions]);
+
   const handleDownload = () => {
     if (formattedWorkbook) {
       formattedWorkbook.xlsx.writeBuffer().then((buffer: ArrayBuffer) => {
@@ -329,6 +344,8 @@ export const AnalysisResults = ({
         onStartNew={handleStartNew}
         onViewFullResults={() => setShowFullResults(true)}
         accentColor="#FF3B30"
+        addressedSpend={addressedSpend}
+        undecidedSpend={undecidedSpend}
       />
     );
   }
@@ -409,6 +426,14 @@ export const AnalysisResults = ({
           </div>
         </details>
       )}
+
+      {/* Spend distribution — collapsible visualization */}
+      <SpendDistributionStrip
+        items={allRows.map((r) => ({
+          label: r.customer_search_term || r.keyword_text || r.product_targeting || r.campaign || 'Untitled',
+          spend: r.spend || 0,
+        }))}
+      />
 
       {/* Decision table */}
       {sheetNames.length > 0 && (

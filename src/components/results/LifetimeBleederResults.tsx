@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { CompactStatsBar } from '@/components/shared/CompactStatsBar';
 import { CompletionView } from '@/components/shared/CompletionView';
 import { DecisionProgressBar } from '@/components/shared/DecisionProgressBar';
+import { SpendDistributionStrip } from '@/components/shared/SpendDistributionStrip';
 import { DecisionSelect, decisionRowClass } from '@/components/shared/DecisionSelect';
 import { SortHeader, useSortable } from '@/components/shared/SortHeader';
 import { suggestLifetimeRow } from '@/lib/ui/lifetimeSuggestion';
@@ -250,6 +251,19 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
   const breakdownCounts: Record<string, number> = {};
   Object.values(decisions).forEach((d) => { if (d) breakdownCounts[d] = (breakdownCounts[d] ?? 0) + 1; });
 
+  // Spend addressed vs. undecided — drives the impact donut
+  const { addressedSpend, undecidedSpend } = (() => {
+    let addressed = 0;
+    let undecided = 0;
+    bleeders.forEach((b, idx) => {
+      const dec = decisions[idx];
+      const spend = b.spend || 0;
+      if (dec) addressed += spend;
+      else undecided += spend;
+    });
+    return { addressedSpend: addressed, undecidedSpend: undecided };
+  })();
+
   if (amazonFile && !showFullResults) {
     return (
       <CompletionView
@@ -274,6 +288,8 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
         onStartNew={onStartNew}
         onViewFullResults={() => setShowFullResults(true)}
         accentColor="#A855F7"
+        addressedSpend={addressedSpend}
+        undecidedSpend={undecidedSpend}
       />
     );
   }
@@ -303,6 +319,14 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
           { label: 'Make decisions', status: amazonFile ? 'complete' : 'active' },
           { label: 'Generate Amazon file', status: amazonFile ? 'complete' : 'pending' },
         ]}
+      />
+
+      {/* Spend distribution — collapsible visualization */}
+      <SpendDistributionStrip
+        items={bleeders.map((b) => ({
+          label: b.targetingText || b.campaignName || 'Untitled',
+          spend: b.spend || 0,
+        }))}
       />
 
       {/* Decision table */}
