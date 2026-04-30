@@ -372,61 +372,9 @@ const Index = () => {
     }
   };
 
-  const handleDownloadLifetimeDecisionSheet = async () => {
-    if (!lifetimeResult?.decisionWorkbook) return;
-    try {
-      const buffer = await lifetimeResult.decisionWorkbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = lifetimeResult.decisionFileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      setLifetimeStage("decision-upload");
-      toast({ title: "Decision file downloaded", description: "Edit the Decision column, then upload it back below." });
-    } catch (err: any) {
-      toast({ title: "Download failed", description: err.message, variant: "destructive" });
-    }
-  };
+  // (Old download-edit-reupload handlers removed — Lifetime now uses inline decisions)
 
-  const handleLifetimeDecisionUpload = async (file: File) => {
-    try {
-      setLifetimeProcessing(true);
-      const { processLifetimeDecisionFile } = await import("@/lib/lifetimeBleederAnalysis");
-      const result = await processLifetimeDecisionFile(file);
-      setLifetimeDecisionResult(result);
-      setLifetimeStage("decision-results");
-      toast({ title: "Processing complete", description: `${result.pausedCount} targets to pause` });
-    } catch (err: any) {
-      toast({ title: "Processing failed", description: err.message, variant: "destructive" });
-    } finally {
-      setLifetimeProcessing(false);
-    }
-  };
 
-  const handleDownloadLifetimeBulkUpdate = () => {
-    if (!lifetimeDecisionResult?.workbook) return;
-    try {
-      const wbout = XLSX.write(lifetimeDecisionResult.workbook, { bookType: "xlsx", type: "array" });
-      const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = lifetimeDecisionResult.fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      toast({ title: "Amazon Bulk Update downloaded", description: lifetimeDecisionResult.fileName });
-    } catch (err: any) {
-      toast({ title: "Download failed", description: err.message, variant: "destructive" });
-    }
-  };
-
-  const handleProcessorReupload = () => {
     setDecisionResults(null);
     setValidatorResults(null);
     setShowProcessorUpload(true);
