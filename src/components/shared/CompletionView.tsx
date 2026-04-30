@@ -172,16 +172,19 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
           </h3>
 
           {impactHeadline && (
-            <div className="text-center mb-5">
-              <div
-                className="font-mono-nums text-[#1D1D1F] leading-none"
-                style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-1px' }}
-              >
-                {impactHeadline}
+            <div className="flex items-center justify-center gap-5 mb-5">
+              <ImpactDonut addressed={donutAddressed} undecided={donutUndecided} size={80} />
+              <div className="text-left">
+                <div
+                  className="font-mono-nums text-[#1D1D1F] leading-none"
+                  style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-1px' }}
+                >
+                  {impactHeadline}
+                </div>
+                {impactSubtitle && (
+                  <div className="text-[13px] text-[#6E6E73] mt-2.5">{impactSubtitle}</div>
+                )}
               </div>
-              {impactSubtitle && (
-                <div className="text-[13px] text-[#6E6E73] mt-2.5">{impactSubtitle}</div>
-              )}
             </div>
           )}
 
