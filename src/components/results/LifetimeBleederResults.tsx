@@ -288,6 +288,8 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
         onStartNew={onStartNew}
         onViewFullResults={() => setShowFullResults(true)}
         accentColor="#A855F7"
+        addressedSpend={addressedSpend}
+        undecidedSpend={undecidedSpend}
       />
     );
   }
