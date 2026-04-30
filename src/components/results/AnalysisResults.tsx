@@ -412,7 +412,7 @@ export const AnalysisResults = ({
 
       {/* Decision table */}
       {sheetNames.length > 0 && (
-        <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
+        <div className="decision-table-card">
           {/* Tab segmented control */}
           <div className="border-b border-border px-3 pt-3">
             <div className="flex items-end gap-0.5 overflow-x-auto -mb-px tab-scroll-fade text-[14px]">
@@ -447,7 +447,7 @@ export const AnalysisResults = ({
           </div>
 
           {/* Bulk action bar */}
-          <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-border bg-[#FAFAFA]">
+          <div className="decision-table-bar flex items-center justify-between gap-2 px-4 py-2.5">
             <div className="text-[12px] text-[hsl(var(--text-secondary))] truncate">
               <span className="font-medium text-foreground">{shortTabLabel(currentSheet)}</span>
               <span className="mx-1.5 text-[hsl(var(--text-tertiary))]">·</span>
@@ -508,7 +508,7 @@ export const AnalysisResults = ({
           </div>
 
           {/* Table — scrollable area with sticky thead, action bar pinned below */}
-          <div className="w-full max-h-[58vh] overflow-auto table-sticky-header">
+          <div className="w-full max-h-[58vh] overflow-auto table-sticky-header decision-table">
             <Table className="table-fixed w-full">
               <colgroup>
                 <col style={{ width: '20%' }} />
@@ -581,7 +581,7 @@ export const AnalysisResults = ({
                   return (
                     <TableRow
                       key={`${rowIdx}-${flashKey?.key === key ? flashKey.ts : 'r'}`}
-                      className={`row-enter cursor-pointer hover:bg-[#F9F9FB] transition-colors ${displayIdx % 2 === 1 && !decision ? 'bg-secondary/30' : ''} ${urgencyClass} ${indicatorClass} ${flashClass}`}
+                      className={`row-enter cursor-pointer transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
                       style={{ animationDelay: `${Math.min(displayIdx * 12, 240)}ms` }}
                     >
                       <TableCell className="truncate font-medium" title={row.campaign}>
@@ -656,7 +656,7 @@ export const AnalysisResults = ({
           </div>
 
           {/* Pinned action bar — sticky at the bottom of the table card */}
-          <div className="sticky bottom-0 z-10 border-t border-border bg-card/95 backdrop-blur-sm p-4">
+          <div className="decision-table-footer p-4">
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="min-w-0 flex-1">
                 {decisionsMade >= allRows.length && allRows.length > 0 ? (
@@ -722,7 +722,7 @@ export const AnalysisResults = ({
                 <button
                   onClick={handleGenerateDecisionFile}
                   disabled={decisionsMade === 0 || isGenerating}
-                  className={`btn-primary-action btn-press ${generateDone ? 'is-done' : ''} ${decisionsMade >= allRows.length && allRows.length > 0 && !generateDone ? 'is-ready-pulse' : ''}`}
+                  className={`btn-primary-action btn-press ${generateDone ? 'is-done' : ''} ${decisionsMade >= allRows.length && allRows.length > 0 && !generateDone ? 'is-ready' : ''}`}
                 >
                   {isGenerating ? (
                     <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</>
