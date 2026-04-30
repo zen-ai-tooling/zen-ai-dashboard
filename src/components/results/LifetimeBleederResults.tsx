@@ -388,7 +388,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                 return (
                   <TableRow
                     key={`${idx}-${flashIdx?.idx === idx ? flashIdx.ts : 'r'}`}
-                    className={`hover:bg-[#F9F9FB] transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
+                    className={`transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
                   >
                     <TableCell className="text-[13px] max-w-[180px] truncate" title={b.campaignName}>
                       {b.campaignName}
@@ -399,7 +399,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                     <TableCell className="text-[13px] max-w-[200px] truncate" title={b.targetingText}>
                       {b.targetingText}
                     </TableCell>
-                    <TableCell className="text-[13px] text-muted-foreground">
+                    <TableCell className="col-nowrap-ellipsis text-[13px] text-muted-foreground" title={b.matchType || ''}>
                       {b.matchType || '—'}
                     </TableCell>
                     <TableCell className="text-right">
@@ -462,7 +462,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
         </div>
 
         {/* Pinned action bar */}
-        <div className="sticky bottom-0 z-10 p-4 border-t border-border bg-[#FAFAFA] space-y-2">
+        <div className="decision-table-footer p-4 space-y-2">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
               {decisionsMade >= bleeders.length && bleeders.length > 0 ? (
@@ -495,7 +495,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
               <button
                 onClick={handleGenerate}
                 disabled={decisionsMade === 0 || isGenerating || !!amazonFile}
-                className={`btn-primary-action btn-press ${amazonFile ? 'is-done' : ''} ${decisionsMade >= bleeders.length && bleeders.length > 0 && !amazonFile ? 'is-ready-pulse' : ''}`}
+                className={`btn-primary-action btn-press ${amazonFile ? 'is-done' : ''} ${decisionsMade >= bleeders.length && bleeders.length > 0 && !amazonFile ? 'is-ready' : ''}`}
               >
                 {isGenerating ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
