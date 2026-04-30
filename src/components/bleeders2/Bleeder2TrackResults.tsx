@@ -13,6 +13,7 @@ import { CompactStatsBar } from "@/components/shared/CompactStatsBar";
 import { SortHeader, useSortable } from "@/components/shared/SortHeader";
 import { CompletionView } from "@/components/shared/CompletionView";
 import { DecisionProgressBar } from "@/components/shared/DecisionProgressBar";
+import { SpendDistributionStrip } from "@/components/shared/SpendDistributionStrip";
 
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
