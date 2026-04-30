@@ -58,10 +58,10 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
     <div className="w-full space-y-5 max-w-[760px] mx-auto">
       {/* Title + subtitle */}
       <div>
-        <h2 className="text-[24px] font-semibold text-foreground tracking-tight">
+        <h2 style={{ fontSize: 24, fontWeight: 700, color: '#1D1D1F', letterSpacing: '-0.3px' }}>
           Upload your lifetime audit files
         </h2>
-        <p className="text-[14px] text-[#86868B] mt-1.5">
+        <p className="mt-1.5" style={{ fontSize: 14, color: '#6E6E73' }}>
           Lifetime Audit — find targets with high lifetime clicks and zero sales.
         </p>
       </div>
