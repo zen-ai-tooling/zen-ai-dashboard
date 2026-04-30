@@ -49,10 +49,34 @@ export const DecisionSelect: React.FC<DecisionSelectProps> = ({
 }) => {
   // Inset left-border indicator: blue when undecided, decision color when set
   const insetColor = value ? decisionTextColor(value) : '#0071E3';
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+
+  const handleChange = (val: string) => {
+    onChange(val);
+    // Flash the row with the decision's color tint for 300ms
+    const row = triggerRef.current?.closest('tr');
+    if (row) {
+      const flashClass =
+        val === 'Pause' ? 'row-flash-pause' :
+        val === 'Keep' ? 'row-flash-keep' :
+        val.startsWith('Cut') ? 'row-flash-cut' :
+        val.startsWith('Negat') ? 'row-flash-negate' :
+        '';
+      if (flashClass) {
+        row.classList.remove('row-flash-pause', 'row-flash-keep', 'row-flash-cut', 'row-flash-negate');
+        // Force reflow so the animation restarts even if same class is reapplied
+        void (row as HTMLElement).offsetWidth;
+        row.classList.add(flashClass);
+        window.setTimeout(() => row.classList.remove(flashClass), 340);
+      }
+    }
+  };
+
   return (
-    <Select value={value || ''} onValueChange={onChange}>
+    <Select value={value || ''} onValueChange={handleChange}>
       <SelectTrigger
-        className="text-[13px] font-medium"
+        ref={triggerRef}
+        className="text-[13px] font-medium decision-trigger"
         style={{
           width,
           color: decisionTextColor(value),
@@ -62,6 +86,7 @@ export const DecisionSelect: React.FC<DecisionSelectProps> = ({
           border: '1.5px solid #D2D2D7',
           borderRadius: 8,
           boxShadow: `inset 3px 0 0 ${insetColor}`,
+          transition: 'box-shadow 150ms ease, color 150ms ease, border-color 150ms ease',
         }}
       >
         {value ? (

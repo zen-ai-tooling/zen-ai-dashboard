@@ -24,10 +24,17 @@ export const DecisionProgressBar: React.FC<DecisionProgressBarProps> = ({
   const decided = segments.reduce((s, x) => s + x.count, 0);
   const remainder = Math.max(0, total - decided);
 
+  const isComplete = total > 0 && decided >= total;
+
   return (
     <div
       className={`flex w-full max-w-[280px] overflow-hidden bg-[#E5E5EA] ${className}`}
-      style={{ height: 8, borderRadius: 4 }}
+      style={{
+        height: 8,
+        borderRadius: 4,
+        boxShadow: isComplete ? '0 0 8px rgba(52, 199, 89, 0.40)' : 'none',
+        transition: 'box-shadow 300ms ease',
+      }}
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={total}
@@ -42,7 +49,7 @@ export const DecisionProgressBar: React.FC<DecisionProgressBarProps> = ({
             style={{
               width: `${pct}%`,
               background: s.color,
-              transition: 'width 320ms ease',
+              transition: 'width 300ms ease',
             }}
             title={`${s.key}: ${s.count}`}
           />

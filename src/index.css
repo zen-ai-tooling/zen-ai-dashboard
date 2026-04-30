@@ -274,8 +274,8 @@
   .row-decision-negate { box-shadow: inset 3px 0 0 #0071E3; }
 
 
-  /* Page enter — premium fade + lift */
-  .page-enter { animation: page-enter 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  /* Page enter — content area only (sidebar stays fixed) */
+  .page-enter { animation: page-enter 200ms ease-out both; }
 
   /* Stagger helper */
   .row-enter { animation: row-enter 240ms ease-out both; }
@@ -497,7 +497,7 @@
   /* Alternating rows + hover (scoped to decision tables) */
   .decision-table table tbody tr {
     background: #FFFFFF;
-    transition: background-color 100ms ease;
+    transition: background 300ms ease, box-shadow 150ms ease;
     border-bottom: 1px solid #F2F2F7;
   }
   .decision-table table tbody tr:nth-child(even) { background: #FAFBFC; }
@@ -527,11 +527,40 @@
     text-overflow: ellipsis;
     max-width: 120px;
   }
+
+  /* Sidebar item transitions — smooth active-state highlight */
+  [data-sidebar="menu-button"],
+  .sidebar-nav-item {
+    transition: background 150ms ease, color 150ms ease;
+  }
+
+  /* Decision Select trigger — subtle press feedback */
+  .decision-trigger:active { transform: scale(0.97); }
+
+  /* Sonner toast motion overrides — slide-up enter, fade+slide-down exit */
+  [data-sonner-toaster] [data-sonner-toast] {
+    transition: transform 200ms ease-out, opacity 200ms ease-out !important;
+  }
+  [data-sonner-toaster] [data-sonner-toast][data-mounted="true"] {
+    animation: toast-enter 200ms ease-out;
+  }
+  [data-sonner-toaster] [data-sonner-toast][data-removed="true"] {
+    animation: toast-exit 200ms ease-in forwards;
+  }
+}
+
+@keyframes toast-enter {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes toast-exit {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(8px); }
 }
 
 /* ── keyframes ── */
 @keyframes page-enter {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
