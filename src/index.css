@@ -497,22 +497,31 @@
   /* Alternating rows + hover (scoped to decision tables) */
   .decision-table table tbody tr {
     background: #FFFFFF;
-    transition: background 300ms ease, box-shadow 150ms ease;
+    transition: background-color 100ms ease, box-shadow 150ms ease;
     border-bottom: 1px solid #F2F2F7;
   }
   .decision-table table tbody tr:nth-child(even) { background: #FAFBFC; }
   .decision-table table tbody tr:hover,
   .decision-table table tbody tr:hover:nth-child(even) { background: #F0F5FF !important; }
+  /* Ensure row cells have at least 14px vertical padding */
+  .decision-table table tbody td { padding-top: 14px; padding-bottom: 14px; }
   /* When a decision class adds a flash background animation, it overrides via animation */
 
   /* Column header styling inside decision tables */
   .decision-table thead th {
     background: #FAFAFA !important;
+    border-bottom: 1px solid #E5E5EA;
     text-transform: uppercase;
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.8px;
     color: #86868B;
+  }
+
+  /* Tab bar area at the top of the B1 decision-table card */
+  .decision-table-tabs {
+    background: #FAFAFA;
+    border-bottom: 1px solid #E5E5EA;
   }
 
   /* Generate button "ready" glow — replaces aggressive pulse */
