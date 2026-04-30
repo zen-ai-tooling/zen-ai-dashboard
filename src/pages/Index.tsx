@@ -635,10 +635,8 @@ const Index = () => {
     }
 
     if (activeModule === 'lifetime_bleeders') {
-      if (lifetimeStage === 'results' || lifetimeStage === 'decision-upload') {
+      if (lifetimeStage === 'results') {
         crumbs.push({ label: 'Results' });
-      } else if (lifetimeStage === 'decision-results') {
-        crumbs.push({ label: 'Decision Results' });
       }
     }
 
