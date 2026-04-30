@@ -364,24 +364,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
       )}
 
       {/* Decision table */}
-      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
-        {/* Card header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <div>
-            <h3 className="text-[14px] font-medium text-foreground font-display">
-              Bleeders — {TRACK_LABELS[result.trackType]}
-            </h3>
-            <p className="text-[12px] text-muted-foreground mt-0.5">
-              Select a decision per row then generate
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={onDownload} className="text-[11px] h-7 btn-press">
-              <Download className="w-3 h-3 mr-1" />
-              Download XLSX
-            </Button>
-          </div>
-        </div>
+      <div className="decision-table-card">
 
         {/* Bulk action buttons */}
         <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-border bg-[#FAFAFA]">
