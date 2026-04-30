@@ -196,6 +196,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
               borderTop: `2px solid ${accentColor}`,
               borderRadius: 12,
               boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.04)',
+              animation: 'cv-slide-up 200ms ease-out 850ms both',
             }}
           >
             <h3
