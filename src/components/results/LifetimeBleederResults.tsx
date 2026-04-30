@@ -539,6 +539,90 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Master/detail side panel */}
+      {(() => {
+        const idx = selectedIdx;
+        const b = idx != null ? bleeders[idx] : null;
+        const decision = idx != null ? decisions[idx] : undefined;
+
+        const buttonSpecs: DecisionButtonSpec[] = [
+          { value: 'Pause',       label: 'Pause',       bg: '#FFE5E5', color: '#CC0000', border: '#FFCCCC', hoverBg: '#FFCCCC' },
+          { value: 'Cut Bid 50%', label: 'Cut Bid 50%', bg: '#FFF3E0', color: '#CC7700', border: '#FFE0B2', hoverBg: '#FFE0B2' },
+          { value: 'Keep',        label: 'Keep',        bg: '#E8F5E9', color: '#1B7A2B', border: '#C8E6C9', hoverBg: '#C8E6C9' },
+        ];
+
+        const detail: RowDetail | null = b && idx != null ? (() => {
+          const sug = suggestions[idx];
+          const isHighSpend = b.spend >= urgencyBands.high && b.spend > 0;
+          const cpc = (b.clicks && b.clicks > 0) ? b.spend / b.clicks : 0;
+          const acosVal = b.acos ?? 0;
+          return {
+            key: idx,
+            campaign: b.campaignName || '—',
+            adGroup: b.adGroupName || undefined,
+            entity: b.targetingText || '—',
+            matchType: b.matchType || undefined,
+            metrics: [
+              { label: 'Clicks', value: (b.clicks ?? 0).toLocaleString() },
+              { label: 'Spend', value: `$${b.spend.toFixed(2)}`, color: isHighSpend ? '#FF3B30' : undefined },
+              { label: 'Sales', value: `$${b.sales.toFixed(2)}` },
+              acosVal > 0
+                ? { label: 'ACoS', value: `${acosVal.toFixed(1)}%`, pill: true, pillBg: acosVal >= 100 ? '#FF3B30' : '#FF9500' }
+                : { label: 'ACoS', value: '—' },
+              { label: 'CPC', value: cpc > 0 ? `$${cpc.toFixed(2)}` : '—' },
+            ],
+            suggestion: { label: sug.label, bg: sug.bg, color: sug.color, border: sug.border },
+            rationale: sug.rationale,
+          };
+        })() : null;
+
+        const moveTo = (delta: number) => {
+          if (idx == null || sortedIndices.length === 0) return;
+          const pos = sortedIndices.indexOf(idx);
+          if (pos === -1) return;
+          const next = (pos + delta + sortedIndices.length) % sortedIndices.length;
+          setSelectedIdx(sortedIndices[next]);
+          setPanelComplete(false);
+        };
+
+        const advanceToNextUndecided = () => {
+          if (idx == null) { setPanelComplete(true); return; }
+          const start = sortedIndices.indexOf(idx);
+          for (let i = 1; i <= sortedIndices.length; i++) {
+            const probe = sortedIndices[(start + i) % sortedIndices.length];
+            if (!decisions[probe]) {
+              setSelectedIdx(probe);
+              setPanelComplete(false);
+              return;
+            }
+          }
+          setPanelComplete(true);
+        };
+
+        return (
+          <RowDetailPanel
+            open={idx != null}
+            detail={detail}
+            currentDecision={decision}
+            buttons={buttonSpecs}
+            allComplete={panelComplete}
+            onSelectDecision={(val) => {
+              if (idx == null) return;
+              setDecisionWithFlash(idx, val);
+              window.setTimeout(advanceToNextUndecided, 520);
+            }}
+            onClose={() => { setSelectedIdx(null); setPanelComplete(false); }}
+            onPrev={() => moveTo(-1)}
+            onNext={() => moveTo(1)}
+            onGenerate={() => {
+              setSelectedIdx(null);
+              setPanelComplete(false);
+              handleGenerate();
+            }}
+          />
+        );
+      })()}
     </div>
   );
 };
