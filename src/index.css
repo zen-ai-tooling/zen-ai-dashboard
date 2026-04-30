@@ -527,6 +527,35 @@
     text-overflow: ellipsis;
     max-width: 120px;
   }
+
+  /* Sidebar item transitions — smooth active-state highlight */
+  [data-sidebar="menu-button"],
+  .sidebar-nav-item {
+    transition: background 150ms ease, color 150ms ease;
+  }
+
+  /* Decision Select trigger — subtle press feedback */
+  .decision-trigger:active { transform: scale(0.97); }
+
+  /* Sonner toast motion overrides — slide-up enter, fade+slide-down exit */
+  [data-sonner-toaster] [data-sonner-toast] {
+    transition: transform 200ms ease-out, opacity 200ms ease-out !important;
+  }
+  [data-sonner-toaster] [data-sonner-toast][data-mounted="true"] {
+    animation: toast-enter 200ms ease-out;
+  }
+  [data-sonner-toaster] [data-sonner-toast][data-removed="true"] {
+    animation: toast-exit 200ms ease-in forwards;
+  }
+}
+
+@keyframes toast-enter {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes toast-exit {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(8px); }
 }
 
 /* ── keyframes ── */
