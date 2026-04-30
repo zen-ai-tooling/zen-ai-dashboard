@@ -466,7 +466,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 return (
                   <TableRow
                     key={`${idx}-${flashIdx?.idx === idx ? flashIdx.ts : 'r'}`}
-                    className={`hover:bg-[#F9F9FB] transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
+                    className={`transition-colors ${urgencyClass} ${indicatorClass} ${flashClass}`}
                   >
                     <TableCell className="text-[13px] max-w-[180px] truncate" title={bleeder.campaignName}>
                       {bleeder.campaignName}
