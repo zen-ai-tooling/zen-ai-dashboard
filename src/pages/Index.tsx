@@ -548,7 +548,6 @@ const Index = () => {
       setBleederMode('lifetime');
       setLifetimeStage('upload');
       setLifetimeResult(null);
-      setLifetimeDecisionResult(null);
       setChatState('awaiting-upload');
       setShowUpload(false);
     } else {
