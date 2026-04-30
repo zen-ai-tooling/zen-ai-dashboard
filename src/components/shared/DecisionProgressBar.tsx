@@ -49,7 +49,7 @@ export const DecisionProgressBar: React.FC<DecisionProgressBarProps> = ({
             style={{
               width: `${pct}%`,
               background: s.color,
-              transition: 'width 320ms ease',
+              transition: 'width 300ms ease',
             }}
             title={`${s.key}: ${s.count}`}
           />
