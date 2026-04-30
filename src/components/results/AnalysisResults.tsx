@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Download, Loader2, CheckCircle2, MoreHorizontal, AlertTriangle, FileSpreadsheet, Layers, ChevronDown, Percent, DollarSign, Info, XCircle, Upload } from "lucide-react";
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
 import { CompactStatsBar } from "@/components/shared/CompactStatsBar";
@@ -137,7 +137,7 @@ export const AnalysisResults = ({
   // (the active sheet's rows). Resets when the active sheet changes.
   const [selectedRowIdx, setSelectedRowIdx] = useState<number | null>(null);
   const [panelComplete, setPanelComplete] = useState(false);
-  React.useEffect(() => { setSelectedRowIdx(null); setPanelComplete(false); }, [currentSheet]);
+  useEffect(() => { setSelectedRowIdx(null); setPanelComplete(false); }, [currentSheet]);
 
   type SortKey = 'campaign' | 'ad_group' | 'entity' | 'clicks' | 'spend' | 'sales' | 'acos';
   const { sortKey, sortDir, toggle: toggleSort } = useSortable<SortKey>('spend', 'desc');
