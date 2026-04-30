@@ -54,31 +54,33 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
       className="flex flex-col items-center justify-center px-4 py-8"
       style={{ minHeight: 'calc(100vh - 52px)' }}
     >
-      <div className="w-full max-w-[760px] animate-fade-in">
+      <div className="w-full max-w-[760px]">
         <style>{`
-          @keyframes hero-pop { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-          @keyframes title-fade { from { opacity: 0; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
-          @keyframes impact-fade { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
+          @keyframes cv-hero-pop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+          @keyframes cv-glow-fade { from { opacity: 0; } to { opacity: 1; } }
+          @keyframes cv-fade-in { from { opacity: 0; } to { opacity: 1; } }
+          @keyframes cv-slide-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         `}</style>
 
         {/* Hero */}
         <div className="text-center">
           <div className="relative inline-block mb-5">
-            {/* Soft radial glow */}
+            {/* Soft radial glow — fades in alongside checkmark */}
             <div
               aria-hidden
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
               style={{
                 width: 120,
                 height: 120,
-                background: 'radial-gradient(circle, rgba(52, 199, 89, 0.08) 0%, transparent 70%)',
+                background: 'radial-gradient(circle, rgba(52, 199, 89, 0.18) 0%, transparent 70%)',
+                animation: 'cv-glow-fade 400ms ease-out both',
               }}
             />
             <div
               className="relative w-[72px] h-[72px] rounded-full flex items-center justify-center mx-auto"
               style={{
                 background: '#34C759',
-                animation: 'hero-pop 300ms cubic-bezier(0.34, 1.56, 0.64, 1) both',
+                animation: 'cv-hero-pop 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both',
               }}
             >
               <CheckCircle2 className="w-10 h-10 text-white" strokeWidth={2.4} />
@@ -87,15 +89,22 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
 
           <h1
             className="font-bold text-[#1D1D1F]"
-            style={{ fontSize: 24, letterSpacing: '-0.3px', animation: 'title-fade 320ms ease-out 200ms both' }}
+            style={{ fontSize: 24, letterSpacing: '-0.3px', animation: 'cv-fade-in 200ms ease-out 400ms both' }}
           >
             {title}
           </h1>
-          <p className="text-[12px] font-mono-nums text-[#86868B] mt-1.5 truncate" title={fileName}>
+          <p
+            className="text-[12px] font-mono-nums text-[#86868B] mt-1.5 truncate"
+            title={fileName}
+            style={{ animation: 'cv-fade-in 200ms ease-out 500ms both' }}
+          >
             {fileName}
           </p>
 
-          <div className="flex items-center justify-center gap-2.5 mt-6">
+          <div
+            className="flex items-center justify-center gap-2.5 mt-6"
+            style={{ animation: 'cv-fade-in 200ms ease-out 600ms both' }}
+          >
             {onDownload && (
               <button
                 onClick={onDownload}
@@ -141,7 +150,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
             borderTop: `2px solid ${accentColor}`,
             borderRadius: 12,
             boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.04)',
-            animation: 'impact-fade 360ms ease-out 280ms both',
+            animation: 'cv-slide-up 200ms ease-out 700ms both',
           }}
         >
           <h3
