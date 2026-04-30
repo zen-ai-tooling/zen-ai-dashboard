@@ -321,6 +321,14 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
         ]}
       />
 
+      {/* Spend distribution — collapsible visualization */}
+      <SpendDistributionStrip
+        items={bleeders.map((b) => ({
+          label: b.entity || b.campaign || 'Untitled',
+          spend: b.spend || 0,
+        }))}
+      />
+
       {/* Decision table */}
       <div className="decision-table-card">
         {/* Bulk actions */}
