@@ -654,6 +654,116 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
           />
         </div>
       </details>
+
+      {/* Master/detail side panel */}
+      {(() => {
+        const idx = selectedIdx;
+        const bleeder = idx != null ? result.bleeders[idx] : null;
+        const decision = idx != null ? decisions[idx] : undefined;
+
+        const opts = getDecisionOptions();
+        const buttonSpecs: DecisionButtonSpec[] = opts.map((opt) => {
+          if (opt === 'Pause')    return { value: 'Pause',    label: 'Pause',    bg: '#FFE5E5', color: '#CC0000', border: '#FFCCCC', hoverBg: '#FFCCCC' };
+          if (opt === 'Cut Bid')  return { value: 'Cut Bid',  label: 'Cut Bid',  bg: '#FFF3E0', color: '#CC7700', border: '#FFE0B2', hoverBg: '#FFE0B2' };
+          if (opt === 'Keep')     return { value: 'Keep',     label: 'Keep',     bg: '#E8F5E9', color: '#1B7A2B', border: '#C8E6C9', hoverBg: '#C8E6C9' };
+          if (opt === 'Negative') return { value: 'Negative', label: 'Negative', bg: '#E3F2FD', color: '#0D47A1', border: '#BBDEFB', hoverBg: '#BBDEFB' };
+          return { value: opt, label: opt, bg: '#F5F5F7', color: '#1D1D1F', border: '#E5E5EA', hoverBg: '#E5E5EA' };
+        });
+
+        const detail: RowDetail | null = bleeder && idx != null ? (() => {
+          const sug = suggestions[idx];
+          const isHighSpend = bleeder.spend >= urgencyBands.high && bleeder.spend > 0;
+          const cpc = (bleeder.clicks && bleeder.clicks > 0) ? bleeder.spend / bleeder.clicks : 0;
+          const aboveAcosThreshold = bleeder.acos >= (result.acosThreshold ?? 0);
+          // Inline rationale — uses orders + ACoS + threshold context
+          const rationale =
+            result.trackType === 'ACOS100'
+              ? `${bleeder.acos.toFixed(1)}% ACoS — well above your ${(result.acosThreshold ?? 100).toFixed(0)}% threshold`
+              : (bleeder.orders ?? 0) === 0
+                ? `0 orders at $${bleeder.spend.toFixed(2)} spend — strong negative signal`
+                : `${bleeder.orders} order(s) at ${bleeder.acos.toFixed(1)}% ACoS — ${aboveAcosThreshold ? `above your ${(result.acosThreshold ?? 0).toFixed(0)}% threshold` : 'borderline performance'}`;
+
+          const metrics: RowDetail['metrics'] = [
+            { label: 'Clicks', value: (bleeder.clicks ?? 0).toLocaleString() },
+            { label: 'Spend', value: `$${bleeder.spend.toFixed(2)}`, color: isHighSpend ? '#FF3B30' : undefined },
+          ];
+          if (result.trackType !== 'ACOS100') {
+            metrics.push({ label: 'Orders', value: String(bleeder.orders ?? 0) });
+          }
+          metrics.push(
+            bleeder.acos > 0
+              ? { label: 'ACoS', value: `${bleeder.acos.toFixed(1)}%`, pill: true, pillBg: aboveAcosThreshold ? '#FF3B30' : '#FF9500' }
+              : { label: 'ACoS', value: '—' },
+            { label: 'CPC', value: cpc > 0 ? `$${cpc.toFixed(2)}` : '—' },
+          );
+
+          return {
+            key: idx,
+            campaign: bleeder.campaignName || '—',
+            adGroup: showAdGroup ? (bleeder.adGroupName || undefined) : undefined,
+            entity: bleeder.entity || '—',
+            matchType: bleeder.matchType || undefined,
+            metrics,
+            suggestion: {
+              label: sug.shortLabel,
+              bg: 'rgba(255, 149, 0, 0.10)',
+              color: '#A35A00',
+              border: 'rgba(255, 149, 0, 0.25)',
+            },
+            rationale: sug.reason || rationale,
+          };
+        })() : null;
+
+        const moveTo = (delta: number) => {
+          if (idx == null || sortedIndices.length === 0) return;
+          const pos = sortedIndices.indexOf(idx);
+          if (pos === -1) return;
+          const next = (pos + delta + sortedIndices.length) % sortedIndices.length;
+          setSelectedIdx(sortedIndices[next]);
+          setPanelComplete(false);
+        };
+
+        const advanceToNextUndecided = () => {
+          if (idx == null) { setPanelComplete(true); return; }
+          const start = sortedIndices.indexOf(idx);
+          for (let i = 1; i <= sortedIndices.length; i++) {
+            const probe = sortedIndices[(start + i) % sortedIndices.length];
+            if (!decisions[probe]) {
+              setSelectedIdx(probe);
+              setPanelComplete(false);
+              return;
+            }
+          }
+          setPanelComplete(true);
+        };
+
+        return (
+          <RowDetailPanel
+            open={idx != null}
+            detail={detail}
+            currentDecision={decision}
+            buttons={buttonSpecs}
+            allComplete={panelComplete}
+            onSelectDecision={(val) => {
+              if (idx == null) return;
+              setDecisionWithFlash(idx, val);
+              window.setTimeout(advanceToNextUndecided, 520);
+            }}
+            onClose={() => { setSelectedIdx(null); setPanelComplete(false); }}
+            onPrev={() => moveTo(-1)}
+            onNext={() => moveTo(1)}
+            onGenerate={async () => {
+              setSelectedIdx(null);
+              setPanelComplete(false);
+              await handleGenerateInline();
+              toast.success('Amazon file ready', {
+                description: `${decisionsMade} decisions exported`,
+                duration: 3000,
+              });
+            }}
+          />
+        );
+      })()}
     </div>
   );
 };
