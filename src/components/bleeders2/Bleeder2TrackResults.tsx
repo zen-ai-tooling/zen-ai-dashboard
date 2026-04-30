@@ -367,7 +367,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
       <div className="decision-table-card">
 
         {/* Bulk action buttons */}
-        <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-border bg-[#FAFAFA]">
+        <div className="decision-table-bar flex items-center justify-between gap-2 px-4 py-2.5">
           <div className="text-[12px] text-[hsl(var(--text-secondary))] truncate">
             <span className="font-medium text-foreground">{TRACK_LABELS[result.trackType]}</span>
             <span className="mx-1.5 text-[hsl(var(--text-tertiary))]">·</span>
@@ -408,7 +408,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         </div>
 
         {/* Table — scrollable with sticky thead, pinned footer below */}
-        <div className="max-h-[58vh] overflow-auto table-sticky-header">
+        <div className="max-h-[58vh] overflow-auto table-sticky-header decision-table">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
