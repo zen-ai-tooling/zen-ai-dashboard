@@ -133,6 +133,12 @@ export const AnalysisResults = ({
   const currentRows = rowsBySheet[currentSheet] || [];
   const decisionOptions = getDecisionOptions(currentSheet);
 
+  // Master/detail panel state — selectedRowIdx is an index into currentRows
+  // (the active sheet's rows). Resets when the active sheet changes.
+  const [selectedRowIdx, setSelectedRowIdx] = useState<number | null>(null);
+  const [panelComplete, setPanelComplete] = useState(false);
+  React.useEffect(() => { setSelectedRowIdx(null); setPanelComplete(false); }, [currentSheet]);
+
   type SortKey = 'campaign' | 'ad_group' | 'entity' | 'clicks' | 'spend' | 'sales' | 'acos';
   const { sortKey, sortDir, toggle: toggleSort } = useSortable<SortKey>('spend', 'desc');
 
