@@ -306,27 +306,9 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
       />
 
       {/* Decision table */}
-      <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <div>
-            <h3 className="text-[14px] font-medium text-foreground font-display">
-              Bleeders — Lifetime Audit
-            </h3>
-            <p className="text-[12px] text-muted-foreground mt-0.5">
-              Select a decision per row then generate the Amazon file
-            </p>
-          </div>
-          {onDownloadDecisionSheet && (
-            <Button variant="outline" size="sm" onClick={onDownloadDecisionSheet} className="text-[11px] h-7 btn-press">
-              <Download className="w-3 h-3 mr-1" />
-              Download XLSX
-            </Button>
-          )}
-        </div>
-
+      <div className="decision-table-card">
         {/* Bulk actions */}
-        <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-border bg-[#FAFAFA]">
+        <div className="decision-table-bar flex items-center justify-between gap-2 px-4 py-2.5">
           <div className="text-[12px] text-[hsl(var(--text-secondary))] truncate">
             <span className="font-medium text-foreground">Lifetime Audit</span>
             <span className="mx-1.5 text-[hsl(var(--text-tertiary))]">·</span>
