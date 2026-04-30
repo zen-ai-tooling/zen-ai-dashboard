@@ -497,7 +497,7 @@
   /* Alternating rows + hover (scoped to decision tables) */
   .decision-table table tbody tr {
     background: #FFFFFF;
-    transition: background-color 100ms ease;
+    transition: background 300ms ease, box-shadow 150ms ease;
     border-bottom: 1px solid #F2F2F7;
   }
   .decision-table table tbody tr:nth-child(even) { background: #FAFBFC; }
