@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ArrowUpRight, Clock, ChevronRight, CheckCircle2, AlertTriangle, HelpCircle, SlidersHorizontal, FileText } from 'lucide-react';
+import { Clock, ChevronRight, CheckCircle2, AlertTriangle, HelpCircle, SlidersHorizontal, FileText } from 'lucide-react';
 import { useHistory } from '@/context/HistoryContext';
 
 type ActiveModule = 'bleeders_1' | 'bleeders_2' | 'lifetime_bleeders' | null;
@@ -25,7 +25,8 @@ const MODULES = [
     desc: 'Find targets with zero sales that are wasting your budget',
     dot: 'hsl(var(--destructive))',
     accent: '#EF4444',
-    accentRgb: '239, 68, 68',
+    gradient: 'linear-gradient(180deg, rgba(239, 68, 68, 0.06) 0%, #FFFFFF 50%)',
+    borderColor: '#E5E5EA',
     tag: 'Standard',
     historyKey: 'bleeders_1',
   },
@@ -35,7 +36,8 @@ const MODULES = [
     desc: 'Find low-performing targets with high ACoS and low sales',
     dot: 'hsl(var(--amber))',
     accent: '#F59E0B',
-    accentRgb: '245, 158, 11',
+    gradient: 'linear-gradient(180deg, rgba(245, 158, 11, 0.06) 0%, #FFFFFF 50%)',
+    borderColor: 'rgba(245,158,11,0.3)',
     tag: 'Recommended',
     historyKey: 'bleeders_2',
   },
@@ -45,7 +47,8 @@ const MODULES = [
     desc: 'Find targets that have never converted across their entire lifetime',
     dot: 'hsl(265 70% 60%)',
     accent: '#8B5CF6',
-    accentRgb: '139, 92, 246',
+    gradient: 'linear-gradient(180deg, rgba(139, 92, 246, 0.06) 0%, #FFFFFF 50%)',
+    borderColor: '#E5E5EA',
     tag: 'Audit',
     historyKey: 'lifetime',
   },
@@ -98,40 +101,35 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
   const hasSessions = entries.length > 0;
 
   return (
-    <div
-      className="flex flex-col"
-      style={{
-        backgroundImage:
-          'radial-gradient(circle, rgba(229,229,234,0.5) 0.5px, transparent 0.5px)',
-        backgroundSize: '24px 24px',
-      }}
-    >
-      <div className="pb-10" style={{ paddingTop: 40 }}>
-        {/* Greeting — dynamic value hook */}
-        <div className="mb-12">
-          <p className="type-eyebrow">{getTimeString()}</p>
-          <h1 className="type-page-title mt-2">{getGreeting()}, operator</h1>
-          {hasSessions ? (
-            <p
-              className="mt-3 max-w-2xl text-[#1D1D1F]"
-              style={{ fontSize: 15, fontWeight: 400, lineHeight: 1.5 }}
-            >
-              You've addressed{' '}
-              <span style={{ fontSize: 20, fontWeight: 600 }}>
-                ${Math.round(monthStats.totalSpend).toLocaleString()}
-              </span>{' '}
-              in at-risk spend across{' '}
-              <span style={{ fontSize: 20, fontWeight: 600 }}>{monthStats.sessions}</span>{' '}
-              session{monthStats.sessions === 1 ? '' : 's'} this month
-            </p>
-          ) : (
-            <p className="type-page-sub mt-3 max-w-md">
-              Start your first session to begin identifying wasted ad spend.
-            </p>
-          )}
-        </div>
+    <div className="flex flex-col" style={{ paddingTop: 40 }}>
+      {/* Greeting + value hook */}
+      <div>
+        <p className="type-eyebrow">{getTimeString()}</p>
+        <h1 className="type-page-title mt-2">{getGreeting()}, operator</h1>
+        {hasSessions ? (
+          <p
+            className="mt-3 max-w-2xl"
+            style={{ fontSize: 16, fontWeight: 400, color: '#6E6E73', lineHeight: 1.5 }}
+          >
+            You've addressed{' '}
+            <span style={{ fontSize: 24, fontWeight: 700, color: '#1D1D1F' }}>
+              ${Math.round(monthStats.totalSpend).toLocaleString()}
+            </span>{' '}
+            in at-risk spend across{' '}
+            <span style={{ fontSize: 16, fontWeight: 600, color: '#1D1D1F' }}>
+              {monthStats.sessions} session{monthStats.sessions === 1 ? '' : 's'}
+            </span>{' '}
+            this month
+          </p>
+        ) : (
+          <p className="type-page-sub mt-3 max-w-md">
+            Start your first session to begin identifying wasted ad spend.
+          </p>
+        )}
+      </div>
 
-        {/* Module cards */}
+      {/* Workflows — 48px from greeting */}
+      <div style={{ marginTop: 48 }}>
         <p className="type-section-eyebrow mb-4">Workflows</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {MODULES.map((m) => {
@@ -141,14 +139,26 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
               <button
                 key={m.id}
                 onClick={() => onSelectModule(m.id)}
-                className="group text-left rounded-xl border bg-white p-6 btn-press tile-hover relative overflow-hidden flex flex-col"
+                className="group text-left rounded-xl border p-6 relative overflow-hidden flex flex-col workflow-card"
                 style={{
                   minHeight: '180px',
-                  borderColor: isRecommended ? 'rgba(245,158,11,0.3)' : '#E5E5EA',
-                  backgroundImage: `linear-gradient(180deg, rgba(${m.accentRgb}, 0.04) 0%, transparent 40%)`,
+                  cursor: 'pointer',
+                  borderColor: m.borderColor,
+                  background: m.gradient,
                   boxShadow: isRecommended
                     ? '0 4px 16px rgba(0,0,0,0.08)'
                     : '0 1px 3px rgba(0,0,0,0.04)',
+                  transition: 'transform 200ms ease, box-shadow 200ms ease',
+                }}
+                onMouseEnter={(ev) => {
+                  ev.currentTarget.style.transform = 'translateY(-2px)';
+                  ev.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)';
+                }}
+                onMouseLeave={(ev) => {
+                  ev.currentTarget.style.transform = 'translateY(0)';
+                  ev.currentTarget.style.boxShadow = isRecommended
+                    ? '0 4px 16px rgba(0,0,0,0.08)'
+                    : '0 1px 3px rgba(0,0,0,0.04)';
                 }}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -182,7 +192,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                       className="text-[12px] font-semibold flex items-center gap-1"
                       style={{ color: m.accent }}
                     >
-                      Start →
+                      Start{' '}
+                      <span
+                        className="start-arrow inline-block"
+                        style={{ transition: 'transform 200ms ease' }}
+                      >
+                        →
+                      </span>
                     </span>
                   </div>
                 ) : (
@@ -191,7 +207,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                       className="text-[12px] font-semibold flex items-center gap-1"
                       style={{ color: m.accent }}
                     >
-                      Start →
+                      Start{' '}
+                      <span
+                        className="start-arrow inline-block"
+                        style={{ transition: 'transform 200ms ease' }}
+                      >
+                        →
+                      </span>
                     </span>
                   </div>
                 )}
@@ -199,125 +221,131 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
             );
           })}
         </div>
+      </div>
 
-        {/* Recent activity */}
-        <div className="mt-14">
-          <p className="type-section-eyebrow mb-4">Recent activity</p>
-          {recent.length === 0 ? (
-            <div
-              className="rounded-[10px] border border-[#E5E5EA] bg-white px-5 py-10 text-center"
-              style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}
-            >
-              <Clock className="w-4 h-4 mx-auto text-[#86868B] opacity-60" strokeWidth={1.6} />
-              <p className="text-[13px] text-[#6E6E73] mt-2 font-medium">No sessions yet</p>
-              <p className="text-[12px] text-[#86868B] mt-1">
-                Pick a workflow above to get started.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {recent.map((e) => {
-                const accent = MODULE_ACCENT[e.module] ?? '#86868B';
-                const success = e.bleedersFound >= 0;
-                const Icon = success ? CheckCircle2 : AlertTriangle;
-                return (
-                  <div
-                    key={e.id}
-                    className="rounded-[10px] border border-[#E5E5EA] bg-white px-5 py-4 flex items-center gap-3 cursor-pointer transition-colors"
-                    style={{
-                      boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                      borderLeft: `3px solid ${accent}`,
-                    }}
-                    onMouseEnter={(ev) => (ev.currentTarget.style.background = '#F9FAFB')}
-                    onMouseLeave={(ev) => (ev.currentTarget.style.background = '#FFFFFF')}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <Icon
-                          className="w-3.5 h-3.5 flex-shrink-0"
-                          strokeWidth={2}
-                          style={{ color: success ? '#34C759' : '#F59E0B' }}
-                        />
-                        <span className="text-[14px] font-semibold text-[#1D1D1F] truncate">
-                          {MODULE_LABELS[e.module] ?? e.module}
+      {/* Recent activity — 40px from workflows */}
+      <div style={{ marginTop: 40 }}>
+        <p className="type-section-eyebrow mb-4">Recent activity</p>
+        {recent.length === 0 ? (
+          <div
+            className="rounded-[10px] border border-[#E5E5EA] bg-white px-5 py-10 text-center"
+            style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}
+          >
+            <Clock className="w-4 h-4 mx-auto text-[#86868B] opacity-60" strokeWidth={1.6} />
+            <p className="text-[13px] text-[#6E6E73] mt-2 font-medium">No sessions yet</p>
+            <p className="text-[12px] text-[#86868B] mt-1">
+              Pick a workflow above to get started.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {recent.map((e) => {
+              const accent = MODULE_ACCENT[e.module] ?? '#86868B';
+              const success = e.bleedersFound >= 0;
+              const Icon = success ? CheckCircle2 : AlertTriangle;
+              return (
+                <div
+                  key={e.id}
+                  className="rounded-[10px] border border-[#E5E5EA] bg-white px-5 py-4 flex items-center gap-3 cursor-pointer"
+                  style={{
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                    borderLeft: `3px solid ${accent}`,
+                    transition: 'background 150ms ease',
+                  }}
+                  onMouseEnter={(ev) => (ev.currentTarget.style.background = '#F3F4F6')}
+                  onMouseLeave={(ev) => (ev.currentTarget.style.background = '#FFFFFF')}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <Icon
+                        className="w-3.5 h-3.5 flex-shrink-0"
+                        strokeWidth={2}
+                        style={{ color: success ? '#34C759' : '#F59E0B' }}
+                      />
+                      <span className="text-[14px] font-semibold text-[#1D1D1F] truncate">
+                        {MODULE_LABELS[e.module] ?? e.module}
+                      </span>
+                      {e.track && (
+                        <span className="text-[10.5px] font-mono-nums px-1.5 py-px rounded bg-[#F5F5F7] text-[#86868B]">
+                          {e.track}
                         </span>
-                        {e.track && (
-                          <span className="text-[10.5px] font-mono-nums px-1.5 py-px rounded bg-[#F5F5F7] text-[#86868B]">
-                            {e.track}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[12px] text-[#86868B] truncate mt-0.5 ml-5">
-                        {e.clientName} · {e.fileName}
-                      </p>
+                      )}
                     </div>
-                    <div className="text-right flex-shrink-0">
-                      <div className="flex items-center justify-end gap-2">
-                        <span
-                          className="rounded-full"
-                          style={{ width: 8, height: 8, background: accent }}
-                        />
-                        <span
-                          className="font-mono-nums font-semibold text-[#1D1D1F]"
-                          style={{ fontSize: 16 }}
-                        >
-                          {e.bleedersFound.toLocaleString()}
-                        </span>
-                        <span className="text-[12px] text-[#86868B]">bleeders</span>
-                      </div>
-                      <div className="text-[12px] text-[#86868B] mt-0.5">
-                        {formatRelative(e.completedAt)}
-                      </div>
-                    </div>
+                    <p className="text-[12px] text-[#86868B] truncate mt-0.5 ml-5">
+                      {e.clientName} · {e.fileName}
+                    </p>
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Quick start */}
-        <div className="mt-14">
-          <p className="type-section-eyebrow mb-4">Quick start</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {[
-              { title: 'What are bleeders?', desc: 'Targets with high spend and zero or near-zero conversions.', Icon: HelpCircle },
-              { title: 'How thresholds work', desc: 'SB/SD use Target ACoS + 10%. SP uses Target ACoS + 20%.', Icon: SlidersHorizontal },
-              { title: 'Bulk file guide', desc: 'Export 60-day Bulk Operations from Campaign Manager.', Icon: FileText },
-            ].map((q) => (
-              <div
-                key={q.title}
-                className="rounded-[10px] border border-[#E5E5EA] p-4 tile-hover flex items-start justify-between gap-3 cursor-pointer"
-                style={{
-                  background: '#F9FAFB',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
-                }}
-              >
-                <div className="flex items-start gap-3 min-w-0">
-                  <q.Icon
-                    className="w-4 h-4 text-[#6E6E73] flex-shrink-0 mt-0.5"
-                    strokeWidth={1.8}
-                  />
-                  <div className="min-w-0">
-                    <div className="text-[13px] font-semibold text-[#1D1D1F] tracking-tight">
-                      {q.title}
+                  <div className="text-right flex-shrink-0">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <span
+                        className="rounded-full"
+                        style={{ width: 6, height: 6, background: accent }}
+                      />
+                      <span
+                        className="font-mono-nums text-[#1D1D1F]"
+                        style={{ fontSize: 14, fontWeight: 600 }}
+                      >
+                        {e.bleedersFound.toLocaleString()} bleeders
+                      </span>
                     </div>
-                    <p className="text-[12.5px] text-[#6E6E73] mt-1.5 leading-relaxed">{q.desc}</p>
+                    <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
+                      {formatRelative(e.completedAt)}
+                    </div>
                   </div>
                 </div>
-                <ChevronRight
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Quick start — 32px from recent activity (related secondary section) */}
+      <div style={{ marginTop: 32 }}>
+        <p className="type-section-eyebrow mb-4">Quick start</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {[
+            { title: 'What are bleeders?', desc: 'Targets with high spend and zero or near-zero conversions.', Icon: HelpCircle },
+            { title: 'How thresholds work', desc: 'SB/SD use Target ACoS + 10%. SP uses Target ACoS + 20%.', Icon: SlidersHorizontal },
+            { title: 'Bulk file guide', desc: 'Export 60-day Bulk Operations from Campaign Manager.', Icon: FileText },
+          ].map((q) => (
+            <div
+              key={q.title}
+              className="rounded-[10px] border border-[#E5E5EA] flex items-start justify-between gap-3 cursor-pointer tile-hover"
+              style={{
+                background: '#FFFFFF',
+                borderLeft: '2px solid rgba(37, 99, 235, 0.15)',
+                padding: 16,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+              }}
+            >
+              <div className="flex items-start gap-3 min-w-0">
+                <q.Icon
                   className="flex-shrink-0 mt-0.5"
-                  style={{ width: 16, height: 16, color: '#C7C7CC' }}
+                  style={{ width: 18, height: 18, color: '#6E6E73' }}
                   strokeWidth={1.8}
                 />
+                <div className="min-w-0">
+                  <div className="text-[13px] font-semibold text-[#1D1D1F] tracking-tight">
+                    {q.title}
+                  </div>
+                  <p className="text-[12.5px] text-[#6E6E73] mt-1.5 leading-relaxed">{q.desc}</p>
+                </div>
               </div>
-            ))}
-          </div>
+              <ChevronRight
+                className="flex-shrink-0 mt-0.5"
+                style={{ width: 16, height: 16, color: '#C7C7CC' }}
+                strokeWidth={1.8}
+              />
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="border-t border-[#F0F0F2] py-4 flex items-center justify-between">
+      {/* Footer — 48px from quick start */}
+      <div
+        className="border-t border-[#F0F0F2] py-4 flex items-center justify-between"
+        style={{ marginTop: 48 }}
+      >
         <span className="text-[12px] text-[#86868B]">Zen AI · Amazon Ads Workflow</span>
         <div className="flex items-center gap-4">
           <a
