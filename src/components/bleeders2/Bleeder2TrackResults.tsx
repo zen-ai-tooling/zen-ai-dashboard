@@ -550,7 +550,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         </div>
 
         {/* Pinned action bar */}
-        <div className="sticky bottom-0 z-10 p-4 border-t border-border bg-[#FAFAFA] space-y-2">
+        <div className="decision-table-footer p-4 space-y-2">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
               {decisionsMade >= result.bleeders.length && result.bleeders.length > 0 ? (
@@ -594,7 +594,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                   });
                 }}
                 disabled={decisionsMade === 0 || isGenerating || !!amazonFile}
-                className={`btn-primary-action btn-press ${(generateDone || amazonFile) ? 'is-done' : ''} ${decisionsMade >= result.bleeders.length && result.bleeders.length > 0 && !generateDone && !amazonFile ? 'is-ready-pulse' : ''}`}
+                className={`btn-primary-action btn-press ${(generateDone || amazonFile) ? 'is-done' : ''} ${decisionsMade >= result.bleeders.length && result.bleeders.length > 0 && !generateDone && !amazonFile ? 'is-ready' : ''}`}
               >
                 {isGenerating ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
