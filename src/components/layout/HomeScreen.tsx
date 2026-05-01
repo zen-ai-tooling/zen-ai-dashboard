@@ -254,7 +254,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                       Last run {formatRelative(lastRun)}
                     </span>
                   ) : (
-                    <span className="text-[12px] text-[#9CA3AF]">Not yet run</span>
+                    <span className="flex items-center gap-1.5 text-[12px] text-[#9CA3AF]">
+                      <Clock className="w-3 h-3" strokeWidth={1.8} />
+                      Not yet run
+                    </span>
                   )}
                   <span
                     className="text-[12px] font-semibold flex items-center gap-1"
