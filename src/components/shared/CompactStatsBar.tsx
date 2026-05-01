@@ -51,14 +51,14 @@ export const CompactStatsBar: React.FC<Props> = ({ stats, steps, accent = 'red' 
               >
                 {s.value}
               </span>
-              <span className="text-[12px] text-[#86868B]">{s.label}</span>
+              <span className="text-[12px] text-[#9CA3AF]">{s.label}</span>
             </div>
           </React.Fragment>
         ))}
       </div>
 
       {/* Divider */}
-      <div className="border-t border-[#E5E5EA]" />
+      <div className="border-t border-[#E5E7EB]" />
 
       {/* Steps */}
       <div className="px-5 py-3 bg-card/60">

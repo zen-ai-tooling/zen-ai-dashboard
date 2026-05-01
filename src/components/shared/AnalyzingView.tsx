@@ -28,7 +28,7 @@ const ActivityDots: React.FC = () => {
           key={d}
           className="w-[3px] h-[3px] rounded-full"
           style={{
-            background: d === phase ? '#0071E3' : '#D2D2D7',
+            background: d === phase ? '#4F6EF7' : '#D1D5DB',
             transition: 'background-color 150ms ease',
           }}
         />
@@ -87,25 +87,25 @@ export const AnalyzingView: React.FC<AnalyzingViewProps> = ({
     >
       <div className="w-full max-w-[520px]">
         {/* Top progress bar — 4px */}
-        <div className="w-full overflow-hidden" style={{ height: 4, borderRadius: 2, background: '#E5E5EA' }}>
+        <div className="w-full overflow-hidden" style={{ height: 4, borderRadius: 2, background: '#E5E7EB' }}>
           <div
             style={{
               height: '100%',
               borderRadius: 2,
               width: `${progress}%`,
-              background: '#0071E3',
+              background: '#4F6EF7',
               transition: 'width 200ms linear',
             }}
           />
         </div>
 
         <div className="text-center" style={{ marginTop: 16 }}>
-          <Loader2 className="w-6 h-6 animate-spin mx-auto" style={{ color: '#0071E3' }} strokeWidth={2} />
+          <Loader2 className="w-6 h-6 animate-spin mx-auto" style={{ color: '#4F6EF7' }} strokeWidth={2} />
 
-          <h2 className="mt-3" style={{ fontSize: 20, fontWeight: 600, color: '#1D1D1F', letterSpacing: '-0.3px' }}>
+          <h2 className="mt-3" style={{ fontSize: 20, fontWeight: 600, color: '#111827', letterSpacing: '-0.3px' }}>
             Analyzing your file
           </h2>
-          <p className="mt-1" style={{ fontSize: 13, color: '#86868B' }}>
+          <p className="mt-1" style={{ fontSize: 13, color: '#9CA3AF' }}>
             This usually takes just a few seconds.
           </p>
 
@@ -121,9 +121,9 @@ export const AnalyzingView: React.FC<AnalyzingViewProps> = ({
                 >
                   <span
                     className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                    style={{ background: isDone ? '#34C759' : '#0071E3' }}
+                    style={{ background: isDone ? '#10B981' : '#4F6EF7' }}
                   />
-                  <span className="inline-flex items-center" style={{ fontSize: 14, color: '#6E6E73' }}>
+                  <span className="inline-flex items-center" style={{ fontSize: 14, color: '#374151' }}>
                     {s}
                     {isCurrent && <ActivityDots />}
                   </span>
@@ -132,8 +132,8 @@ export const AnalyzingView: React.FC<AnalyzingViewProps> = ({
             })}
             {showFinal && finalMessage && (
               <div className="flex items-center gap-2.5 animate-fade-in pt-1">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#34C759' }} />
-                <span style={{ fontSize: 14, fontWeight: 600, color: '#1D1D1F' }}>
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#10B981' }} />
+                <span style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>
                   {finalMessage}
                 </span>
               </div>

@@ -303,16 +303,16 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
           ...(acosThresholdLabel ? [{ label: 'Threshold used', value: acosThresholdLabel }] : []),
         ]}
         breakdown={[
-          { label: 'Paused', count: breakdownCounts['Pause'] ?? 0, color: '#FF3B30' },
-          { label: 'Cut Bid', count: breakdownCounts['Cut Bid'] ?? 0, color: '#FF9500' },
-          { label: 'Negative', count: breakdownCounts['Negative'] ?? 0, color: '#0071E3' },
-          { label: 'Keep', count: breakdownCounts['Keep'] ?? 0, color: '#34C759' },
-          { label: 'No decision', count: Math.max(0, result.bleeders.length - decisionsMade), color: '#D2D2D7' },
+          { label: 'Paused', count: breakdownCounts['Pause'] ?? 0, color: '#EF4444' },
+          { label: 'Cut Bid', count: breakdownCounts['Cut Bid'] ?? 0, color: '#F59E0B' },
+          { label: 'Negative', count: breakdownCounts['Negative'] ?? 0, color: '#4F6EF7' },
+          { label: 'Keep', count: breakdownCounts['Keep'] ?? 0, color: '#10B981' },
+          { label: 'No decision', count: Math.max(0, result.bleeders.length - decisionsMade), color: '#D1D5DB' },
         ]}
         onDownload={onDownloadAmazon}
         onStartNew={onStartNew}
         onViewFullResults={() => setShowFullResults(true)}
-        accentColor="#FF9500"
+        accentColor="#F59E0B"
         addressedSpend={addressedSpend}
         undecidedSpend={undecidedSpend}
       />
@@ -325,7 +325,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
       {amazonFile && showFullResults && (
         <button
           onClick={() => setShowFullResults(false)}
-          className="text-[12.5px] text-[#0071E3] hover:underline btn-press"
+          className="text-[12.5px] text-[#4F6EF7] hover:underline btn-press"
         >
           ← Back to summary
         </button>
@@ -406,24 +406,24 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
               suggestions.forEach((s, idx) => { allSuggested[idx] = s.decision; });
               setDecisions(allSuggested);
             }} className="bulk-btn btn-press">
-              <span className="decision-dot" style={{ background: '#0071E3' }} />
+              <span className="decision-dot" style={{ background: '#4F6EF7' }} />
               Apply all suggestions
             </button>
             {getDecisionOptions().includes('Pause') && (
               <button onClick={handleSetAllPause} className="bulk-btn btn-press">
-                <span className="decision-dot" style={{ background: '#FF3B30' }} />
+                <span className="decision-dot" style={{ background: '#EF4444' }} />
                 Select all → Pause
               </button>
             )}
             {getDecisionOptions().includes('Cut Bid') && (
               <button onClick={handleSetAllCutBid} className="bulk-btn btn-press">
-                <span className="decision-dot" style={{ background: '#FF9500' }} />
+                <span className="decision-dot" style={{ background: '#F59E0B' }} />
                 Select all → Cut Bid
               </button>
             )}
             {getDecisionOptions().includes('Keep') && (
               <button onClick={handleSetAllKeep} className="bulk-btn btn-press">
-                <span className="decision-dot" style={{ background: '#34C759' }} />
+                <span className="decision-dot" style={{ background: '#10B981' }} />
                 Select all → Keep
               </button>
             )}
@@ -476,11 +476,11 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 const indicatorClass = decisionRowClass(decision);
                 const isKeep = suggestion.shortLabel?.toLowerCase().includes('keep');
                 const sugStyle = isKeep
-                  ? { background: 'rgba(52, 199, 89, 0.10)', color: '#1A7F3E', border: '1px solid rgba(52, 199, 89, 0.25)' }
-                  : { background: 'rgba(255, 149, 0, 0.10)', color: '#A35A00', border: '1px solid rgba(255, 149, 0, 0.25)' };
+                  ? { background: 'rgba(52, 199, 89, 0.10)', color: '#047857', border: '1px solid rgba(52, 199, 89, 0.25)' }
+                  : { background: 'rgba(255, 149, 0, 0.10)', color: '#B45309', border: '1px solid rgba(255, 149, 0, 0.25)' };
                 const acosVal = bleeder.acos;
                 const aboveThreshold = acosVal >= (result.acosThreshold ?? 0);
-                const acosBg = aboveThreshold ? '#FF3B30' : '#FF9500';
+                const acosBg = aboveThreshold ? '#EF4444' : '#F59E0B';
 
                 const isHighUrgency = !decision && bleeder.spend >= urgencyBands.high && bleeder.spend > 0;
                 const isLowUrgency = !decision && bleeder.spend <= urgencyBands.low;
@@ -533,7 +533,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                           {acosVal.toFixed(1)}%
                         </span>
                       ) : (
-                        <span className="text-[13px] text-[#D2D2D7]">—</span>
+                        <span className="text-[13px] text-[#D1D5DB]">—</span>
                       )}
                     </TableCell>
                     <TableCell onClick={(e) => e.stopPropagation()}>
@@ -549,7 +549,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                     <TableCell onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-1.5">
                         {decision && (
-                          <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#34C759' }} />
+                          <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#10B981' }} />
                         )}
                         <DecisionSelect
                           value={decision}
@@ -585,10 +585,10 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
             <div className="min-w-0 flex-1">
               {decisionsMade >= result.bleeders.length && result.bleeders.length > 0 ? (
                 <div className="flex items-baseline gap-2">
-                  <span className="text-[14px] font-semibold font-mono-nums" style={{ color: '#34C759' }}>
+                  <span className="text-[14px] font-semibold font-mono-nums" style={{ color: '#10B981' }}>
                     All {result.bleeders.length} decisions complete
                   </span>
-                  <CheckCircle2 className="w-4 h-4" style={{ color: '#34C759' }} />
+                  <CheckCircle2 className="w-4 h-4" style={{ color: '#10B981' }} />
                 </div>
               ) : (
                 <div className="flex items-baseline gap-2">
@@ -602,10 +602,10 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 <DecisionProgressBar
                   total={result.bleeders.length}
                   segments={[
-                    { key: 'Pause', count: Object.values(decisions).filter(d => d === 'Pause').length, color: '#FF3B30' },
-                    { key: 'Cut', count: Object.values(decisions).filter(d => d === 'Cut Bid').length, color: '#FF9500' },
-                    { key: 'Negative', count: Object.values(decisions).filter(d => d === 'Negative').length, color: '#0071E3' },
-                    { key: 'Keep', count: Object.values(decisions).filter(d => d === 'Keep').length, color: '#34C759' },
+                    { key: 'Pause', count: Object.values(decisions).filter(d => d === 'Pause').length, color: '#EF4444' },
+                    { key: 'Cut', count: Object.values(decisions).filter(d => d === 'Cut Bid').length, color: '#F59E0B' },
+                    { key: 'Negative', count: Object.values(decisions).filter(d => d === 'Negative').length, color: '#4F6EF7' },
+                    { key: 'Keep', count: Object.values(decisions).filter(d => d === 'Keep').length, color: '#10B981' },
                   ]}
                 />
               </div>
@@ -663,11 +663,11 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
 
         const opts = getDecisionOptions();
         const buttonSpecs: DecisionButtonSpec[] = opts.map((opt) => {
-          if (opt === 'Pause')    return { value: 'Pause',    label: 'Pause',    bg: '#FFE5E5', color: '#CC0000', border: '#FFCCCC', hoverBg: '#FFCCCC' };
-          if (opt === 'Cut Bid')  return { value: 'Cut Bid',  label: 'Cut Bid',  bg: '#FFF3E0', color: '#CC7700', border: '#FFE0B2', hoverBg: '#FFE0B2' };
-          if (opt === 'Keep')     return { value: 'Keep',     label: 'Keep',     bg: '#E8F5E9', color: '#1B7A2B', border: '#C8E6C9', hoverBg: '#C8E6C9' };
-          if (opt === 'Negative') return { value: 'Negative', label: 'Negative', bg: '#E3F2FD', color: '#0D47A1', border: '#BBDEFB', hoverBg: '#BBDEFB' };
-          return { value: opt, label: opt, bg: '#F5F5F7', color: '#1D1D1F', border: '#E5E5EA', hoverBg: '#E5E5EA' };
+          if (opt === 'Pause')    return { value: 'Pause',    label: 'Pause',    bg: 'rgba(239, 68, 68, 0.10)', color: '#B91C1C', border: 'rgba(239, 68, 68, 0.20)', hoverBg: 'rgba(239, 68, 68, 0.20)' };
+          if (opt === 'Cut Bid')  return { value: 'Cut Bid',  label: 'Cut Bid',  bg: 'rgba(245, 158, 11, 0.10)', color: '#B45309', border: 'rgba(245, 158, 11, 0.20)', hoverBg: 'rgba(245, 158, 11, 0.20)' };
+          if (opt === 'Keep')     return { value: 'Keep',     label: 'Keep',     bg: 'rgba(16, 185, 129, 0.10)', color: '#047857', border: 'rgba(16, 185, 129, 0.20)', hoverBg: 'rgba(16, 185, 129, 0.20)' };
+          if (opt === 'Negative') return { value: 'Negative', label: 'Negative', bg: 'rgba(99, 102, 241, 0.10)', color: '#4338CA', border: 'rgba(99, 102, 241, 0.20)', hoverBg: 'rgba(99, 102, 241, 0.20)' };
+          return { value: opt, label: opt, bg: '#F3F4F6', color: '#111827', border: '#E5E7EB', hoverBg: '#E5E7EB' };
         });
 
         const detail: RowDetail | null = bleeder && idx != null ? (() => {
@@ -685,14 +685,14 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
 
           const metrics: RowDetail['metrics'] = [
             { label: 'Clicks', value: (bleeder.clicks ?? 0).toLocaleString() },
-            { label: 'Spend', value: `$${bleeder.spend.toFixed(2)}`, color: isHighSpend ? '#FF3B30' : undefined },
+            { label: 'Spend', value: `$${bleeder.spend.toFixed(2)}`, color: isHighSpend ? '#EF4444' : undefined },
           ];
           if (result.trackType !== 'ACOS100') {
             metrics.push({ label: 'Orders', value: String(bleeder.orders ?? 0) });
           }
           metrics.push(
             bleeder.acos > 0
-              ? { label: 'ACoS', value: `${bleeder.acos.toFixed(1)}%`, pill: true, pillBg: aboveAcosThreshold ? '#FF3B30' : '#FF9500' }
+              ? { label: 'ACoS', value: `${bleeder.acos.toFixed(1)}%`, pill: true, pillBg: aboveAcosThreshold ? '#EF4444' : '#F59E0B' }
               : { label: 'ACoS', value: '—' },
             { label: 'CPC', value: cpc > 0 ? `$${cpc.toFixed(2)}` : '—' },
           );
@@ -707,7 +707,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
             suggestion: {
               label: sug.shortLabel,
               bg: 'rgba(255, 149, 0, 0.10)',
-              color: '#A35A00',
+              color: '#B45309',
               border: 'rgba(255, 149, 0, 0.25)',
             },
             rationale: sug.reason || rationale,

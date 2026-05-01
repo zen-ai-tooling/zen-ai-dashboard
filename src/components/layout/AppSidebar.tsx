@@ -33,7 +33,7 @@ const MODULES: { id: Exclude<ActiveModule, null>; label: string; dot: string }[]
 ];
 
 const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="px-4 mt-6 mb-2 text-[11px] font-semibold uppercase text-[#6E6E73]" style={{ letterSpacing: '0.1em' }}>
+  <div className="px-4 mt-6 mb-2 text-[11px] font-semibold uppercase text-[#374151]" style={{ letterSpacing: '0.1em' }}>
     {children}
   </div>
 );
@@ -67,12 +67,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         className="px-6 pt-6 pb-6 text-left btn-press"
       >
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-md bg-white text-[#1D1D1F] flex items-center justify-center text-[12px] font-semibold">
+          <div className="w-7 h-7 rounded-md bg-white text-[#111827] flex items-center justify-center text-[12px] font-semibold">
             Z
           </div>
           <div>
             <div className="text-[18px] font-semibold leading-tight text-white tracking-tight">Zen AI</div>
-            <div className="text-[12px] text-[#86868B] mt-0.5">Amazon Ads Workflow</div>
+            <div className="text-[12px] text-[#9CA3AF] mt-0.5">Amazon Ads Workflow</div>
           </div>
         </div>
       </button>
@@ -92,7 +92,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                 className={`group relative w-full flex items-center gap-3 h-10 pl-4 pr-3 rounded-lg text-[14px] my-[1px] btn-press transition-colors ${
                   isActive
                     ? 'bg-white/[0.10] text-white font-semibold'
-                    : 'text-[#E5E5EA] font-medium hover:bg-white/[0.05] hover:text-white'
+                    : 'text-[#E5E7EB] font-medium hover:bg-white/[0.05] hover:text-white'
                 }`}
               >
                 {isActive && (
@@ -115,13 +115,13 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         {showTracks && activeModule === 'bleeders_2' && (
           <div className="px-3 mt-2">
             <div className="flex items-center justify-between px-3 mb-1.5">
-              <span className="text-[10px] font-semibold uppercase text-[#6E6E73]" style={{ letterSpacing: '0.1em' }}>
+              <span className="text-[10px] font-semibold uppercase text-[#374151]" style={{ letterSpacing: '0.1em' }}>
                 Tracks
               </span>
               {bleeder2ActiveTrack && onBackToTrackPicker && (
                 <button
                   onClick={onBackToTrackPicker}
-                  className="flex items-center gap-1 text-[10px] text-[#86868B] hover:text-white btn-press"
+                  className="flex items-center gap-1 text-[10px] text-[#9CA3AF] hover:text-white btn-press"
                 >
                   <ArrowLeft className="w-3 h-3" /> Back
                 </button>
@@ -138,7 +138,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                   className={`w-full flex items-center gap-2.5 px-3 h-8 rounded-md text-[13px] my-[1px] btn-press transition-colors ${
                     isTrackActive
                       ? 'bg-white/[0.08] text-white font-medium'
-                      : 'text-[#E5E5EA] hover:bg-white/[0.05] hover:text-white'
+                      : 'text-[#E5E7EB] hover:bg-white/[0.05] hover:text-white'
                   }`}
                 >
                   {isComplete ? (
@@ -152,7 +152,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                         backgroundColor:
                           isTrackActive ? 'hsl(var(--primary))' :
                           status === 'done' ? 'hsl(var(--success))' :
-                          '#6E6E73',
+                          '#374151',
                       }}
                     />
                   )}
@@ -171,7 +171,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             className={`w-full flex items-center gap-3 h-10 px-4 rounded-lg text-[14px] my-[1px] btn-press transition-colors ${
               showHistoryView
                 ? 'bg-white/[0.10] text-white font-semibold'
-                : 'text-[#E5E5EA] font-medium hover:bg-white/[0.05] hover:text-white'
+                : 'text-[#E5E7EB] font-medium hover:bg-white/[0.05] hover:text-white'
             }`}
           >
             <Clock className="w-3.5 h-3.5 opacity-70" />
@@ -191,9 +191,9 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           </div>
           <div className="text-left min-w-0 flex-1">
             <div className="text-[15px] font-semibold text-white truncate leading-tight">{activeClient.name}</div>
-            <div className="text-[11px] text-[#86868B] mt-0.5 uppercase" style={{ letterSpacing: '0.08em' }}>Active workspace</div>
+            <div className="text-[11px] text-[#9CA3AF] mt-0.5 uppercase" style={{ letterSpacing: '0.08em' }}>Active workspace</div>
           </div>
-          <ChevronsUpDown className="w-4 h-4 text-[#86868B] flex-shrink-0" strokeWidth={1.8} />
+          <ChevronsUpDown className="w-4 h-4 text-[#9CA3AF] flex-shrink-0" strokeWidth={1.8} />
         </button>
 
         {clientDropdownOpen && (

@@ -72,7 +72,7 @@ export const TrackUploader: React.FC<TrackUploaderProps> = ({ track, onUpload, e
         <div
           style={{
             background: '#FFFFFF',
-            border: '1px solid #E5E5EA',
+            border: '1px solid #E5E7EB',
             borderRadius: 12,
             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
             padding: 24,
@@ -80,7 +80,7 @@ export const TrackUploader: React.FC<TrackUploaderProps> = ({ track, onUpload, e
           className="flex items-center justify-center gap-2"
         >
           <Loader2 className="h-4 w-4 animate-spin text-primary" />
-          <span style={{ fontSize: 13, color: '#6E6E73' }}>Validating file…</span>
+          <span style={{ fontSize: 13, color: '#374151' }}>Validating file…</span>
         </div>
       ) : (
         <WorkspaceCard

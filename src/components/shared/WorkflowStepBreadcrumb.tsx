@@ -16,13 +16,13 @@ export const WorkflowStepBreadcrumb: React.FC<Props> = ({ steps }) => {
       {steps.map((s, i) => {
         const isLast = i === steps.length - 1;
         const colorBg =
-          s.status === 'complete' ? '#34C759'
-          : s.status === 'active' ? '#0071E3'
-          : '#F0F0F2';
+          s.status === 'complete' ? '#10B981'
+          : s.status === 'active' ? '#4F6EF7'
+          : '#F3F4F6';
         const colorText =
-          s.status === 'complete' ? '#1A7F3E'
-          : s.status === 'active' ? '#0071E3'
-          : '#86868B';
+          s.status === 'complete' ? '#047857'
+          : s.status === 'active' ? '#4F6EF7'
+          : '#9CA3AF';
         const fontWeight = s.status === 'active' ? 600 : 500;
 
         return (
@@ -31,16 +31,16 @@ export const WorkflowStepBreadcrumb: React.FC<Props> = ({ steps }) => {
               <span
                 className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-semibold font-mono-nums"
                 style={{
-                  background: s.status === 'pending' ? '#F0F0F2' : colorBg,
-                  color: s.status === 'pending' ? '#86868B' : '#fff',
-                  border: s.status === 'pending' ? '1px solid #D2D2D7' : 'none',
+                  background: s.status === 'pending' ? '#F3F4F6' : colorBg,
+                  color: s.status === 'pending' ? '#9CA3AF' : '#fff',
+                  border: s.status === 'pending' ? '1px solid #D1D5DB' : 'none',
                 }}
               >
                 {s.status === 'complete' ? <Check className="w-2.5 h-2.5" strokeWidth={3} /> : i + 1}
               </span>
               <span style={{ color: colorText, fontWeight }}>{s.label}</span>
             </div>
-            {!isLast && <span className="text-[#D2D2D7]">→</span>}
+            {!isLast && <span className="text-[#D1D5DB]">→</span>}
           </React.Fragment>
         );
       })}

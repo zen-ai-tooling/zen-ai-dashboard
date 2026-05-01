@@ -75,7 +75,7 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
 
         <div>
           <h2 className="text-[24px] font-semibold text-foreground tracking-tight">Configure Thresholds</h2>
-          <p className="text-[14px] text-[#86868B] mt-1">Set your campaign performance parameters.</p>
+          <p className="text-[14px] text-[#9CA3AF] mt-1">Set your campaign performance parameters.</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4 items-stretch">
@@ -141,7 +141,7 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
               </Label>
             </div>
 
-            <p className="flex items-center gap-1.5 text-[12px] text-[#86868B] pt-1 border-t border-[#F0F0F2]">
+            <p className="flex items-center gap-1.5 text-[12px] text-[#9CA3AF] pt-1 border-t border-[#F3F4F6]">
               <Info className="w-3 h-3" strokeWidth={1.8} />
               SB/SD: Target + 10%. SP: Target + 20%.
             </p>
@@ -177,13 +177,13 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
               </div>
 
               <div className="border-t border-border pt-3 space-y-1.5">
-                <div className="flex items-center gap-1.5 text-[12px] text-[#86868B]">
-                  <CheckCircle2 className="w-3 h-3 text-[#86868B]" strokeWidth={2} />
+                <div className="flex items-center gap-1.5 text-[12px] text-[#9CA3AF]">
+                  <CheckCircle2 className="w-3 h-3 text-[#9CA3AF]" strokeWidth={2} />
                   <span>Orders filter: ≤ {local.fewerThanOrders}</span>
                 </div>
                 {local.excludeRanking && (
-                  <div className="flex items-center gap-1.5 text-[12px] text-[#86868B]">
-                    <CheckCircle2 className="w-3 h-3 text-[#86868B]" strokeWidth={2} />
+                  <div className="flex items-center gap-1.5 text-[12px] text-[#9CA3AF]">
+                    <CheckCircle2 className="w-3 h-3 text-[#9CA3AF]" strokeWidth={2} />
                     <span>Ranking campaigns excluded</span>
                   </div>
                 )}
@@ -197,7 +197,7 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
           {onBack ? (
             <button
               onClick={onBack}
-              className="inline-flex items-center gap-1.5 text-[13px] text-[#6E6E73] hover:text-foreground btn-press"
+              className="inline-flex items-center gap-1.5 text-[13px] text-[#374151] hover:text-foreground btn-press"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               Back to track selection

@@ -135,7 +135,7 @@ export function getConfidenceStyle(confidence: SuggestionConfidence): {
 } {
   switch (confidence) {
     case 'high':
-      return { background: '#F0FDF4', color: '#16A34A', border: '#BBF7D0' };
+      return { background: '#F0FDF4', color: '#10B981', border: '#BBF7D0' };
     case 'medium':
       return { background: '#FFFBEB', color: '#D97706', border: '#FDE68A' };
     case 'low':

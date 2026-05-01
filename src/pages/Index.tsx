@@ -817,7 +817,7 @@ const Index = () => {
                 <div className="space-y-5">
                   <div>
                     <h2 className="text-[24px] font-semibold text-foreground tracking-tight">Select a Track</h2>
-                    <p className="text-[14px] text-[#86868B] mt-1">Choose which analysis to run.</p>
+                    <p className="text-[14px] text-[#9CA3AF] mt-1">Choose which analysis to run.</p>
                   </div>
 
                   <div className="grid grid-cols-3 gap-5">
@@ -835,18 +835,18 @@ const Index = () => {
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
                                 <div className="text-[14px] font-semibold text-foreground">{t.name}</div>
-                                <div className="text-[12.5px] text-[#86868B] mt-0.5">{t.desc}</div>
+                                <div className="text-[12.5px] text-[#9CA3AF] mt-0.5">{t.desc}</div>
                                 {isDone && result && (
-                                  <div className="text-[12px] text-[#34C759] mt-1.5 font-mono-nums">
+                                  <div className="text-[12px] text-[#10B981] mt-1.5 font-mono-nums">
                                     ✓ {result.bleeders?.length ?? 0} bleeders · ${(result.totalSpend ?? 0).toFixed(0)} at risk
                                   </div>
                                 )}
                               </div>
                               <div className="flex items-center gap-2 flex-shrink-0">
                                 {isDone && (
-                                  <CheckCircle2 className="w-4 h-4" style={{ color: '#34C759' }} strokeWidth={2.2} />
+                                  <CheckCircle2 className="w-4 h-4" style={{ color: '#10B981' }} strokeWidth={2.2} />
                                 )}
-                                <span className="text-[18px] leading-none text-[#C7C7CC] group-hover:text-[#86868B] transition-colors">›</span>
+                                <span className="text-[18px] leading-none text-[#D1D5DB] group-hover:text-[#9CA3AF] transition-colors">›</span>
                               </div>
                             </div>
                           </button>
@@ -856,19 +856,19 @@ const Index = () => {
                       {/* Session progress */}
                       <div className="pt-3">
                         <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#86868B]">
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9CA3AF]">
                             Session progress
                           </span>
-                          <span className="text-[12px] font-mono-nums text-[#6E6E73]">
+                          <span className="text-[12px] font-mono-nums text-[#374151]">
                             {completedCount} of {totalCount} tracks complete
                           </span>
                         </div>
-                        <div className="h-1.5 w-full rounded-full bg-[#F0F0F2] overflow-hidden">
+                        <div className="h-1.5 w-full rounded-full bg-[#F3F4F6] overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-300"
                             style={{
                               width: `${(completedCount / totalCount) * 100}%`,
-                              background: completedCount === totalCount ? '#34C759' : '#0071E3',
+                              background: completedCount === totalCount ? '#10B981' : '#4F6EF7',
                             }}
                           />
                         </div>
@@ -879,7 +879,7 @@ const Index = () => {
                     <div className="col-span-1">
                       <div className="surface-card p-4 sticky top-4">
                         <div className="flex items-center justify-between mb-3">
-                          <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#86868B]">
+                          <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9CA3AF]">
                             Current thresholds
                           </h3>
                           <button
@@ -887,30 +887,30 @@ const Index = () => {
                               setBleeder2ActiveTrack('SBSD');
                               setBleeder2Stage('thresholds');
                             }}
-                            className="text-[11px] font-medium text-[#0071E3] hover:underline btn-press"
+                            className="text-[11px] font-medium text-[#4F6EF7] hover:underline btn-press"
                           >
                             Edit
                           </button>
                         </div>
                         <div className="space-y-2.5 text-[12.5px]">
                           <div className="flex justify-between items-baseline">
-                            <span className="text-[#6E6E73]">Target ACoS</span>
-                            <span className="font-mono-nums font-semibold text-[#1D1D1F]">{bleeder2Thresholds.targetACOS}%</span>
+                            <span className="text-[#374151]">Target ACoS</span>
+                            <span className="font-mono-nums font-semibold text-[#111827]">{bleeder2Thresholds.targetACOS}%</span>
                           </div>
                           <div className="flex justify-between items-baseline">
-                            <span className="text-[#6E6E73]">SB/SD threshold</span>
-                            <span className="font-mono-nums font-semibold text-[#1D1D1F]">{bleeder2Thresholds.targetACOS + 10}%</span>
+                            <span className="text-[#374151]">SB/SD threshold</span>
+                            <span className="font-mono-nums font-semibold text-[#111827]">{bleeder2Thresholds.targetACOS + 10}%</span>
                           </div>
                           <div className="flex justify-between items-baseline">
-                            <span className="text-[#6E6E73]">SP threshold</span>
-                            <span className="font-mono-nums font-semibold text-[#1D1D1F]">{bleeder2Thresholds.targetACOS + 20}%</span>
+                            <span className="text-[#374151]">SP threshold</span>
+                            <span className="font-mono-nums font-semibold text-[#111827]">{bleeder2Thresholds.targetACOS + 20}%</span>
                           </div>
-                          <div className="flex justify-between items-baseline border-t border-[#F0F0F2] pt-2.5">
-                            <span className="text-[#6E6E73]">Orders ≤</span>
-                            <span className="font-mono-nums font-semibold text-[#1D1D1F]">{bleeder2Thresholds.fewerThanOrders}</span>
+                          <div className="flex justify-between items-baseline border-t border-[#F3F4F6] pt-2.5">
+                            <span className="text-[#374151]">Orders ≤</span>
+                            <span className="font-mono-nums font-semibold text-[#111827]">{bleeder2Thresholds.fewerThanOrders}</span>
                           </div>
                           {bleeder2Thresholds.excludeRanking && (
-                            <div className="text-[11.5px] text-[#86868B] pt-1">
+                            <div className="text-[11.5px] text-[#9CA3AF] pt-1">
                               · Ranking campaigns excluded
                             </div>
                           )}
@@ -922,8 +922,8 @@ const Index = () => {
                   {completedCount === totalCount && (
                     <div className="flex items-center gap-2 rounded-lg p-3"
                       style={{ background: 'rgba(52,199,89,0.08)', border: '1px solid rgba(52,199,89,0.25)' }}>
-                      <CheckCircle2 className="w-4 h-4" style={{ color: '#34C759' }} strokeWidth={2.2} />
-                      <span className="text-[13px] font-medium text-[#1A7F3E]">All tracks complete — session ready to archive</span>
+                      <CheckCircle2 className="w-4 h-4" style={{ color: '#10B981' }} strokeWidth={2.2} />
+                      <span className="text-[13px] font-medium text-[#047857]">All tracks complete — session ready to archive</span>
                     </div>
                   )}
                 </div>

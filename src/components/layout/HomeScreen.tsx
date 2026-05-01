@@ -125,7 +125,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
             fontSize: 11,
             fontWeight: 500,
             letterSpacing: '0.12em',
-            color: '#A1A1A6',
+            color: '#9CA3AF',
             textTransform: 'uppercase',
           }}
         >
@@ -135,10 +135,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
         {hasSessions ? (
           <p
             className="mt-3 max-w-2xl"
-            style={{ fontSize: 16, fontWeight: 400, color: '#6E6E73', lineHeight: 1.5 }}
+            style={{ fontSize: 16, fontWeight: 400, color: '#374151', lineHeight: 1.5 }}
           >
             You've addressed{' '}
-            <span style={{ fontSize: 24, fontWeight: 700, color: '#1D1D1F' }}>
+            <span style={{ fontSize: 24, fontWeight: 700, color: '#111827' }}>
               ${Math.round(monthStats.totalSpend).toLocaleString()}
             </span>{' '}
             in at-risk spend across {monthStats.sessions} session{monthStats.sessions === 1 ? '' : 's'} this month
@@ -146,7 +146,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
         ) : (
           <p
             className="mt-3 max-w-2xl"
-            style={{ fontSize: 16, fontWeight: 400, color: '#6E6E73', lineHeight: 1.5 }}
+            style={{ fontSize: 16, fontWeight: 400, color: '#374151', lineHeight: 1.5 }}
           >
             Run your first workflow to start tracking at-risk spend.
           </p>
@@ -169,7 +169,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                 style={{
                   minHeight: '180px',
                   cursor: 'pointer',
-                  borderColor: isRecommended ? 'rgba(99, 102, 241, 0.25)' : '#E5E5EA',
+                  borderColor: isRecommended ? 'rgba(99, 102, 241, 0.25)' : '#E5E7EB',
                   background: '#FFFFFF',
                   boxShadow: isEmptyState
                     ? '0 6px 20px rgba(99, 102, 241, 0.10)'
@@ -221,7 +221,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                     </span>
                   ) : (
                     <span
-                      className="text-[10px] font-semibold uppercase text-[#86868B]"
+                      className="text-[10px] font-semibold uppercase text-[#9CA3AF]"
                       style={{ letterSpacing: '0.08em' }}
                     >
                       {m.tag}
@@ -241,14 +241,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between mt-5 pt-4 border-t border-[#F0F0F2]">
+                <div className="flex items-center justify-between mt-5 pt-4 border-t border-[#F3F4F6]">
                   {lastRun ? (
-                    <span className="flex items-center gap-1.5 text-[12px] text-[#1D1D1F] font-medium">
+                    <span className="flex items-center gap-1.5 text-[12px] text-[#111827] font-medium">
                       <Clock className="w-3 h-3" strokeWidth={1.8} />
                       Last run {formatRelative(lastRun)}
                     </span>
                   ) : (
-                    <span className="text-[12px] text-[#A1A1A6]">Not yet run</span>
+                    <span className="text-[12px] text-[#9CA3AF]">Not yet run</span>
                   )}
                   <span
                     className="text-[12px] font-semibold flex items-center gap-1"
@@ -284,24 +284,24 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
         </div>
         {recent.length === 0 ? (
           <div
-            className="rounded-[10px] border border-[#E5E5EA] bg-white px-5 py-10 text-center"
+            className="rounded-[10px] border border-[#E5E7EB] bg-white px-5 py-10 text-center"
             style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}
           >
-            <Clock className="w-4 h-4 mx-auto text-[#86868B] opacity-60" strokeWidth={1.6} />
-            <p className="text-[13px] text-[#86868B] mt-2">
+            <Clock className="w-4 h-4 mx-auto text-[#9CA3AF] opacity-60" strokeWidth={1.6} />
+            <p className="text-[13px] text-[#9CA3AF] mt-2">
               Your completed sessions will appear here.
             </p>
           </div>
         ) : (
           <div className="space-y-2">
             {recent.map((e) => {
-              const accent = MODULE_ACCENT[e.module] ?? '#86868B';
+              const accent = MODULE_ACCENT[e.module] ?? '#9CA3AF';
               const success = e.bleedersFound >= 0;
               const Icon = success ? CheckCircle2 : AlertTriangle;
               return (
                 <div
                   key={e.id}
-                  className="rounded-[10px] border border-[#E5E5EA] bg-white px-5 py-4 flex items-center gap-4 cursor-pointer"
+                  className="rounded-[10px] border border-[#E5E7EB] bg-white px-5 py-4 flex items-center gap-4 cursor-pointer"
                   style={{
                     boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
                     borderLeft: `3px solid ${accent}`,
@@ -315,21 +315,21 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                       <Icon
                         className="w-3.5 h-3.5 flex-shrink-0"
                         strokeWidth={2}
-                        style={{ color: success ? '#34C759' : '#F59E0B' }}
+                        style={{ color: success ? '#10B981' : '#F59E0B' }}
                       />
-                      <span className="text-[14px] font-semibold text-[#1D1D1F] truncate">
+                      <span className="text-[14px] font-semibold text-[#111827] truncate">
                         {MODULE_LABELS[e.module] ?? e.module}
                       </span>
                       {e.track && (
-                        <span className="text-[10.5px] font-mono-nums px-1.5 py-px rounded bg-[#F5F5F7] text-[#86868B]">
+                        <span className="text-[10.5px] font-mono-nums px-1.5 py-px rounded bg-[#F3F4F6] text-[#9CA3AF]">
                           {e.track}
                         </span>
                       )}
                     </div>
-                    <p className="text-[12px] text-[#86868B] truncate mt-0.5 ml-5">
+                    <p className="text-[12px] text-[#9CA3AF] truncate mt-0.5 ml-5">
                       {e.clientName} · {e.fileName}
                     </p>
-                    <p className="text-[12px] text-[#6E6E73] truncate mt-0.5 ml-5">
+                    <p className="text-[12px] text-[#374151] truncate mt-0.5 ml-5">
                       {decisionsSummary(e)}
                     </p>
                   </div>
@@ -340,7 +340,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                         style={{ width: 6, height: 6, background: accent }}
                       />
                       <span
-                        className="font-mono-nums text-[#1D1D1F]"
+                        className="font-mono-nums text-[#111827]"
                         style={{ fontSize: 14, fontWeight: 600 }}
                       >
                         {e.bleedersFound.toLocaleString()} bleeders
@@ -368,7 +368,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
           ].map((q) => (
             <div
               key={q.title}
-              className="rounded-[10px] border border-[#E5E5EA] flex items-start justify-between gap-3 cursor-pointer tile-hover"
+              className="rounded-[10px] border border-[#E5E7EB] flex items-start justify-between gap-3 cursor-pointer tile-hover"
               style={{
                 background: '#FFFFFF',
                 borderLeft: '2px solid rgba(37, 99, 235, 0.15)',
@@ -379,19 +379,19 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
               <div className="flex items-start gap-3 min-w-0">
                 <q.Icon
                   className="flex-shrink-0 mt-0.5"
-                  style={{ width: 18, height: 18, color: '#6E6E73' }}
+                  style={{ width: 18, height: 18, color: '#374151' }}
                   strokeWidth={1.8}
                 />
                 <div className="min-w-0">
-                  <div className="text-[13px] font-semibold text-[#1D1D1F] tracking-tight">
+                  <div className="text-[13px] font-semibold text-[#111827] tracking-tight">
                     {q.title}
                   </div>
-                  <p className="text-[12.5px] text-[#6E6E73] mt-1.5 leading-relaxed">{q.desc}</p>
+                  <p className="text-[12.5px] text-[#374151] mt-1.5 leading-relaxed">{q.desc}</p>
                 </div>
               </div>
               <ChevronRight
                 className="flex-shrink-0 mt-0.5"
-                style={{ width: 16, height: 16, color: '#C7C7CC' }}
+                style={{ width: 16, height: 16, color: '#D1D5DB' }}
                 strokeWidth={1.8}
               />
             </div>
@@ -401,15 +401,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
 
       {/* Footer */}
       <div
-        className="border-t border-[#F0F0F2] py-4 flex items-center justify-between"
+        className="border-t border-[#F3F4F6] py-4 flex items-center justify-between"
         style={{ marginTop: 48, opacity: 0.75 }}
       >
-        <span style={{ fontSize: 11, color: '#A1A1A6' }}>Zen AI · Amazon Ads Workflow</span>
+        <span style={{ fontSize: 11, color: '#9CA3AF' }}>Zen AI · Amazon Ads Workflow</span>
         <div className="flex items-center gap-4">
           <a
             href="mailto:feedback@adprune.com"
-            style={{ fontSize: 11, color: '#A1A1A6' }}
-            className="hover:text-[#1D1D1F] transition-colors"
+            style={{ fontSize: 11, color: '#9CA3AF' }}
+            className="hover:text-[#111827] transition-colors"
           >
             Feedback
           </a>
@@ -417,12 +417,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
             href="https://docs.lovable.dev"
             target="_blank"
             rel="noreferrer"
-            style={{ fontSize: 11, color: '#A1A1A6' }}
-            className="hover:text-[#1D1D1F] transition-colors"
+            style={{ fontSize: 11, color: '#9CA3AF' }}
+            className="hover:text-[#111827] transition-colors"
           >
             Changelog
           </a>
-          <span style={{ fontSize: 11, color: '#A1A1A6' }} className="font-mono-nums">v2.0</span>
+          <span style={{ fontSize: 11, color: '#9CA3AF' }} className="font-mono-nums">v2.0</span>
         </div>
       </div>
     </div>

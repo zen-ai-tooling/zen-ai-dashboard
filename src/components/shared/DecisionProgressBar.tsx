@@ -14,7 +14,7 @@ interface DecisionProgressBarProps {
 
 /**
  * 8px segmented progress bar showing decision composition.
- * Undecided remainder is rendered in light gray (#E5E5EA).
+ * Undecided remainder is rendered in light gray (#E5E7EB).
  */
 export const DecisionProgressBar: React.FC<DecisionProgressBarProps> = ({
   total,
@@ -28,7 +28,7 @@ export const DecisionProgressBar: React.FC<DecisionProgressBarProps> = ({
 
   return (
     <div
-      className={`flex w-full max-w-[280px] overflow-hidden bg-[#E5E5EA] ${className}`}
+      className={`flex w-full max-w-[280px] overflow-hidden bg-[#E5E7EB] ${className}`}
       style={{
         height: 8,
         borderRadius: 4,
@@ -56,7 +56,7 @@ export const DecisionProgressBar: React.FC<DecisionProgressBarProps> = ({
         );
       })}
       {remainder > 0 && total > 0 && (
-        <div style={{ width: `${(remainder / total) * 100}%`, background: '#E5E5EA' }} />
+        <div style={{ width: `${(remainder / total) * 100}%`, background: '#E5E7EB' }} />
       )}
     </div>
   );

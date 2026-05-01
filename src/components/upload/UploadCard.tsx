@@ -81,14 +81,14 @@ export const UploadCard = ({ onFileUpload, isVisible }: UploadCardProps) => {
           <button
             onClick={handleClear}
             className="rounded-[10px] btn-press"
-            style={{ background: '#FFFFFF', border: '1px solid #D2D2D7', color: '#1D1D1F', padding: '12px 24px', fontSize: 14, fontWeight: 600 }}
+            style={{ background: '#FFFFFF', border: '1px solid #D1D5DB', color: '#111827', padding: '12px 24px', fontSize: 14, fontWeight: 600 }}
           >
             Cancel
           </button>
           <button
             onClick={handleAnalyze}
             className="rounded-[10px] btn-press"
-            style={{ background: '#2563EB', color: '#FFFFFF', padding: '12px 24px', fontSize: 14, fontWeight: 600 }}
+            style={{ background: '#4F6EF7', color: '#FFFFFF', padding: '12px 24px', fontSize: 14, fontWeight: 600 }}
           >
             Analyze File →
           </button>

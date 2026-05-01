@@ -31,7 +31,7 @@ export function suggestB1Row(row: B1SuggestionInput): B1Suggestion {
       kind: 'pause',
       label: 'Pause',
       bg: 'rgba(255, 59, 48, 0.10)',
-      color: '#B71C1C',
+      color: '#B91C1C',
       border: 'rgba(255, 59, 48, 0.25)',
       rationale: `${clicks} clicks with zero conversions — strong pause candidate`,
     };
@@ -42,7 +42,7 @@ export function suggestB1Row(row: B1SuggestionInput): B1Suggestion {
       kind: 'review',
       label: 'Review',
       bg: 'rgba(255, 149, 0, 0.10)',
-      color: '#A35A00',
+      color: '#B45309',
       border: 'rgba(255, 149, 0, 0.25)',
       rationale: `${clicks} clicks with no conversions — review before deciding`,
     };
@@ -53,7 +53,7 @@ export function suggestB1Row(row: B1SuggestionInput): B1Suggestion {
       kind: 'monitor',
       label: 'Monitor',
       bg: 'rgba(134, 134, 139, 0.10)',
-      color: '#6E6E73',
+      color: '#374151',
       border: 'rgba(134, 134, 139, 0.25)',
       rationale: `${clicks} clicks — consider monitoring before taking action`,
     };
@@ -63,7 +63,7 @@ export function suggestB1Row(row: B1SuggestionInput): B1Suggestion {
     kind: 'keep',
     label: 'Keep?',
     bg: 'rgba(52, 199, 89, 0.10)',
-    color: '#1A7F3E',
+    color: '#047857',
     border: 'rgba(52, 199, 89, 0.25)',
     rationale: 'Performance is borderline — keep and monitor for now',
   };

@@ -41,7 +41,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
   onDownload,
   onStartNew,
   onViewFullResults,
-  accentColor = '#34C759',
+  accentColor = '#10B981',
   impactHeadline,
   impactSubtitle,
   totalRows,
@@ -90,7 +90,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
             <div
               className="relative w-[72px] h-[72px] rounded-full flex items-center justify-center mx-auto"
               style={{
-                background: '#34C759',
+                background: '#10B981',
                 animation: 'cv-hero-pop 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both',
               }}
             >
@@ -99,13 +99,13 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
           </div>
 
           <h1
-            className="font-bold text-[#1D1D1F]"
+            className="font-bold text-[#111827]"
             style={{ fontSize: 24, letterSpacing: '-0.3px', animation: 'cv-fade-in 200ms ease-out 400ms both' }}
           >
             {title}
           </h1>
           <p
-            className="text-[12px] font-mono-nums text-[#86868B] mt-1.5 truncate"
+            className="text-[12px] font-mono-nums text-[#9CA3AF] mt-1.5 truncate"
             title={fileName}
             style={{ animation: 'cv-fade-in 200ms ease-out 500ms both' }}
           >
@@ -122,8 +122,8 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
                 className="rounded-[10px] btn-press inline-flex items-center gap-1.5"
                 style={{
                   background: '#FFFFFF',
-                  border: '1px solid #D2D2D7',
-                  color: '#1D1D1F',
+                  border: '1px solid #D1D5DB',
+                  color: '#111827',
                   padding: '12px 24px',
                   fontSize: 14,
                   fontWeight: 600,
@@ -138,7 +138,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
                 onClick={onStartNew}
                 className="rounded-[10px] btn-press inline-flex items-center gap-1.5"
                 style={{
-                  background: '#2563EB',
+                  background: '#4F6EF7',
                   color: '#fff',
                   padding: '12px 24px',
                   fontSize: 14,
@@ -157,7 +157,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
           className="mt-8 p-6"
           style={{
             background: '#FFFFFF',
-            border: '1px solid #E5E5EA',
+            border: '1px solid #E5E7EB',
             borderTop: `2px solid ${accentColor}`,
             borderRadius: 12,
             boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.04)',
@@ -166,7 +166,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
         >
           <h3
             className="mb-3 text-center"
-            style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', color: '#86868B' }}
+            style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', color: '#9CA3AF' }}
           >
             Session impact
           </h3>
@@ -176,23 +176,23 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
               <ImpactDonut addressed={donutAddressed} undecided={donutUndecided} size={80} />
               <div className="text-left">
                 <div
-                  className="font-mono-nums text-[#1D1D1F] leading-none"
+                  className="font-mono-nums text-[#111827] leading-none"
                   style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-1px' }}
                 >
                   {impactHeadline}
                 </div>
                 {impactSubtitle && (
-                  <div className="text-[13px] text-[#6E6E73] mt-2.5">{impactSubtitle}</div>
+                  <div className="text-[13px] text-[#374151] mt-2.5">{impactSubtitle}</div>
                 )}
               </div>
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-x-8 gap-y-3 pt-4 border-t border-[#F0F0F2]">
+          <div className="grid grid-cols-2 gap-x-8 gap-y-3 pt-4 border-t border-[#F3F4F6]">
             {summary.map((s) => (
               <div key={s.label} className="flex items-baseline justify-between">
-                <span style={{ fontSize: 13, color: '#6E6E73' }}>{s.label}</span>
-                <span className="font-mono-nums text-right" style={{ fontSize: 16, fontWeight: 600, color: '#1D1D1F' }}>
+                <span style={{ fontSize: 13, color: '#374151' }}>{s.label}</span>
+                <span className="font-mono-nums text-right" style={{ fontSize: 16, fontWeight: 600, color: '#111827' }}>
                   {s.value}
                 </span>
               </div>
@@ -206,7 +206,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
             className="mt-4 p-6"
             style={{
               background: '#FFFFFF',
-              border: '1px solid #E5E5EA',
+              border: '1px solid #E5E7EB',
               borderTop: `2px solid ${accentColor}`,
               borderRadius: 12,
               boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.04)',
@@ -215,14 +215,14 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
           >
             <h3
               className="mb-4"
-              style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', color: '#86868B' }}
+              style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', color: '#9CA3AF' }}
             >
               Decisions breakdown
             </h3>
 
             {/* Bar — 16px tall, rounded ends, white gaps between segments, inline % when wide enough */}
             <div
-              className="flex w-full overflow-hidden bg-[#F0F0F2] mb-4"
+              className="flex w-full overflow-hidden bg-[#F3F4F6] mb-4"
               style={{ height: 16, borderRadius: 8, gap: 1 }}
             >
               {breakdown.map((b) => {
@@ -236,7 +236,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
                     className="flex items-center justify-center"
                     style={{
                       width: `${pct}%`,
-                      background: isUndecided ? '#E5E5EA' : b.color,
+                      background: isUndecided ? '#E5E7EB' : b.color,
                       transition: 'width 320ms ease',
                     }}
                     title={`${b.label}: ${b.count} (${pct.toFixed(0)}%)`}
@@ -246,7 +246,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
                         style={{
                           fontSize: 10,
                           fontWeight: 700,
-                          color: isUndecided ? '#6E6E73' : '#FFFFFF',
+                          color: isUndecided ? '#374151' : '#FFFFFF',
                           letterSpacing: 0.2,
                         }}
                       >
@@ -267,14 +267,14 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
                   <div key={b.label} className="flex items-center gap-2">
                     <span
                       className="rounded-full"
-                      style={{ width: 8, height: 8, background: isUndecided ? '#E5E5EA' : b.color }}
+                      style={{ width: 8, height: 8, background: isUndecided ? '#E5E7EB' : b.color }}
                     />
-                    <span style={{ fontSize: 13, color: isUndecided ? '#86868B' : '#6E6E73' }}>{b.label}</span>
-                    <span className="font-mono-nums" style={{ fontSize: 13, fontWeight: 600, color: '#1D1D1F' }}>
+                    <span style={{ fontSize: 13, color: isUndecided ? '#9CA3AF' : '#374151' }}>{b.label}</span>
+                    <span className="font-mono-nums" style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>
                       {b.count}
                     </span>
                     {showPctInLegend && (
-                      <span className="font-mono-nums" style={{ fontSize: 11, color: '#86868B' }}>
+                      <span className="font-mono-nums" style={{ fontSize: 11, color: '#9CA3AF' }}>
                         ({pct.toFixed(0)}%)
                       </span>
                     )}
@@ -286,13 +286,13 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
             {allDecided ? (
               <p
                 className="mt-4 inline-flex items-center gap-1.5"
-                style={{ fontSize: 13, color: '#34C759', fontWeight: 600 }}
+                style={{ fontSize: 13, color: '#10B981', fontWeight: 600 }}
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Every bleeder has been addressed
               </p>
             ) : noCount > 0 ? (
-              <p className="mt-4" style={{ fontSize: 13, color: '#86868B' }}>
+              <p className="mt-4" style={{ fontSize: 13, color: '#9CA3AF' }}>
                 {noCount === 1 ? '1 row was left at its current state' : `${noCount} rows were left at their current state`}
               </p>
             ) : null}
@@ -303,8 +303,8 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
         <div
           className="mt-4 flex items-start gap-3"
           style={{
-            background: '#F0F5FF',
-            borderLeft: '3px solid #0071E3',
+            background: 'rgba(79, 110, 247, 0.06)',
+            borderLeft: '3px solid #4F6EF7',
             borderRadius: 8,
             padding: '16px 20px',
             animation: 'cv-slide-up 200ms ease-out 1000ms both',
@@ -314,19 +314,19 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
             className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
             style={{ background: 'rgba(0, 113, 227, 0.10)' }}
           >
-            <Info className="w-4 h-4" style={{ color: '#0071E3' }} />
+            <Info className="w-4 h-4" style={{ color: '#4F6EF7' }} />
           </div>
           <div className="min-w-0 flex-1">
             <h4
               className="mb-1.5"
-              style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', color: '#86868B' }}
+              style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', color: '#9CA3AF' }}
             >
               What's next
             </h4>
-            <p style={{ fontSize: 14, color: '#1D1D1F', lineHeight: 1.45 }}>
+            <p style={{ fontSize: 14, color: '#111827', lineHeight: 1.45 }}>
               Your Amazon bulk file is ready to upload back into Campaign Manager.
             </p>
-            <p className="mt-1.5 font-mono-nums" style={{ fontSize: 12, color: '#6E6E73' }}>
+            <p className="mt-1.5 font-mono-nums" style={{ fontSize: 12, color: '#374151' }}>
               Amazon Ads → Campaign Manager → Bulk Operations → Upload
             </p>
           </div>
@@ -337,7 +337,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
             <button
               onClick={onViewFullResults}
               className="hover:underline btn-press"
-              style={{ fontSize: 13, fontWeight: 500, color: '#0071E3' }}
+              style={{ fontSize: 13, fontWeight: 500, color: '#4F6EF7' }}
             >
               View full results → Review all {total} bleeders and decisions
             </button>
