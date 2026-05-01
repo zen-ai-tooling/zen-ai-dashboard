@@ -597,6 +597,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                           value={decision}
                           onChange={(val) => setDecisionWithFlash(idx, val)}
                           options={getDecisionOptions()}
+                          placeholder="Decide..."
                           width="128px"
                         />
                         {decisions[idx] === 'Cut Bid' && (
