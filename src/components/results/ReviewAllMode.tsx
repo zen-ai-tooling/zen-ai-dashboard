@@ -49,19 +49,19 @@ interface ReviewAllModeProps {
 }
 
 const SUGGESTION_PILL_CLASS = {
-  pause: { bg: "#FEE2E2", color: "#B91C1C", label: "Pause" },
-  review: { bg: "#FFEDD5", color: "#9A3412", label: "Review" },
-  monitor: { bg: "#FEF3C7", color: "#92400E", label: "Monitor" },
-  keep: { bg: "#F1F5F9", color: "#475569", label: "None" },
+  pause: { bg: "rgba(239, 68, 68, 0.10)", color: "#B91C1C", label: "Pause" },
+  review: { bg: "rgba(245, 158, 11, 0.10)", color: "#B45309", label: "Review" },
+  monitor: { bg: "rgba(245, 158, 11, 0.06)", color: "#92400E", label: "Monitor" },
+  keep: { bg: "#F3F4F6", color: "#374151", label: "None" },
 } as const;
 
 const DECISION_PILL = (decision: string): { bg: string; color: string; label: string } | null => {
   if (!decision) return null;
-  if (decision === "Pause") return { bg: "#DC2626", color: "#FFFFFF", label: "Pause" };
-  if (decision.startsWith("Cut")) return { bg: "#EA580C", color: "#FFFFFF", label: "Cut Bid" };
-  if (decision === "Keep") return { bg: "#16A34A", color: "#FFFFFF", label: "Keep" };
-  if (decision.startsWith("Negat")) return { bg: "#2563EB", color: "#FFFFFF", label: decision.includes("Phrase") ? "Negative (P)" : "Negative" };
-  return { bg: "#6B7280", color: "#FFFFFF", label: decision };
+  if (decision === "Pause") return { bg: "#EF4444", color: "#FFFFFF", label: "Pause" };
+  if (decision.startsWith("Cut")) return { bg: "#F59E0B", color: "#FFFFFF", label: "Cut Bid" };
+  if (decision === "Keep") return { bg: "#10B981", color: "#FFFFFF", label: "Keep" };
+  if (decision.startsWith("Negat")) return { bg: "#6366F1", color: "#FFFFFF", label: decision.includes("Phrase") ? "Negative (P)" : "Negative" };
+  return { bg: "#9CA3AF", color: "#FFFFFF", label: decision };
 };
 
 const parseAcosNum = (s: string): number => {
