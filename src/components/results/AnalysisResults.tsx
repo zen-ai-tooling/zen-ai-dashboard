@@ -402,6 +402,42 @@ export const AnalysisResults = ({
         </button>
       )}
 
+      {/* Mode toggle — Triage vs Review All */}
+      <div className="flex items-center justify-end">
+        <div
+          className="inline-flex items-center p-0.5 rounded-full border border-border bg-card"
+          role="tablist"
+          aria-label="View mode"
+        >
+          <button
+            role="tab"
+            aria-selected={viewMode === 'triage'}
+            onClick={() => setViewMode('triage')}
+            className={`inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full text-[12.5px] font-medium transition-colors ${
+              viewMode === 'triage'
+                ? 'text-white shadow-sm'
+                : 'text-[hsl(var(--text-secondary))] hover:text-foreground'
+            }`}
+            style={viewMode === 'triage' ? { background: '#2563EB' } : undefined}
+          >
+            <Zap className="w-3.5 h-3.5" /> Triage
+          </button>
+          <button
+            role="tab"
+            aria-selected={viewMode === 'review'}
+            onClick={() => setViewMode('review')}
+            className={`inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full text-[12.5px] font-medium transition-colors ${
+              viewMode === 'review'
+                ? 'text-white shadow-sm'
+                : 'text-[hsl(var(--text-secondary))] hover:text-foreground'
+            }`}
+            style={viewMode === 'review' ? { background: '#2563EB' } : undefined}
+          >
+            <ListIcon className="w-3.5 h-3.5" /> Review All
+          </button>
+        </div>
+      </div>
+
       {/* Compact stats + workflow steps — single unified container */}
       <CompactStatsBar
         accent={mode === 'lifetime' ? 'purple' : 'red'}
@@ -416,6 +452,58 @@ export const AnalysisResults = ({
           { label: 'Generate Amazon file', status: generateDone ? 'complete' : 'pending' },
         ]}
       />
+
+      {/* TRIAGE MODE ─────────────────────────────────────── */}
+      {viewMode === 'triage' && sheetNames.length > 0 && (() => {
+        const items: TriageItem[] = [];
+        Object.entries(rowsBySheet).forEach(([sheet, rows]) => {
+          rows.forEach((row, idx) => {
+            items.push({
+              key: `${sheet}-ROWINDEX-${idx}`,
+              sheet,
+              campaign: row.campaign || '—',
+              adGroup: row.ad_group || '',
+              entity: row.customer_search_term || row.keyword_text || row.product_targeting || row.entity || '—',
+              matchType: row.match_type || undefined,
+              clicks: row.clicks ?? 0,
+              spend: row.spend ?? 0,
+              sales: row.sales ?? 0,
+              acos: row.acos || '',
+              acosNum: parseAcosNum(row.acos),
+              orders: row.orders ?? 0,
+            });
+          });
+        });
+        // Sort by spend desc — most at-risk first.
+        items.sort((a, b) => b.spend - a.spend);
+
+        const decisionSpecsBySheet = (sheet: string): TriageDecisionSpec[] => {
+          const opts = getDecisionOptions(sheet);
+          return opts.map((opt) => {
+            if (opt === 'Pause') return { value: 'Pause', label: 'PAUSE', bg: '#DC2626', color: '#FFFFFF', shortcut: 'P', countsAsSavings: true };
+            if (opt === 'Cut Bid 50%') return { value: 'Cut Bid 50%', label: 'CUT BID', bg: '#EA580C', color: '#FFFFFF', shortcut: 'C', countsAsSavings: true };
+            if (opt === 'Keep') return { value: 'Keep', label: 'KEEP', bg: '#16A34A', color: '#FFFFFF', shortcut: 'K', countsAsSavings: false };
+            // Negate variants → blue NEGATIVE; map both to single shortcut N (last wins, but typically only one is shown alongside Keep)
+            if (opt.startsWith('Negat')) return { value: opt, label: opt.includes('Phrase') ? 'NEG (PHRASE)' : 'NEGATIVE', bg: '#2563EB', color: '#FFFFFF', shortcut: opt.includes('Phrase') ? 'N' : 'N', countsAsSavings: true };
+            return { value: opt, label: opt.toUpperCase(), bg: '#6B7280', color: '#FFFFFF', shortcut: opt[0].toUpperCase(), countsAsSavings: false };
+          });
+        };
+
+        return (
+          <TriageMode
+            items={items}
+            decisions={decisions}
+            decisionSpecsBySheet={decisionSpecsBySheet}
+            onDecide={(key, val) => setDecisionWithFlash(key, val)}
+            onUndo={(key) => setDecisions(prev => { const n = { ...prev }; delete n[key]; return n; })}
+            onGenerate={handleGenerateDecisionFile}
+            onSwitchToReview={() => setViewMode('review')}
+            totalSpend={totalSpend}
+            sheetsCount={sheetsCount}
+            shortSheetLabel={shortTabLabel}
+          />
+        );
+      })()}
 
       {/* Completion banner removed — replaced by full CompletionView page */}
 
