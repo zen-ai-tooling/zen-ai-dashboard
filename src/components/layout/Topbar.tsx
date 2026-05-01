@@ -29,7 +29,7 @@ export const Topbar: React.FC<TopbarProps> = ({
 }) => {
   return (
     <div
-      className="flex items-center justify-between px-6 flex-shrink-0 sticky top-0 z-30"
+      className="app-topbar flex items-center justify-between px-6 flex-shrink-0 sticky top-0 z-30"
       style={{ height: '52px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB' }}
     >
       {/* Left: back + breadcrumb */}
