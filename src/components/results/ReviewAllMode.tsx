@@ -713,5 +713,45 @@ export const ReviewAllMode = ({
         </div>
       </div>
     </div>
+
+      {/* "/" hint */}
+      <div className="fixed bottom-3 left-3 text-[11px] z-20" style={{ color: '#9CA3AF' }}>
+        Press <kbd className="px-1.5 py-0.5 rounded font-mono-nums" style={{ background: '#F3F4F6', color: '#374151' }}>/</kbd> for commands
+      </div>
+
+      {/* Command palette */}
+      {paletteOpen && (
+        <div className="fixed inset-0 z-[120] flex items-start justify-center pt-[20vh] px-4" style={{ background: 'rgba(0,0,0,0.4)' }} onClick={() => setPaletteOpen(false)}>
+          <div
+            className="w-full max-w-[480px] rounded-xl overflow-hidden"
+            style={{ background: '#1F2937', border: '1px solid #374151', boxShadow: '0 25px 60px rgba(0,0,0,0.5)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              autoFocus
+              value={paletteQuery}
+              onChange={(e) => setPaletteQuery(e.target.value)}
+              placeholder="Type a command or filter..."
+              className="w-full bg-transparent text-white px-4 py-3 text-[14px] outline-none border-b"
+              style={{ borderColor: '#374151' }}
+            />
+            <div className="max-h-[320px] overflow-y-auto py-1">
+              {filteredCommands.length === 0 ? (
+                <div className="px-4 py-3 text-[13px]" style={{ color: '#9CA3AF' }}>No matching commands</div>
+              ) : filteredCommands.map(c => (
+                <button
+                  key={c.id}
+                  onClick={() => { c.run(); setPaletteOpen(false); setPaletteQuery(''); }}
+                  className="w-full text-left px-4 py-2 text-[13px] hover:bg-white/5"
+                  style={{ color: '#F3F4F6' }}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
