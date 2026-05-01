@@ -442,8 +442,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
               suggestions.forEach((s, idx) => { allSuggested[idx] = s.decision; });
               setDecisions(allSuggested);
             }} className="bulk-btn btn-press">
-              <span className="decision-dot" style={{ background: '#4F6EF7' }} />
-              Apply all suggestions
+              <Sparkles className="w-3 h-3" style={{ color: '#4F6EF7' }} />
+              Apply all AI suggestions
             </button>
             {getDecisionOptions().includes('Pause') && (
               <button onClick={handleSetAllPause} className="bulk-btn btn-press">
