@@ -13,6 +13,8 @@ import { suggestB1Row } from "@/lib/ui/bleeder1Suggestion";
 import { TriageMode, type TriageItem, type TriageDecisionSpec } from "@/components/results/TriageMode";
 import { ReviewAllMode } from "@/components/results/ReviewAllMode";
 import { Zap, List as ListIcon } from "lucide-react";
+import { processDecisions } from '@/lib/decisionProcessor';
+import * as XLSX from 'xlsx';
 
 interface TopSpender {
   term: string;
@@ -294,41 +296,56 @@ export const AnalysisResults = ({
       });
       for (const [tabName, rows] of Object.entries(grouped)) {
         const ws = wb.addWorksheet(tabName);
-        ws.addRow(['Campaign Name', 'Ad Group Name', 'Entity', 'Keyword Text', 'Product Targeting Expression', 'Match Type', 'Customer Search Term', 'Decision', 'Campaign Id', 'Ad Group Id', 'Keyword Id', 'Product Targeting Id', 'Targeting Id']);
+        ws.addRow(['Campaign Name', 'Ad Group Name', 'Entity', 'Keyword Text', 'Product Targeting Expression', 'Match Type', 'Customer Search Term', 'Decision', 'Campaign Id', 'Ad Group Id', 'Keyword Id', 'Product Targeting Id', 'Targeting Id', 'Bid']);
         rows.forEach((row: any) => {
-          ws.addRow([row.campaign ?? '', row.ad_group ?? '', row.entityType ?? row.entity ?? '', row.keyword_text ?? '', row.product_targeting ?? '', row.match_type ?? '', row.customer_search_term ?? '', row._decision, row.campaignId ?? '', row.adGroupId ?? '', row.keywordId ?? '', row.productTargetingId ?? '', row.targetingId ?? '']);
+          ws.addRow([row.campaign ?? '', row.ad_group ?? '', row.entityType ?? row.entity ?? '', row.keyword_text ?? '', row.product_targeting ?? '', row.match_type ?? '', row.customer_search_term ?? '', row._decision, row.campaignId ?? '', row.adGroupId ?? '', row.keywordId ?? '', row.productTargetingId ?? '', row.targetingId ?? '', row.bid ?? '']);
         });
       }
       const buffer = await wb.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
+      const decisionsFile = new File(
+        [buffer],
+        'decisions.xlsx',
+        { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
+      );
+      const result = await processDecisions(decisionsFile);
       const date = new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles', month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-');
-      const fileName = `Bleeders_1_Decisions_${date}_PT.xlsx`;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      setGeneratedFileName(fileName);
-      setGenerateDone(true);
-      // Persistent re-download handler for the completion banner
-      lastDownloadRef.current = () => {
-        const blob2 = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const u2 = URL.createObjectURL(blob2);
-        const a2 = document.createElement('a');
-        a2.href = u2;
-        a2.download = fileName;
-        document.body.appendChild(a2);
-        a2.click();
-        document.body.removeChild(a2);
-        URL.revokeObjectURL(u2);
-      };
-      toast.success('Decision file downloaded', {
-        description: `${decisionsMade} decisions exported`,
-        duration: 3000,
-      });
+
+      if (result.validation.errors.length === 0) {
+        const outBuffer = XLSX.write(result.workbook, { bookType: 'xlsx', type: 'array' });
+        const amazonFileName = `Bleeders_1_Amazon_${date}_PT.xlsx`;
+        const blob = new Blob([outBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = amazonFileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        setGeneratedFileName(amazonFileName);
+        setGenerateDone(true);
+        lastDownloadRef.current = () => {
+          const blob2 = new Blob([outBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          const u2 = URL.createObjectURL(blob2);
+          const a2 = document.createElement('a');
+          a2.href = u2;
+          a2.download = amazonFileName;
+          document.body.appendChild(a2);
+          a2.click();
+          document.body.removeChild(a2);
+          URL.revokeObjectURL(u2);
+        };
+        toast.success('Amazon bulk file ready', {
+          description: `${decisionsMade} decisions processed`,
+          duration: 3000,
+        });
+        if (result.validation.warnings.length > 0) {
+          toast.warning(result.validation.warnings[0]);
+        }
+      } else {
+        console.error('[Generate Decision File] Validation errors:', result.validation.errors);
+        toast.error(result.validation.errors[0]);
+      }
     } catch (err) {
       console.error('[Generate Decision File] Failed:', err);
       toast.error('Failed to generate decision file');
