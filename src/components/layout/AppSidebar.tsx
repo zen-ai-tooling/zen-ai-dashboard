@@ -77,28 +77,22 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                 d="M0,-58 C12,-46 20,-20 18,12 C16,40 6,56 0,58 C6,54 24,38 36,14 C46,0 44,-28 30,-46 C20,-58 10,-62 0,-58 Z"
                 fill="#3b0764"
               />
-              <path
-                d="M0,-58 C3,-30 -3,2 0,58"
-                stroke-width="1.2"
-                stroke-linecap="round"
-                fill="none"
-                stroke="rgba(255,255,255,0.1)"
-              />
               <ellipse cx="-16" cy="-18" rx="11" ry="15" transform="rotate(-15 -16 -18)" fill="rgba(255,255,255,0.1)" />
               <path
-                d="M0,-58 C-1,-66 1,-74 0,-80"
+                d="M0,-58 C-4,-68 -8,-76 -10,-84"
                 stroke-width="3"
                 stroke-linecap="round"
                 fill="none"
                 stroke="#ffffff"
               />
-              <path d="M0,-72 C10,-84 28,-86 30,-78 C20,-68 4,-68 0,-72 Z" fill="#a78bfa" />
+              <path d="M-7,-74 C2,-84 18,-84 18,-78 C8,-71 -5,-72 -7,-74 Z" fill="#a78bfa" />
+              <path d="M-8,-67 C-16,-75 -28,-74 -28,-69 C-20,-63 -9,-64 -8,-67 Z" fill="#a78bfa" opacity="0.65" />
             </g>
             <text
               x="148"
               y="172"
               font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
-              font-size="82"
+              font-size="83"
               font-weight="700"
               letter-spacing="-5"
               fill="#ffffff"
