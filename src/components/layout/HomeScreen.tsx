@@ -175,10 +175,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                 style={{
                   minHeight: '180px',
                   cursor: 'pointer',
-                  borderColor: isRecommended ? 'rgba(99, 102, 241, 0.25)' : '#E5E7EB',
+                  borderColor: isRecommended ? 'rgba(13, 148, 136, 0.25)' : '#E5E7EB',
                   background: '#FFFFFF',
                   boxShadow: isEmptyState
-                    ? '0 6px 20px rgba(99, 102, 241, 0.10)'
+                    ? '0 6px 20px rgba(13, 148, 136, 0.10)'
                     : isRecommended
                       ? '0 2px 8px rgba(0,0,0,0.04)'
                       : '0 1px 3px rgba(0,0,0,0.04)',
@@ -191,7 +191,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                 onMouseLeave={(ev) => {
                   ev.currentTarget.style.transform = 'translateY(0)';
                   ev.currentTarget.style.boxShadow = isEmptyState
-                    ? '0 6px 20px rgba(99, 102, 241, 0.10)'
+                    ? '0 6px 20px rgba(13, 148, 136, 0.10)'
                     : isRecommended
                       ? '0 2px 8px rgba(0,0,0,0.04)'
                       : '0 1px 3px rgba(0,0,0,0.04)';
@@ -207,7 +207,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                       left: 0,
                       right: 0,
                       height: 3,
-                      background: 'linear-gradient(90deg, #6366F1 0%, #4F46E5 100%)',
+                      background: '#0D9488',
                     }}
                   />
                 )}
