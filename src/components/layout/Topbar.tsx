@@ -65,11 +65,12 @@ export const Topbar: React.FC<TopbarProps> = ({
       <div className="flex items-center justify-center flex-shrink-0">
         {statusBadge && (
           <span
-            className={`text-[12px] px-2.5 py-1 rounded-md font-medium font-mono-nums ${
+            className="text-[12px] py-1 rounded-md font-medium font-mono-nums"
+            style={
               statusBadge.variant === 'danger'
-                ? 'bg-destructive/10 text-destructive'
-                : 'bg-[#F3F4F6] text-[#374151]'
-            }`}
+                ? { background: '#1F2937', color: '#FFFFFF', borderLeft: '3px solid #EF4444', paddingLeft: 10, paddingRight: 10 }
+                : { background: '#F3F4F6', color: '#374151', paddingLeft: 10, paddingRight: 10 }
+            }
           >
             {statusBadge.label}
           </span>
