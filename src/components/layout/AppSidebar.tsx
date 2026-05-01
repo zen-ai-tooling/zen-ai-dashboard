@@ -101,12 +101,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             </text>
             <text
               x="149"
-              y="208"
+              y="212"
               font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
-              font-size="25"
-              font-weight="400"
+              font-size="30"
+              font-weight="500"
               letter-spacing="0.2"
-              fill="#6a6a8a"
+              fill="#9CA3AF"
             >
               Amazon Ads Optimization
             </text>
