@@ -218,8 +218,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                     <span
                       className="text-[10px] font-semibold uppercase px-2 py-[3px] rounded-full"
                       style={{
-                        background: 'rgba(99, 102, 241, 0.10)',
-                        color: '#4F46E5',
+                        background: 'rgba(13, 148, 136, 0.10)',
+                        color: '#0D9488',
                         letterSpacing: '0.08em',
                       }}
                     >
