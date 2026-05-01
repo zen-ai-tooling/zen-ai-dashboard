@@ -86,8 +86,14 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   const [history, setHistory] = React.useState<string[]>([]);
   const [cursor, setCursor] = React.useState(0);
   const [direction, setDirection] = React.useState<'left' | 'right'>('right');
+  const [phase, setPhase] = React.useState<'idle' | 'exiting'>('idle');
   const [showThreshold, setShowThreshold] = React.useState(false);
   const [showLegend, setShowLegend] = React.useState(true);
+
+  // Refs that survive re-renders — used by debounced key handler
+  const lastKeyAtRef = React.useRef(0);
+  const phaseRef = React.useRef<'idle' | 'exiting'>('idle');
+  React.useEffect(() => { phaseRef.current = phase; }, [phase]);
 
   // Toggle the body class so the global sidebar slides out and the topbar hides.
   React.useEffect(() => {
@@ -135,49 +141,85 @@ export const TriageMode: React.FC<TriageModeProps> = ({
 
   const current = queue[cursor];
   const currentSpecs = current ? decisionSpecsBySheet(current.sheet) : [];
+  const currentDecision = current ? decisions[current.key] : undefined;
+
+  // Sequential exit -> advance -> enter. Keeps only one card visible at a time.
+  const sequence = (dir: 'left' | 'right', advance: () => void) => {
+    if (phaseRef.current === 'exiting') return;
+    setDirection(dir);
+    setPhase('exiting');
+    window.setTimeout(() => {
+      advance();
+      setPhase('idle');
+    }, 130);
+  };
 
   const handleDecide = (val: string) => {
     if (!current) return;
-    setHistory(h => [...h, current.key]);
+    const wasUndecided = !decisions[current.key];
+    if (wasUndecided) setHistory(h => [...h, current.key]);
     onDecide(current.key, val);
-    setDirection('right');
-    window.setTimeout(() => {
+    sequence('right', () => {
       setCursor(c => Math.min(c + 1, queue.length - 1));
-    }, 150);
+    });
   };
 
   const handleSkip = () => {
     if (!current || decisions[current.key]) return;
     setSkipped(s => new Set(s).add(current.key));
-    setDirection('right');
-    setCursor(c => Math.min(c + 1, queue.length - 1));
+    sequence('right', () => {
+      setCursor(c => Math.min(c + 1, queue.length - 1));
+    });
   };
 
+  // Z behavior: if current card has a decision, clear it in place (no advance).
+  // Otherwise undo the most recent decision and navigate back to that card.
   const handleUndo = () => {
+    if (current && decisions[current.key]) {
+      onUndo?.(current.key);
+      setHistory(h => h.filter(k => k !== current.key));
+      return;
+    }
     const last = history[history.length - 1];
     if (!last) return;
     onUndo?.(last);
     setHistory(h => h.slice(0, -1));
-    setDirection('left');
     const idx = queue.findIndex(q => q.key === last);
-    if (idx >= 0) setCursor(idx);
+    if (idx >= 0) {
+      sequence('left', () => setCursor(idx));
+    }
   };
 
-  const handlePrev = () => { setDirection('left'); setCursor(c => Math.max(0, c - 1)); };
-  const handleNext = () => { setDirection('right'); setCursor(c => Math.min(queue.length - 1, c + 1)); };
+  const handlePrev = () => {
+    sequence('left', () => setCursor(c => Math.max(0, c - 1)));
+  };
+  const handleNext = () => {
+    sequence('right', () => setCursor(c => Math.min(queue.length - 1, c + 1)));
+  };
 
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.target && (e.target as HTMLElement).closest('input,textarea,select,[contenteditable="true"]')) return;
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
-      const k = e.key.toLowerCase();
-      if (e.key === 'ArrowLeft') { e.preventDefault(); handlePrev(); return; }
-      if (e.key === 'ArrowRight') { e.preventDefault(); handleNext(); return; }
-      if (k === 's') { e.preventDefault(); handleSkip(); return; }
-      if (k === 'z') { e.preventDefault(); handleUndo(); return; }
-      if (k === 'escape') { e.preventDefault(); onSwitchToReview(); return; }
-      const spec = currentSpecs.find(s => s.shortcut.toLowerCase() === k);
-      if (spec) { e.preventDefault(); handleDecide(spec.value); }
+      try {
+        if (e.target && (e.target as HTMLElement).closest('input,textarea,select,[contenteditable="true"]')) return;
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        // Debounce: 100ms between accepted keypresses
+        const now = Date.now();
+        if (now - lastKeyAtRef.current < 100) return;
+        lastKeyAtRef.current = now;
+
+        const k = e.key.toLowerCase();
+        if (e.key === 'ArrowLeft') { e.preventDefault(); handlePrev(); return; }
+        if (e.key === 'ArrowRight') { e.preventDefault(); handleNext(); return; }
+        if (k === 's') { e.preventDefault(); handleSkip(); return; }
+        if (k === 'z') { e.preventDefault(); handleUndo(); return; }
+        if (k === 'escape') { e.preventDefault(); onSwitchToReview(); return; }
+        const spec = currentSpecs.find(s => s.shortcut.toLowerCase() === k);
+        if (spec) { e.preventDefault(); handleDecide(spec.value); }
+      } catch (err) {
+        // Never let a key handler crash the component
+        // eslint-disable-next-line no-console
+        console.error('[TriageMode] key handler error', err);
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
