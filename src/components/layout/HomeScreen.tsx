@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Clock, ChevronRight, ArrowRight, CheckCircle2, AlertTriangle, HelpCircle, SlidersHorizontal, FileText, Sparkles } from 'lucide-react';
 import { useHistory } from '@/context/HistoryContext';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 type ActiveModule = 'bleeders_1' | 'bleeders_2' | 'lifetime_bleeders' | null;
 
@@ -13,6 +14,12 @@ const getGreeting = () => {
   if (hour < 12) return 'Good morning';
   if (hour < 17) return 'Good afternoon';
   return 'Good evening';
+};
+
+const getGreetingHeadline = (firstName: string | null): string => {
+  const base = getGreeting();
+  if (firstName) return `${base}, ${firstName}`;
+  return `${base}, welcome back`;
 };
 
 const getTimeString = () =>
@@ -114,7 +121,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
   }, [entries]);
 
   const hasSessions = entries.length > 0;
-  const greetingHeadline = firstName ? `${getGreeting()}, ${firstName}` : getGreeting();
+  const greetingHeadline = getGreetingHeadline(firstName);
 
   return (
     <div className="flex flex-col" style={{ paddingTop: 40 }}>
@@ -169,10 +176,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                 style={{
                   minHeight: '180px',
                   cursor: 'pointer',
-                  borderColor: isRecommended ? 'rgba(99, 102, 241, 0.25)' : '#E5E7EB',
+                  borderColor: isRecommended ? 'rgba(13, 148, 136, 0.25)' : '#E5E7EB',
                   background: '#FFFFFF',
                   boxShadow: isEmptyState
-                    ? '0 6px 20px rgba(99, 102, 241, 0.10)'
+                    ? '0 6px 20px rgba(13, 148, 136, 0.10)'
                     : isRecommended
                       ? '0 2px 8px rgba(0,0,0,0.04)'
                       : '0 1px 3px rgba(0,0,0,0.04)',
@@ -185,7 +192,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                 onMouseLeave={(ev) => {
                   ev.currentTarget.style.transform = 'translateY(0)';
                   ev.currentTarget.style.boxShadow = isEmptyState
-                    ? '0 6px 20px rgba(99, 102, 241, 0.10)'
+                    ? '0 6px 20px rgba(13, 148, 136, 0.10)'
                     : isRecommended
                       ? '0 2px 8px rgba(0,0,0,0.04)'
                       : '0 1px 3px rgba(0,0,0,0.04)';
@@ -201,7 +208,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                       left: 0,
                       right: 0,
                       height: 3,
-                      background: 'linear-gradient(90deg, #6366F1 0%, #4F46E5 100%)',
+                      background: '#0D9488',
                     }}
                   />
                 )}
@@ -212,8 +219,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                     <span
                       className="text-[10px] font-semibold uppercase px-2 py-[3px] rounded-full"
                       style={{
-                        background: 'rgba(99, 102, 241, 0.10)',
-                        color: '#4F46E5',
+                        background: 'rgba(13, 148, 136, 0.10)',
+                        color: '#0D9488',
                         letterSpacing: '0.08em',
                       }}
                     >
@@ -234,7 +241,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                 {isEmptyState && (
                   <div
                     className="mt-3 flex items-center gap-1.5 text-[11.5px] font-medium"
-                    style={{ color: '#4F46E5' }}
+                    style={{ color: '#0D9488' }}
                   >
                     <Sparkles style={{ width: 12, height: 12 }} strokeWidth={2} />
                     Recommended first workflow
@@ -248,7 +255,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                       Last run {formatRelative(lastRun)}
                     </span>
                   ) : (
-                    <span className="text-[12px] text-[#9CA3AF]">Not yet run</span>
+                    <span className="flex items-center gap-1.5 text-[12px] text-[#9CA3AF]">
+                      <Clock className="w-3 h-3" strokeWidth={1.8} />
+                      Not yet run
+                    </span>
                   )}
                   <span
                     className="text-[12px] font-semibold flex items-center gap-1"
@@ -321,9 +331,22 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                         {MODULE_LABELS[e.module] ?? e.module}
                       </span>
                       {e.track && (
-                        <span className="text-[10.5px] font-mono-nums px-1.5 py-px rounded bg-[#F3F4F6] text-[#9CA3AF]">
-                          {e.track}
-                        </span>
+                        e.track === 'SBSD' ? (
+                          <TooltipProvider delayDuration={200}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="text-[10.5px] font-mono-nums px-1.5 py-px rounded bg-[#F3F4F6] text-[#9CA3AF] cursor-help">
+                                  {e.track}
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent side="top">Sponsored Brands + Sponsored Display</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        ) : (
+                          <span className="text-[10.5px] font-mono-nums px-1.5 py-px rounded bg-[#F3F4F6] text-[#9CA3AF]">
+                            {e.track}
+                          </span>
+                        )
                       )}
                     </div>
                     <p className="text-[12px] text-[#9CA3AF] truncate mt-0.5 ml-5">

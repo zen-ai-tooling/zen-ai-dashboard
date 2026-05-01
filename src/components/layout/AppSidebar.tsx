@@ -33,7 +33,7 @@ const MODULES: { id: Exclude<ActiveModule, null>; label: string; dot: string }[]
 ];
 
 const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="px-4 mt-6 mb-2 text-[11px] font-semibold uppercase text-[#374151]" style={{ letterSpacing: "0.1em" }}>
+  <div className="px-4 mt-6 mb-2 text-[11px] font-semibold uppercase text-[#6B7280]" style={{ letterSpacing: "0.1em" }}>
     {children}
   </div>
 );
@@ -101,12 +101,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             </text>
             <text
               x="149"
-              y="208"
+              y="212"
               font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
-              font-size="25"
-              font-weight="400"
+              font-size="30"
+              font-weight="500"
               letter-spacing="0.2"
-              fill="#6a6a8a"
+              fill="#9CA3AF"
             >
               Amazon Ads Optimization
             </text>
@@ -225,7 +225,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             {activeClient.initials}
           </div>
           <div className="text-left min-w-0 flex-1">
-            <div className="text-[15px] font-semibold text-white truncate leading-tight">{activeClient.name}</div>
+            <div className="text-[13px] font-semibold text-white truncate leading-tight" title={activeClient.name}>{activeClient.name}</div>
             <div className="text-[11px] text-[#9CA3AF] mt-0.5 uppercase" style={{ letterSpacing: "0.08em" }}>
               Active workspace
             </div>
