@@ -76,8 +76,8 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   onUndo,
   onGenerate,
   onSwitchToReview,
-  totalSpend,
-  sheetsCount,
+  totalSpend: _totalSpend,
+  sheetsCount: _sheetsCount,
   shortSheetLabel,
 }) => {
   const [skipped, setSkipped] = React.useState<Set<string>>(new Set());
@@ -128,7 +128,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
     });
     return s;
   }, [items, decisions, decisionSpecsBySheet]);
-  const savingsAnimated = useCountUp(savingsTarget);
+  const _savingsAnimated = useCountUp(savingsTarget);
 
   const current = queue[cursor];
   const currentSpecs = current ? decisionSpecsBySheet(current.sheet) : [];
