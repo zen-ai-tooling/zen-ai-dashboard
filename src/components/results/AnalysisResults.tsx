@@ -11,6 +11,7 @@ import { SpendDistributionStrip } from "@/components/shared/SpendDistributionStr
 import { RowDetailPanel, type DecisionButtonSpec, type RowDetail } from "@/components/shared/RowDetailPanel";
 import { suggestB1Row } from "@/lib/ui/bleeder1Suggestion";
 import { TriageMode, type TriageItem, type TriageDecisionSpec } from "@/components/results/TriageMode";
+import { ReviewAllMode } from "@/components/results/ReviewAllMode";
 import { Zap, List as ListIcon } from "lucide-react";
 
 interface TopSpender {
