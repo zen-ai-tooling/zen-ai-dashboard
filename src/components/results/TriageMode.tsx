@@ -268,24 +268,26 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                 <span className="font-semibold" style={{ color: '#374151' }}>{cursor + 1}</span> of {queue.length}
               </div>
             </div>
-            {/* card progress bar */}
-            <div className="mt-2 w-full rounded-full overflow-hidden" style={{ height: 4, background: '#F3F4F6' }}>
-              <div className="h-full transition-all duration-300" style={{ width: `${progressPct}%`, background: '#0D9488' }} />
+            {/* card progress bar — overall session completion */}
+            <div className="mt-3 w-full overflow-hidden" style={{ height: 4, background: '#F3F4F6', borderRadius: 2 }}>
+              <div className="h-full transition-all duration-300" style={{ width: `${progressPct}%`, background: '#0D9488', borderRadius: 2 }} />
             </div>
 
             {/* b. Entity name */}
             <h2
-              className="mt-5 break-words"
-              style={{ fontSize: 28, fontWeight: 700, color: '#111827', lineHeight: 1.2, letterSpacing: '-0.02em' }}
+              className="break-words"
+              style={{ marginTop: 16, fontSize: 28, fontWeight: 700, color: '#111827', lineHeight: 1.2, letterSpacing: '-0.02em' }}
             >
               {current.entity}
             </h2>
 
-            {/* c. Metadata row */}
-            <div className="mt-2 flex items-center gap-2 flex-wrap" style={{ fontSize: 13, color: '#9CA3AF' }}>
-              <span title={current.campaign} className="truncate max-w-[40%]">{current.campaign}</span>
-              <span style={{ color: '#D1D5DB' }}>·</span>
-              <span title={current.adGroup} className="truncate max-w-[35%]">{current.adGroup || '—'}</span>
+            {/* c. Metadata row — campaign (≤35 chars) · match pill */}
+            <div className="flex items-center gap-2 flex-wrap" style={{ marginTop: 6, fontSize: 13, color: '#9CA3AF' }}>
+              <span title={current.campaign}>
+                {current.campaign && current.campaign.length > 35
+                  ? `${current.campaign.slice(0, 35)}…`
+                  : (current.campaign || '—')}
+              </span>
               {current.matchType && (
                 <>
                   <span style={{ color: '#D1D5DB' }}>·</span>
@@ -299,14 +301,18 @@ export const TriageMode: React.FC<TriageModeProps> = ({
               )}
             </div>
 
-            {/* d. Metrics row */}
-            <div className="mt-6 grid grid-cols-4 gap-4">
+            {/* d. Metrics row — 4 equal columns */}
+            <div className="grid grid-cols-4 gap-4" style={{ marginTop: 20 }}>
               <Metric label="Spend" value={`$${current.spend.toFixed(2)}`} accent="#EF4444" />
-              <Metric label="Clicks" value={current.clicks.toLocaleString()} />
+              <Metric label="Clicks" value={current.clicks.toLocaleString()} accent="#111827" />
               <Metric
                 label="Sales"
-                value={`$${current.sales.toFixed(2)}`}
-                accent={current.sales <= 0 ? '#EF4444' : '#059669'}
+                value={current.sales == null ? '—' : `$${current.sales.toFixed(2)}`}
+                accent={
+                  current.sales == null ? '#9CA3AF'
+                  : current.sales <= 0 ? '#EF4444'
+                  : '#059669'
+                }
               />
               <Metric
                 label="ACoS"
@@ -319,14 +325,15 @@ export const TriageMode: React.FC<TriageModeProps> = ({
               />
             </div>
 
-            {/* e. Suggestion banner */}
+            {/* e. Suggestion banner — 4px left border, label + reason on one line */}
             {(() => {
               const s = suggestionFor(current);
               if (!s.label) return null;
               return (
                 <div
-                  className="mt-5 rounded-lg"
+                  className="rounded-lg"
                   style={{
+                    marginTop: 16,
                     background: s.bg,
                     borderLeft: `4px solid ${s.accent}`,
                     padding: '14px 16px',
@@ -335,9 +342,12 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                   <div className="flex items-start gap-3">
                     <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: s.accent }} />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[14px] font-bold tracking-[0.04em]" style={{ color: s.accent }}>
+                      <div className="flex items-baseline gap-1.5 flex-wrap">
+                        <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: s.accent }}>
                           {s.label}
+                        </span>
+                        <span style={{ fontSize: 13, color: '#374151' }}>
+                          — {s.rationale}
                         </span>
                         <button
                           onClick={() => setShowThreshold(v => !v)}
@@ -347,9 +357,6 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                         >
                           <Info className="w-3 h-3" />
                         </button>
-                      </div>
-                      <div className="mt-0.5 text-[13px]" style={{ color: '#374151' }}>
-                        {s.rationale}
                       </div>
                       {showThreshold && (
                         <div className="mt-2 text-[11.5px] leading-relaxed" style={{ color: '#6B7280' }}>
@@ -363,10 +370,15 @@ export const TriageMode: React.FC<TriageModeProps> = ({
               );
             })()}
 
-            {/* f. Action buttons */}
+            {/* f. Action buttons — equal-width grid filling card inner width */}
             <div
-              className="mt-5 grid gap-2"
-              style={{ gridTemplateColumns: `repeat(${currentSpecs.length}, minmax(0, 1fr))` }}
+              className="grid"
+              style={{
+                marginTop: 20,
+                gap: 8,
+                width: '100%',
+                gridTemplateColumns: `repeat(${currentSpecs.length}, 1fr)`,
+              }}
             >
               {currentSpecs.map((spec) => {
                 const isSelected = decisions[current.key] === spec.value;
@@ -374,15 +386,15 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                   <button
                     key={spec.value}
                     onClick={() => handleDecide(spec.value)}
-                    className="relative btn-press transition-all flex items-center justify-center"
+                    className="relative btn-press transition-all flex items-center justify-center w-full"
                     style={{
                       height: 52,
                       borderRadius: 10,
                       background: spec.bg,
                       color: '#FFFFFF',
-                      fontSize: 14,
-                      fontWeight: 600,
-                      letterSpacing: '0.04em',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      letterSpacing: '0.05em',
                       textTransform: 'uppercase',
                       boxShadow: isSelected ? `0 0 0 3px ${spec.bg}55` : undefined,
                       opacity: isSelected ? 0.92 : 1,
@@ -398,8 +410,8 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                         fontWeight: 600,
                         padding: '1px 5px',
                         borderRadius: 3,
-                        background: 'rgba(255,255,255,0.2)',
-                        color: 'rgba(255,255,255,0.95)',
+                        background: 'rgba(0,0,0,0.15)',
+                        color: '#FFFFFF',
                       }}
                     >
                       {spec.shortcut.toUpperCase()}
@@ -410,7 +422,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             </div>
 
             {/* g. Secondary actions */}
-            <div className="mt-3 flex items-center justify-between">
+            <div className="flex items-center justify-between" style={{ marginTop: 10 }}>
               <button
                 onClick={handleUndo}
                 disabled={history.length === 0}
@@ -434,6 +446,82 @@ export const TriageMode: React.FC<TriageModeProps> = ({
           </div>
         )}
       </div>
+
+      {/* 8. Floating Generate file pill — bottom-center */}
+      {!allDone && (
+        <button
+          onClick={onGenerate}
+          disabled={decisionsMade === 0}
+          className="fixed inline-flex items-center gap-1.5 hover:opacity-90 btn-press disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{
+            left: '50%',
+            transform: 'translateX(-50%)',
+            bottom: 24,
+            background: '#0D9488',
+            color: '#FFFFFF',
+            borderRadius: 24,
+            padding: '10px 24px',
+            fontSize: 13,
+            fontWeight: 600,
+            boxShadow: '0 4px 16px rgba(13,148,136,0.4)',
+            zIndex: 50,
+          }}
+        >
+          Generate file ({decisionsMade}/{total}) <ArrowRight className="w-3.5 h-3.5" />
+        </button>
+      )}
+
+      {/* 9. Shortcuts panel — fixed bottom-right */}
+      {showLegend ? (
+        <div
+          className="fixed"
+          style={{
+            right: 24,
+            bottom: 24,
+            width: 192,
+            background: '#1F2937',
+            border: '1px solid #374151',
+            borderRadius: 10,
+            padding: '14px 16px',
+            zIndex: 50,
+          }}
+        >
+          <div className="flex items-center justify-between" style={{ marginBottom: 10 }}>
+            <span className="inline-flex items-center gap-1.5" style={{ color: '#FFFFFF', fontSize: 12, fontWeight: 600 }}>
+              ⌨ Shortcuts
+            </span>
+            <button
+              onClick={() => setShowLegend(false)}
+              className="hover:opacity-70"
+              aria-label="Hide shortcuts"
+              style={{ color: '#9CA3AF', fontSize: 14, lineHeight: 1 }}
+            >
+              ×
+            </button>
+          </div>
+          <div className="flex flex-col" style={{ gap: 8, fontSize: 12 }}>
+            {currentSpecs.map(s => (
+              <ShortcutRow key={s.value} label={s.label} k={s.shortcut.toUpperCase()} />
+            ))}
+            <ShortcutRow label="SKIP" k="S" />
+            <ShortcutRow label="UNDO" k="Z" />
+            <ShortcutRow label="PREV" k="←" />
+            <ShortcutRow label="NEXT" k="→" />
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={() => setShowLegend(true)}
+          className="fixed inline-flex items-center gap-1.5 rounded-full px-3 h-8 text-[11.5px] hover:opacity-90"
+          style={{
+            right: 24, bottom: 24,
+            background: '#1F2937', border: '1px solid #374151', color: '#FFFFFF',
+            zIndex: 50,
+          }}
+        >
+          ⌨ Shortcuts
+        </button>
+      )}
 
     </div>
   );
