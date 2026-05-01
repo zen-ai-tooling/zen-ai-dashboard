@@ -554,7 +554,8 @@
   .review-table-scroll::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
   .review-table { border-collapse: separate; border-spacing: 0; }
-  .review-table th, .review-table td { border-bottom: 1px solid #F3F4F6; padding: 12px 14px; }
+  .review-table th, .review-table td { border-bottom: 1px solid #F3F4F6; padding: 10px 14px; }
+  .review-table tbody tr { height: 44px; }
   .review-table thead th {
     position: sticky; top: 0; z-index: 6;
     background: #F9FAFB;
