@@ -27,9 +27,9 @@ const ACCENT_BORDER: Record<Accent, string> = {
 };
 
 const ACCENT_BG: Record<Accent, string> = {
-  red: 'rgba(255, 59, 48, 0.02)',
-  amber: 'rgba(255, 149, 0, 0.025)',
-  purple: 'rgba(168, 85, 247, 0.025)',
+  red: 'rgba(239, 68, 68, 0.02)',
+  amber: 'rgba(245, 158, 11, 0.025)',
+  purple: 'rgba(139, 92, 246, 0.025)',
 };
 
 export const CompactStatsBar: React.FC<Props> = ({ stats, steps, accent = 'red' }) => {

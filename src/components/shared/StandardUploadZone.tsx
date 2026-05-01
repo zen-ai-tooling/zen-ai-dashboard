@@ -104,12 +104,12 @@ export const StandardUploadZone: React.FC<StandardUploadZoneProps> = ({
           minHeight,
           borderRadius: 12,
           border: isDragging ? '2px solid #4F6EF7' : '1.5px dashed #D1D5DB',
-          background: isDragging ? 'rgba(0, 113, 227, 0.05)' : '#F9FAFB',
+          background: isDragging ? 'rgba(79, 110, 247, 0.05)' : '#F9FAFB',
           transition: 'border-color 150ms ease, border-style 150ms ease, background-color 150ms ease, transform 150ms ease',
         }}
         onMouseEnter={(e) => {
           if (!isDragging) {
-            e.currentTarget.style.background = 'rgba(0, 113, 227, 0.02)';
+            e.currentTarget.style.background = 'rgba(79, 110, 247, 0.02)';
             e.currentTarget.style.border = '1.5px dashed #4F6EF7';
           }
         }}

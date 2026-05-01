@@ -18,8 +18,8 @@ export const CompletionBanner: React.FC<Props> = ({
     <div
       className="relative rounded-xl p-4 flex items-center justify-between gap-4 overflow-hidden animate-fade-in"
       style={{
-        background: 'rgba(52, 199, 89, 0.08)',
-        border: '1px solid rgba(52, 199, 89, 0.25)',
+        background: 'rgba(16, 185, 129, 0.08)',
+        border: '1px solid rgba(16, 185, 129, 0.25)',
       }}
     >
       <span

@@ -312,7 +312,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
         >
           <div
             className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ background: 'rgba(0, 113, 227, 0.10)' }}
+            style={{ background: 'rgba(79, 110, 247, 0.10)' }}
           >
             <Info className="w-4 h-4" style={{ color: '#4F6EF7' }} />
           </div>

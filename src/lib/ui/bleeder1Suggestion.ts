@@ -30,9 +30,9 @@ export function suggestB1Row(row: B1SuggestionInput): B1Suggestion {
     return {
       kind: 'pause',
       label: 'Pause',
-      bg: 'rgba(255, 59, 48, 0.10)',
+      bg: 'rgba(239, 68, 68, 0.10)',
       color: '#B91C1C',
-      border: 'rgba(255, 59, 48, 0.25)',
+      border: 'rgba(239, 68, 68, 0.25)',
       rationale: `${clicks} clicks with zero conversions — strong pause candidate`,
     };
   }
@@ -41,9 +41,9 @@ export function suggestB1Row(row: B1SuggestionInput): B1Suggestion {
     return {
       kind: 'review',
       label: 'Review',
-      bg: 'rgba(255, 149, 0, 0.10)',
+      bg: 'rgba(245, 158, 11, 0.10)',
       color: '#B45309',
-      border: 'rgba(255, 149, 0, 0.25)',
+      border: 'rgba(245, 158, 11, 0.25)',
       rationale: `${clicks} clicks with no conversions — review before deciding`,
     };
   }
@@ -62,9 +62,9 @@ export function suggestB1Row(row: B1SuggestionInput): B1Suggestion {
   return {
     kind: 'keep',
     label: 'Keep?',
-    bg: 'rgba(52, 199, 89, 0.10)',
+    bg: 'rgba(16, 185, 129, 0.10)',
     color: '#047857',
-    border: 'rgba(52, 199, 89, 0.25)',
+    border: 'rgba(16, 185, 129, 0.25)',
     rationale: 'Performance is borderline — keep and monitor for now',
   };
 }

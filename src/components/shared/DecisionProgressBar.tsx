@@ -32,7 +32,7 @@ export const DecisionProgressBar: React.FC<DecisionProgressBarProps> = ({
       style={{
         height: 8,
         borderRadius: 4,
-        boxShadow: isComplete ? '0 0 8px rgba(52, 199, 89, 0.40)' : 'none',
+        boxShadow: isComplete ? '0 0 8px rgba(16, 185, 129, 0.40)' : 'none',
         transition: 'box-shadow 300ms ease',
       }}
       role="progressbar"

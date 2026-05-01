@@ -172,8 +172,8 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
         <div
           className="rounded-lg px-3.5 py-2.5 text-[13px]"
           style={{
-            background: 'rgba(255, 59, 48, 0.06)',
-            border: '1px solid rgba(255, 59, 48, 0.25)',
+            background: 'rgba(239, 68, 68, 0.06)',
+            border: '1px solid rgba(239, 68, 68, 0.25)',
             color: '#B91C1C',
           }}
         >

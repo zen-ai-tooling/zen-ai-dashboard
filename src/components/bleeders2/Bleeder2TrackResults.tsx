@@ -476,8 +476,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 const indicatorClass = decisionRowClass(decision);
                 const isKeep = suggestion.shortLabel?.toLowerCase().includes('keep');
                 const sugStyle = isKeep
-                  ? { background: 'rgba(52, 199, 89, 0.10)', color: '#047857', border: '1px solid rgba(52, 199, 89, 0.25)' }
-                  : { background: 'rgba(255, 149, 0, 0.10)', color: '#B45309', border: '1px solid rgba(255, 149, 0, 0.25)' };
+                  ? { background: 'rgba(16, 185, 129, 0.10)', color: '#047857', border: '1px solid rgba(16, 185, 129, 0.25)' }
+                  : { background: 'rgba(245, 158, 11, 0.10)', color: '#B45309', border: '1px solid rgba(245, 158, 11, 0.25)' };
                 const acosVal = bleeder.acos;
                 const aboveThreshold = acosVal >= (result.acosThreshold ?? 0);
                 const acosBg = aboveThreshold ? '#EF4444' : '#F59E0B';
@@ -706,9 +706,9 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
             metrics,
             suggestion: {
               label: sug.shortLabel,
-              bg: 'rgba(255, 149, 0, 0.10)',
+              bg: 'rgba(245, 158, 11, 0.10)',
               color: '#B45309',
-              border: 'rgba(255, 149, 0, 0.25)',
+              border: 'rgba(245, 158, 11, 0.25)',
             },
             rationale: sug.reason || rationale,
           };

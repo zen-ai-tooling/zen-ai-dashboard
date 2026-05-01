@@ -270,8 +270,8 @@ export const AssetInventory: React.FC<AssetInventoryProps> = ({
               key={sheet.name}
               className="flex items-center gap-2"
               style={{
-                background: detected ? 'rgba(52, 199, 89, 0.08)' : '#FAFAFA',
-                border: `1px solid ${detected ? 'rgba(52, 199, 89, 0.25)' : 'rgba(0,0,0,0.05)'}`,
+                background: detected ? 'rgba(16, 185, 129, 0.08)' : '#FAFAFA',
+                border: `1px solid ${detected ? 'rgba(16, 185, 129, 0.25)' : 'rgba(0,0,0,0.05)'}`,
                 borderRadius: 8,
                 padding: '8px 10px',
                 transition: 'all 200ms ease',
