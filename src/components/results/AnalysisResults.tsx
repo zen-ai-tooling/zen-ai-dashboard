@@ -143,20 +143,21 @@ export const AnalysisResults = ({
   const [panelComplete, setPanelComplete] = useState(false);
   useEffect(() => { setSelectedRowIdx(null); setPanelComplete(false); }, [currentSheet]);
 
-  // Build the side-panel button spec from the active sheet's decision options.
+  // Build the side-panel button spec — uses unified color system.
+  // PAUSE #EF4444 · CUT BID #F59E0B · KEEP #10B981 · NEGATIVE #6366F1
   const panelButtonSpecs: DecisionButtonSpec[] = useMemo(() => {
     return decisionOptions.map((opt) => {
       if (opt === 'Pause') {
-        return { value: 'Pause', label: 'Pause', bg: '#FFE5E5', color: '#CC0000', border: '#FFCCCC', hoverBg: '#FFCCCC' };
+        return { value: 'Pause', label: 'Pause', bg: 'rgba(239, 68, 68, 0.10)', color: '#B91C1C', border: 'rgba(239, 68, 68, 0.25)', hoverBg: 'rgba(239, 68, 68, 0.18)' };
       }
       if (opt === 'Cut Bid 50%') {
-        return { value: 'Cut Bid 50%', label: 'Cut Bid 50%', bg: '#FFF3E0', color: '#CC7700', border: '#FFE0B2', hoverBg: '#FFE0B2' };
+        return { value: 'Cut Bid 50%', label: 'Cut Bid 50%', bg: 'rgba(245, 158, 11, 0.10)', color: '#B45309', border: 'rgba(245, 158, 11, 0.25)', hoverBg: 'rgba(245, 158, 11, 0.18)' };
       }
       if (opt === 'Keep') {
-        return { value: 'Keep', label: 'Keep', bg: '#E8F5E9', color: '#1B7A2B', border: '#C8E6C9', hoverBg: '#C8E6C9' };
+        return { value: 'Keep', label: 'Keep', bg: 'rgba(16, 185, 129, 0.10)', color: '#047857', border: 'rgba(16, 185, 129, 0.25)', hoverBg: 'rgba(16, 185, 129, 0.18)' };
       }
-      // Negate (Exact) / Negate (Phrase)
-      return { value: opt, label: opt, bg: '#E3F2FD', color: '#0D47A1', border: '#BBDEFB', hoverBg: '#BBDEFB' };
+      // Negate (Exact) / Negate (Phrase) → INFO/NEGATIVE violet
+      return { value: opt, label: opt, bg: 'rgba(99, 102, 241, 0.10)', color: '#4338CA', border: 'rgba(99, 102, 241, 0.25)', hoverBg: 'rgba(99, 102, 241, 0.18)' };
     });
   }, [decisionOptions]);
 
