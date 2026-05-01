@@ -27,9 +27,9 @@ const TRACKS: { id: Bleeder2Track; label: string }[] = [
 ];
 
 const MODULES: { id: Exclude<ActiveModule, null>; label: string; dot: string }[] = [
-  { id: 'bleeders_1', label: 'Bleeders 1.0', dot: 'hsl(var(--destructive))' },
-  { id: 'bleeders_2', label: 'Bleeders 2.0', dot: 'hsl(var(--amber))' },
-  { id: 'lifetime_bleeders', label: 'Lifetime Audit', dot: 'hsl(265 70% 60%)' },
+  { id: 'bleeders_1', label: 'Bleeders 1.0', dot: '#EF4444' },
+  { id: 'bleeders_2', label: 'Bleeders 2.0', dot: '#F59E0B' },
+  { id: 'lifetime_bleeders', label: 'Lifetime Audit', dot: '#8B5CF6' },
 ];
 
 const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
