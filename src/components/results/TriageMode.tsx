@@ -639,7 +639,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             onClick={() => setShowLegend(true)}
             className="absolute inline-flex items-center gap-1.5 rounded-full px-3 h-7 text-[11px] hover:opacity-90"
             style={{
-              right: 16,
+              right: 24,
               top: '50%',
               transform: 'translateY(-50%)',
               background: '#1F2937',
