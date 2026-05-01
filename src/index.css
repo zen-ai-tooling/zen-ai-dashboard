@@ -9,73 +9,85 @@
 
 @layer base {
   :root {
-    /* Surfaces — pure white content area, dark sidebar contrast */
-    --background: 0 0% 100%;         /* #FFFFFF — pure white content */
-    --background-deep: 0 0% 100%;    /* keep flat */
-    --foreground: 240 6% 10%;        /* #1D1D1F */
+    /* ── Unified Color System ──
+       Primary  #4F6EF7  indigo-blue  (CTA, links, active, progress)
+       Destruct #EF4444  red          (PAUSE, errors)
+       Warning  #F59E0B  amber        (CUT BID, caution)
+       Success  #10B981  emerald      (KEEP, completion)
+       Info     #6366F1  violet       (NEGATIVE, info banners)
+       Page bg  #F9FAFB · Card #FFFFFF · Border #E5E7EB
+       Muted    #9CA3AF · Body #374151 · Headings #111827
+    */
 
-    --card: 0 0% 100%;               /* #FFFFFF */
-    --card-foreground: 240 6% 10%;
+    /* Surfaces */
+    --background: 220 14% 98%;        /* #F9FAFB page */
+    --background-deep: 220 14% 98%;
+    --foreground: 222 39% 11%;        /* #111827 headings/body */
+
+    --card: 0 0% 100%;                /* #FFFFFF */
+    --card-foreground: 220 13% 26%;   /* #374151 body */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 6% 10%;
+    --popover-foreground: 220 13% 26%;
 
-    /* Accent — Apple blue, used sparingly */
-    --primary: 211 100% 45%;         /* #0071E3 */
+    /* Accent — indigo-blue */
+    --primary: 227 91% 64%;           /* #4F6EF7 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 6% 96%;         /* #F5F5F7 */
-    --secondary-foreground: 240 6% 10%;
+    --secondary: 220 14% 96%;         /* near page bg, slightly lighter */
+    --secondary-foreground: 222 39% 11%;
 
-    --muted: 240 6% 96%;
-    --muted-foreground: 240 3% 44%;  /* #6E6E73 */
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 65%;   /* #9CA3AF */
 
-    --accent: 240 6% 96%;
-    --accent-foreground: 240 6% 10%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 222 39% 11%;
 
-    --destructive: 4 100% 59%;       /* #FF3B30 iOS red */
+    --destructive: 0 84% 60%;         /* #EF4444 */
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 71% 49%;          /* #34C759 iOS green */
+    --success: 160 84% 39%;           /* #10B981 emerald */
     --success-foreground: 0 0% 100%;
 
-    --border: 240 6% 84%;            /* #D2D2D7 */
-    --input: 240 6% 84%;
-    --ring: 211 100% 45%;
-    --radius: 0.75rem;               /* 12px cards */
+    --border: 220 13% 91%;            /* #E5E7EB */
+    --input: 220 13% 91%;
+    --ring: 227 91% 64%;
+    --radius: 0.75rem;
 
     /* Semantic text */
-    --text-secondary: 240 3% 44%;    /* #6E6E73 */
-    --text-tertiary: 240 3% 56%;     /* #86868B */
+    --text-secondary: 220 9% 46%;     /* #6B7280 */
+    --text-tertiary: 220 9% 65%;      /* #9CA3AF */
 
-    /* Sidebar — dark Linear/Raycast treatment */
-    --sidebar-background: 240 6% 12%;       /* #1D1D1F */
+    /* Sidebar — dark contrast */
+    --sidebar-background: 222 39% 11%;       /* #111827 */
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 211 100% 55%;
+    --sidebar-primary: 227 91% 64%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 6% 16%;
+    --sidebar-accent: 222 30% 16%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 240 6% 18%;
-    --sidebar-ring: 211 100% 55%;
+    --sidebar-border: 222 30% 18%;
+    --sidebar-ring: 227 91% 64%;
     --sidebar-active-bg: 0 0% 100% / 0.08;
 
-    --spend: 4 100% 59%;
+    --spend: 0 84% 60%;
 
-    /* Named tokens (back-compat) */
-    --page-bg: 0 0% 98%;
-    --border-strong: 240 6% 78%;
-    --accent-blue: 211 100% 45%;
-    --accent-blue-light: 211 100% 96%;
-    --accent-blue-border: 211 80% 88%;
-    --red: 4 100% 59%;
-    --red-light: 4 100% 97%;
-    --red-border: 4 90% 90%;
-    --green: 142 71% 39%;
-    --green-light: 142 71% 96%;
-    --green-border: 142 60% 82%;
-    --amber: 33 100% 50%;            /* #FF9500 */
-    --amber-light: 33 100% 95%;
-    --amber-border: 33 90% 85%;
+    /* Named tokens (back-compat — remapped to new spec) */
+    --page-bg: 220 14% 98%;
+    --border-strong: 220 13% 82%;
+    --accent-blue: 227 91% 64%;        /* #4F6EF7 */
+    --accent-blue-light: 227 91% 96%;
+    --accent-blue-border: 227 80% 88%;
+    --red: 0 84% 60%;
+    --red-light: 0 86% 97%;
+    --red-border: 0 80% 90%;
+    --green: 160 84% 39%;
+    --green-light: 152 76% 96%;
+    --green-border: 156 60% 82%;
+    --amber: 38 92% 50%;               /* #F59E0B */
+    --amber-light: 48 96% 95%;
+    --amber-border: 38 90% 85%;
+    --info-violet: 239 84% 67%;        /* #6366F1 */
+    --info-violet-light: 239 100% 97%;
 
     /* Elevation */
     --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
