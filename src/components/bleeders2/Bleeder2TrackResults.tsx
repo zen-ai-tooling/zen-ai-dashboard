@@ -515,8 +515,45 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         }))}
       />
 
+      {/* ─── Focus filter pills (matches Bleeders 1.0) ─── */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-[11px] font-medium" style={{ color: '#9CA3AF' }}>
+          {TRACK_LABELS[result.trackType]}:
+        </span>
+        {([
+          { id: 'all', label: 'All', icon: '', count: focusMeta.all },
+          { id: 'pause', label: 'Pause candidates', icon: '🔴', count: focusMeta.pause },
+          { id: 'review', label: 'Needs review', icon: '🟡', count: focusMeta.review },
+          { id: 'decided', label: 'Decided', icon: '✓', count: focusMeta.decided },
+          { id: 'highspend', label: 'High spend', icon: '💰', count: focusMeta.highspend },
+        ] as const).map(f => (
+          <button
+            key={f.id}
+            onClick={() => setFocusFilter(f.id as FocusFilter)}
+            className={`focus-pill ${focusFilter === f.id ? 'is-active' : ''}`}
+          >
+            {f.icon && <span aria-hidden>{f.icon}</span>}
+            {f.label}
+            <span className="count">· {f.count}</span>
+          </button>
+        ))}
+      </div>
+
       {/* Decision table */}
       <div className="decision-table-card">
+
+        {/* ─── Contextual amber callout for SP Search Terms ─── */}
+        {isSearchTermSheet && (
+          <div
+            className="px-4 py-2.5 border-b flex items-start gap-2"
+            style={{ background: '#FFFBEB', borderBottomColor: '#FDE68A', borderLeft: '3px solid #F59E0B' }}
+          >
+            <Info className="w-4 h-4 mt-px flex-shrink-0" style={{ color: '#F59E0B' }} />
+            <p className="text-[12.5px]" style={{ color: '#92400E' }}>
+              <strong>Pause</strong> on search terms auto-converts to <strong>Negate (Exact)</strong> when generating the Amazon file.
+            </p>
+          </div>
+        )}
 
         {/* Bulk action buttons */}
         <div className="decision-table-bar flex items-center justify-between gap-2 px-4 py-2.5">
