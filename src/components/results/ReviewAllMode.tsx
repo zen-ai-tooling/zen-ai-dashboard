@@ -375,16 +375,64 @@ export const ReviewAllMode = ({
                   </button>
                 )}
               </div>
-              <button
-                onClick={() => {
-                  const next = { ...decisions };
-                  currentRows.forEach((_, idx) => { delete next[`${currentSheet}-ROWINDEX-${idx}`]; });
-                  setDecisions(next);
-                }}
-                className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press"
-              >
-                <X className="w-3 h-3" /> Clear sheet
-              </button>
+              <div className="flex items-center gap-1.5 relative" ref={moreRef}>
+                <button
+                  onClick={() => {
+                    const next = { ...decisions };
+                    currentRows.forEach((_, idx) => { delete next[`${currentSheet}-ROWINDEX-${idx}`]; });
+                    setDecisions(next);
+                  }}
+                  className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-[12px] font-medium btn-press transition-opacity"
+                  style={{ color: '#EF4444', opacity: 0.7 }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
+                >
+                  <X className="w-3 h-3" /> Clear sheet
+                </button>
+                <button
+                  onClick={() => setMoreOpen(o => !o)}
+                  className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press"
+                  aria-label="More options"
+                  title="More options"
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
+                {moreOpen && (
+                  <div className="absolute right-0 top-9 min-w-[260px] rounded-lg border border-border bg-popover shadow-pop p-1 z-30 animate-scale-in">
+                    <button
+                      onClick={() => { onDownloadLegacy(); setMoreOpen(false); }}
+                      className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
+                    >
+                      <Download className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))]" />
+                      Export decisions as CSV
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm("Reset all decisions across every sheet?")) setDecisions({});
+                        setMoreOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))]" />
+                      Reset all decisions
+                    </button>
+                    <label className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left cursor-pointer">
+                      <UploadIcon className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))]" />
+                      Upload decision file manually
+                      <input
+                        type="file"
+                        accept=".xlsx,.xls,.csv"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) onUploadDecisionFile(f);
+                          setMoreOpen(false);
+                        }}
+                      />
+                    </label>
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>
