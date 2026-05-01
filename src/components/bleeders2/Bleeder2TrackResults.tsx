@@ -2,7 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Download, CheckCircle2, Loader2, XCircle, ChevronDown, AlertTriangle, DollarSign, Percent } from "lucide-react";
+import { Download, CheckCircle2, Loader2, XCircle, ChevronDown, AlertTriangle, DollarSign, Percent, Sparkles, Zap, List as ListIcon, Info } from "lucide-react";
+import { TriageMode, type TriageItem, type TriageDecisionSpec } from "@/components/results/TriageMode";
 import { toast } from "sonner";
 import type { Bleeder2TrackResult, Bleeder2TrackType } from "@/lib/bleeder2TrackAnalyzer";
 import { DecisionFileDropzone } from "./DecisionFileDropzone";
@@ -55,6 +56,9 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
   const [flashIdx, setFlashIdx] = useState<{ idx: number; cls: string; ts: number } | null>(null);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [panelComplete, setPanelComplete] = useState(false);
+  const [viewMode, setViewMode] = useState<'triage' | 'review'>('review');
+  type FocusFilter = 'all' | 'pause' | 'review' | 'decided' | 'highspend';
+  const [focusFilter, setFocusFilter] = useState<FocusFilter>('all');
 
   const setDecisionWithFlash = (idx: number, val: string) => {
     setDecisions(prev => ({ ...prev, [idx]: val }));
@@ -134,6 +138,38 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
     const q = (p: number) => spends[Math.min(spends.length - 1, Math.floor(spends.length * p))];
     return { high: q(0.75), low: q(0.25) };
   }, [result.bleeders]);
+
+  // Filter pill counts (mirror Bleeders 1.0 buckets)
+  const focusMeta = useMemo(() => {
+    let pause = 0, review = 0, decided = 0, highspend = 0;
+    result.bleeders.forEach((b, idx) => {
+      const sug = suggestions[idx];
+      if (sug?.decision === 'Pause') pause++;
+      else if (sug && sug.decision !== 'Keep') review++;
+      if (decisions[idx]) decided++;
+      if ((b.spend || 0) >= urgencyBands.high && (b.spend || 0) > 0) highspend++;
+    });
+    return { all: result.bleeders.length, pause, review, decided, highspend };
+  }, [result.bleeders, suggestions, decisions, urgencyBands.high]);
+
+  const matchesFocus = (idx: number): boolean => {
+    if (focusFilter === 'all') return true;
+    const b = result.bleeders[idx];
+    const sug = suggestions[idx];
+    if (focusFilter === 'pause') return sug?.decision === 'Pause';
+    if (focusFilter === 'review') return !!sug && sug.decision !== 'Keep' && sug.decision !== 'Pause';
+    if (focusFilter === 'decided') return !!decisions[idx];
+    if (focusFilter === 'highspend') return (b.spend || 0) >= urgencyBands.high && (b.spend || 0) > 0;
+    return true;
+  };
+
+  const filteredSortedIndices = useMemo(
+    () => sortedIndices.filter(matchesFocus),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sortedIndices, focusFilter, decisions, suggestions, urgencyBands.high]
+  );
+
+  const isSearchTermSheet = result.trackType === 'SP';
 
   const handleSetAllPause = () => {
     const all: Record<number, string> = {};
@@ -331,6 +367,95 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         </button>
       )}
 
+      {/* Mode toggle — Triage vs Review All (matches Bleeders 1.0) */}
+      <div className="flex items-center justify-end">
+        <div
+          className="inline-flex items-center p-0.5 rounded-full border border-border bg-card"
+          role="tablist"
+          aria-label="View mode"
+        >
+          <button
+            role="tab"
+            aria-selected={viewMode === 'triage'}
+            onClick={() => setViewMode('triage')}
+            className={`inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full text-[12.5px] font-medium transition-colors ${
+              viewMode === 'triage' ? 'text-white shadow-sm' : 'text-[hsl(var(--text-secondary))] hover:text-foreground'
+            }`}
+            style={viewMode === 'triage' ? { background: '#0D9488' } : undefined}
+          >
+            <Zap className="w-3.5 h-3.5" /> Triage
+          </button>
+          <button
+            role="tab"
+            aria-selected={viewMode === 'review'}
+            onClick={() => setViewMode('review')}
+            className={`inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full text-[12.5px] font-medium transition-colors ${
+              viewMode === 'review' ? 'text-white shadow-sm' : 'text-[hsl(var(--text-secondary))] hover:text-foreground'
+            }`}
+            style={viewMode === 'review' ? { background: '#0D9488' } : undefined}
+          >
+            <ListIcon className="w-3.5 h-3.5" /> Review All
+          </button>
+        </div>
+      </div>
+
+      {/* TRIAGE MODE — full-bleed one-card-at-a-time */}
+      {viewMode === 'triage' && (() => {
+        const items: TriageItem[] = result.bleeders.map((b, idx) => ({
+          key: String(idx),
+          sheet: TRACK_LABELS[result.trackType],
+          campaign: b.campaignName || '—',
+          adGroup: b.adGroupName || '',
+          entity: b.entity || '—',
+          matchType: b.matchType || undefined,
+          clicks: b.clicks ?? 0,
+          spend: b.spend ?? 0,
+          sales: (b as any).sales ?? 0,
+          acos: b.acos ? `${b.acos.toFixed(1)}%` : '',
+          acosNum: b.acos ?? 0,
+          orders: b.orders ?? 0,
+        }));
+        items.sort((a, b) => b.spend - a.spend);
+
+        const triageDecisions: Record<string, string> = {};
+        Object.entries(decisions).forEach(([k, v]) => { triageDecisions[String(k)] = v; });
+
+        const decisionSpecsBySheet = (_sheet: string): TriageDecisionSpec[] => {
+          const opts = getDecisionOptions();
+          return opts.map((opt) => {
+            if (opt === 'Pause') return { value: 'Pause', label: 'PAUSE', bg: '#EF4444', color: '#FFFFFF', shortcut: 'P', countsAsSavings: true };
+            if (opt === 'Cut Bid') return { value: 'Cut Bid', label: 'CUT BID', bg: '#F59E0B', color: '#FFFFFF', shortcut: 'C', countsAsSavings: true };
+            if (opt === 'Keep') return { value: 'Keep', label: 'KEEP', bg: '#059669', color: '#FFFFFF', shortcut: 'K', countsAsSavings: false };
+            if (opt === 'Negative') return { value: 'Negative', label: 'NEGATIVE', bg: '#6366F1', color: '#FFFFFF', shortcut: 'N', countsAsSavings: true };
+            return { value: opt, label: opt.toUpperCase(), bg: '#9CA3AF', color: '#FFFFFF', shortcut: opt[0].toUpperCase(), countsAsSavings: false };
+          });
+        };
+
+        return (
+          <TriageMode
+            items={items}
+            decisions={triageDecisions}
+            decisionSpecsBySheet={decisionSpecsBySheet}
+            onDecide={(key, val) => setDecisionWithFlash(Number(key), val)}
+            onUndo={(key) => setDecisions(prev => { const n = { ...prev }; delete n[Number(key)]; return n; })}
+            onGenerate={async () => {
+              await handleGenerateInline();
+              toast.success('Amazon file ready', {
+                description: `${decisionsMade} decisions exported`,
+                duration: 3000,
+              });
+            }}
+            onSwitchToReview={() => setViewMode('review')}
+            totalSpend={result.totalSpend}
+            sheetsCount={1}
+            addressedSavings={addressedSpend}
+            shortSheetLabel={(s) => s}
+          />
+        );
+      })()}
+
+      {viewMode === 'review' && (<>
+
       {/* Compact stats + 4-step workflow — single unified container */}
       <CompactStatsBar
         accent="amber"
@@ -390,8 +515,45 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         }))}
       />
 
+      {/* ─── Focus filter pills (matches Bleeders 1.0) ─── */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-[11px] font-medium" style={{ color: '#9CA3AF' }}>
+          {TRACK_LABELS[result.trackType]}:
+        </span>
+        {([
+          { id: 'all', label: 'All', icon: '', count: focusMeta.all },
+          { id: 'pause', label: 'Pause candidates', icon: '🔴', count: focusMeta.pause },
+          { id: 'review', label: 'Needs review', icon: '🟡', count: focusMeta.review },
+          { id: 'decided', label: 'Decided', icon: '✓', count: focusMeta.decided },
+          { id: 'highspend', label: 'High spend', icon: '💰', count: focusMeta.highspend },
+        ] as const).map(f => (
+          <button
+            key={f.id}
+            onClick={() => setFocusFilter(f.id as FocusFilter)}
+            className={`focus-pill ${focusFilter === f.id ? 'is-active' : ''}`}
+          >
+            {f.icon && <span aria-hidden>{f.icon}</span>}
+            {f.label}
+            <span className="count">· {f.count}</span>
+          </button>
+        ))}
+      </div>
+
       {/* Decision table */}
       <div className="decision-table-card">
+
+        {/* ─── Contextual amber callout for SP Search Terms ─── */}
+        {isSearchTermSheet && (
+          <div
+            className="px-4 py-2.5 border-b flex items-start gap-2"
+            style={{ background: '#FFFBEB', borderBottomColor: '#FDE68A', borderLeft: '3px solid #F59E0B' }}
+          >
+            <Info className="w-4 h-4 mt-px flex-shrink-0" style={{ color: '#F59E0B' }} />
+            <p className="text-[12.5px]" style={{ color: '#92400E' }}>
+              <strong>Pause</strong> on search terms auto-converts to <strong>Negate (Exact)</strong> when generating the Amazon file.
+            </p>
+          </div>
+        )}
 
         {/* Bulk action buttons */}
         <div className="decision-table-bar flex items-center justify-between gap-2 px-4 py-2.5">
@@ -406,8 +568,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
               suggestions.forEach((s, idx) => { allSuggested[idx] = s.decision; });
               setDecisions(allSuggested);
             }} className="bulk-btn btn-press">
-              <span className="decision-dot" style={{ background: '#4F6EF7' }} />
-              Apply all suggestions
+              <Sparkles className="w-3 h-3" style={{ color: '#4F6EF7' }} />
+              Apply all AI suggestions
             </button>
             {getDecisionOptions().includes('Pause') && (
               <button onClick={handleSetAllPause} className="bulk-btn btn-press">
@@ -453,6 +615,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                   </SortHeader>
                 </TableHead>
                 <TableHead style={{ letterSpacing: '0.08em' }}>Match</TableHead>
+                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Clicks</TableHead>
                 <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
                   <SortHeader active={sortKey === 'spend'} dir={sortDir} onClick={() => toggleSort('spend')} align="right">Spend</SortHeader>
                 </TableHead>
@@ -469,7 +632,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedIndices.map((idx) => {
+              {filteredSortedIndices.map((idx) => {
                 const bleeder = result.bleeders[idx];
                 const suggestion = suggestions[idx];
                 const decision = decisions[idx];
@@ -514,6 +677,11 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                     </TableCell>
                     <TableCell className="text-right">
                       <span className="text-[13px] font-mono-nums text-foreground">
+                        {(bleeder.clicks ?? 0).toLocaleString()}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className="text-[13px] font-mono-nums text-foreground">
                         ${bleeder.spend.toFixed(2)}
                       </span>
                     </TableCell>
@@ -555,6 +723,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                           value={decision}
                           onChange={(val) => setDecisionWithFlash(idx, val)}
                           options={getDecisionOptions()}
+                          placeholder="Decide..."
                           width="128px"
                         />
                         {decisions[idx] === 'Cut Bid' && (
@@ -654,6 +823,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
           />
         </div>
       </details>
+
+      </>)}
 
       {/* Master/detail side panel */}
       {(() => {
