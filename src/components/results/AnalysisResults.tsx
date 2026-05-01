@@ -372,7 +372,7 @@ export const AnalysisResults = ({
         fileName={generatedFileName}
         title="Workflow complete"
         impactHeadline={`$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })} in at-risk spend addressed`}
-        impactSubtitle="The bleeders below were captured and packaged into your Amazon bulk file."
+        impactSubtitle="Your decisions have been packaged into an Amazon-ready bulk file."
         totalRows={allRows.length}
         summary={[
           { label: 'Bleeders found', value: allRows.length.toLocaleString() },

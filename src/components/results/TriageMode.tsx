@@ -254,10 +254,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
       </div>
 
       {/* ── Row 1: top bar (48px) ── */}
-      <div
-        className="flex items-center justify-between"
-        style={{ height: 48, padding: '0 16px', paddingTop: 3 }}
-      >
+      <div className="flex items-center justify-between" style={{ height: 48, paddingLeft: 24, paddingRight: 24, paddingTop: 3 }}>
         <button
           onClick={onSwitchToReview}
           className="hover:text-white transition-colors"
@@ -280,6 +277,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
         className="flex items-center justify-center px-4 min-h-0"
         style={{ overflow: 'hidden' }}
       >
+
 
         {total === 0 ? (
           <div className="bg-white text-center" style={{ borderRadius: 16, padding: 40, maxWidth: 640, width: '85%' }}>
@@ -307,7 +305,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             style={{
               width: '85%',
               maxWidth: 640,
-              maxHeight: '100%',
+              maxHeight: 'calc(100vh - 52px - 48px - 64px)',
               borderRadius: 16,
               padding: 22,
               boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
@@ -349,13 +347,44 @@ export const TriageMode: React.FC<TriageModeProps> = ({
               <div className="h-full transition-all duration-300" style={{ width: `${progressPct}%`, background: '#0D9488', borderRadius: 2 }} />
             </div>
 
-            {/* b. Entity name */}
-            <h2
-              className="break-words"
-              style={{ marginTop: 14, fontSize: 24, fontWeight: 700, color: '#111827', lineHeight: 1.2, letterSpacing: '-0.02em' }}
-            >
-              {current.entity}
-            </h2>
+            {/* b. Entity name — ASINs render muted with prefix label */}
+            {(() => {
+              const isAsin = /^B[A-Z0-9]{9}$/.test(current.entity || '');
+              if (isAsin) {
+                return (
+                  <div className="flex items-baseline gap-2 break-words" style={{ marginTop: 14 }}>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.10em',
+                        color: '#9CA3AF',
+                        padding: '2px 6px',
+                        background: '#F3F4F6',
+                        borderRadius: 4,
+                      }}
+                    >
+                      ASIN
+                    </span>
+                    <h2
+                      className="break-words tabular-nums"
+                      style={{ fontSize: 24, fontWeight: 600, color: '#9CA3AF', lineHeight: 1.2, letterSpacing: '-0.01em' }}
+                    >
+                      {current.entity}
+                    </h2>
+                  </div>
+                );
+              }
+              return (
+                <h2
+                  className="break-words"
+                  style={{ marginTop: 14, fontSize: 24, fontWeight: 700, color: '#111827', lineHeight: 1.2, letterSpacing: '-0.02em' }}
+                >
+                  {current.entity}
+                </h2>
+              );
+            })()}
 
             {/* c. Metadata row — campaign (≤35 chars) · match pill */}
             <div className="flex items-center gap-2 flex-wrap" style={{ marginTop: 6, fontSize: 13, color: '#9CA3AF' }}>
@@ -412,6 +441,9 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                     marginTop: 14,
                     background: s.bg,
                     borderLeft: `4px solid ${s.accent}`,
+                    borderLeftWidth: '4px',
+                    borderLeftStyle: 'solid',
+                    borderLeftColor: s.accent,
                     padding: '12px 14px',
                   }}
                 >
@@ -568,8 +600,9 @@ export const TriageMode: React.FC<TriageModeProps> = ({
           <div
             className="absolute"
             style={{
-              right: 16,
-              bottom: 8,
+              right: 24,
+              top: '50%',
+              transform: 'translateY(-50%)',
               width: 176,
               background: '#1F2937',
               border: '1px solid #374151',
@@ -606,7 +639,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             onClick={() => setShowLegend(true)}
             className="absolute inline-flex items-center gap-1.5 rounded-full px-3 h-7 text-[11px] hover:opacity-90"
             style={{
-              right: 16,
+              right: 24,
               top: '50%',
               transform: 'translateY(-50%)',
               background: '#1F2937',

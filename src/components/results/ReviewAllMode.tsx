@@ -391,11 +391,12 @@ export const ReviewAllMode = ({
                 </button>
                 <button
                   onClick={() => setMoreOpen(o => !o)}
-                  className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press"
+                  className="inline-flex items-center h-8 px-2 text-[12px] hover:underline btn-press"
                   aria-label="More options"
                   title="More options"
+                  style={{ color: '#9CA3AF' }}
                 >
-                  <MoreHorizontal className="w-4 h-4" />
+                  More options
                 </button>
                 {moreOpen && (
                   <div className="absolute right-0 top-9 min-w-[260px] rounded-lg border border-border bg-popover shadow-pop p-1 z-30 animate-scale-in">
@@ -687,8 +688,11 @@ export const ReviewAllMode = ({
       </div>
     </div>
 
-      {/* "/" hint */}
-      <div className="fixed bottom-3 left-3 text-[11px] z-20" style={{ color: '#9CA3AF' }}>
+      {/* "/" command-palette hint — fixed, anchored 24px past sidebar's right edge */}
+      <div
+        className="fixed text-[11px]"
+        style={{ bottom: 16, left: 188, color: '#9CA3AF', zIndex: 50 }}
+      >
         Press <kbd className="px-1.5 py-0.5 rounded font-mono-nums" style={{ background: '#F3F4F6', color: '#374151' }}>/</kbd> for commands
       </div>
 
