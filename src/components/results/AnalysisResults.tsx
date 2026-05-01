@@ -344,11 +344,11 @@ export const AnalysisResults = ({
     const counts: Record<string, number> = { Pause: 0, 'Cut Bid 50%': 0, Keep: 0, 'Negate (Exact)': 0, 'Negate (Phrase)': 0 };
     Object.values(decisions).forEach(d => { if (d) counts[d] = (counts[d] ?? 0) + 1; });
     const items = [
-      { label: 'Paused', count: counts['Pause'] ?? 0, color: '#FF3B30' },
-      { label: 'Cut Bid 50%', count: counts['Cut Bid 50%'] ?? 0, color: '#FF9500' },
-      { label: 'Negative', count: (counts['Negate (Exact)'] ?? 0) + (counts['Negate (Phrase)'] ?? 0), color: '#0071E3' },
-      { label: 'Keep', count: counts['Keep'] ?? 0, color: '#34C759' },
-      { label: 'No decision', count: Math.max(0, allRows.length - decisionsMade), color: '#D2D2D7' },
+      { label: 'Paused', count: counts['Pause'] ?? 0, color: '#EF4444' },
+      { label: 'Cut Bid 50%', count: counts['Cut Bid 50%'] ?? 0, color: '#F59E0B' },
+      { label: 'Negative', count: (counts['Negate (Exact)'] ?? 0) + (counts['Negate (Phrase)'] ?? 0), color: '#6366F1' },
+      { label: 'Keep', count: counts['Keep'] ?? 0, color: '#10B981' },
+      { label: 'No decision', count: Math.max(0, allRows.length - decisionsMade), color: '#E5E7EB' },
     ];
     return items;
   }, [decisions, allRows.length, decisionsMade]);
