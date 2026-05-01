@@ -174,8 +174,8 @@ export const ReviewAllMode = ({
           <div
             className="inline-flex items-center gap-2 h-8 px-3 rounded-full font-mono-nums text-[12.5px] font-semibold"
             style={{
-              background: allDone ? "#DCFCE7" : "#EFF6FF",
-              color: allDone ? "#15803D" : "#1D4ED8",
+              background: allDone ? "rgba(16, 185, 129, 0.12)" : "rgba(79, 110, 247, 0.08)",
+              color: allDone ? "#047857" : "#4F6EF7",
             }}
           >
             {allDone && <CheckCircle2 className="w-3.5 h-3.5" />}
@@ -183,10 +183,10 @@ export const ReviewAllMode = ({
           </div>
           <div className="flex items-center gap-3 text-[11px] text-[hsl(var(--text-tertiary))]">
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full" style={{ background: "#DC2626" }} /> Pause suggested
+              <span className="w-2 h-2 rounded-full" style={{ background: "#EF4444" }} /> Pause suggested
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full" style={{ background: "#EA580C" }} /> Review suggested
+              <span className="w-2 h-2 rounded-full" style={{ background: "#F59E0B" }} /> Review suggested
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full" style={{ background: "#F59E0B" }} /> Monitor
@@ -206,7 +206,7 @@ export const ReviewAllMode = ({
                       allDone && !generateDone ? "ready-pulse" : ""
                     }`}
                     style={{
-                      background: !anyDecided ? "#E5E7EB" : "#2563EB",
+                      background: !anyDecided ? "#E5E7EB" : "#4F6EF7",
                       color: !anyDecided ? "#9CA3AF" : "#FFFFFF",
                       boxShadow: allDone && !generateDone ? "0 0 0 0 rgba(37,99,235,0.5)" : undefined,
                     }}
@@ -297,12 +297,12 @@ export const ReviewAllMode = ({
                 </span>
                 <span
                   className="ml-auto inline-flex items-center justify-center min-w-[20px] h-[18px] px-1.5 rounded-full text-[10.5px] font-mono-nums font-semibold text-white"
-                  style={{ background: isActive ? "#2563EB" : "#9CA3AF" }}
+                  style={{ background: isActive ? "#4F6EF7" : "#9CA3AF" }}
                 >
                   {count}
                 </span>
                 {hasUnresolved && (
-                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#EA580C" }} aria-label="Unresolved decisions" />
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#F59E0B" }} aria-label="Unresolved decisions" />
                 )}
               </div>
               <span className="text-[11px] text-[hsl(var(--text-tertiary))] font-mono-nums">
@@ -325,7 +325,7 @@ export const ReviewAllMode = ({
                 <button
                   onClick={confirmPauseAll}
                   className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12.5px] font-semibold text-white btn-press"
-                  style={{ background: "#DC2626" }}
+                  style={{ background: "#EF4444" }}
                 >
                   Confirm Pause
                 </button>
@@ -343,7 +343,7 @@ export const ReviewAllMode = ({
                 <button
                   onClick={applyAISuggestions}
                   className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12.5px] font-semibold text-white btn-press"
-                  style={{ background: "#2563EB" }}
+                  style={{ background: "#4F6EF7" }}
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   Apply all AI suggestions
@@ -362,7 +362,7 @@ export const ReviewAllMode = ({
                     onClick={() => setPauseConfirm(true)}
                     className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12.5px] font-medium border border-border bg-card text-foreground hover:bg-secondary btn-press"
                   >
-                    <span className="w-2 h-2 rounded-full" style={{ background: "#DC2626" }} />
+                    <span className="w-2 h-2 rounded-full" style={{ background: "#EF4444" }} />
                     Select all → Pause
                   </button>
                 )}
@@ -391,9 +391,9 @@ export const ReviewAllMode = ({
 
         {/* ─── Contextual callout for Search Terms ─── */}
         {isSearchTermSheet && (
-          <div className="px-4 py-2.5 bg-[#EFF6FF] border-b border-[#BFDBFE] flex items-start gap-2">
-            <Info className="w-4 h-4 text-[#2563EB] mt-px flex-shrink-0" />
-            <p className="text-[12.5px] text-[#1E3A8A]">
+          <div className="px-4 py-2.5 bg-[rgba(79, 110, 247, 0.08)] border-b border-[rgba(79, 110, 247, 0.25)] flex items-start gap-2">
+            <Info className="w-4 h-4 text-[#4F6EF7] mt-px flex-shrink-0" />
+            <p className="text-[12.5px] text-[#1E40AF]">
               <strong>Pause</strong> on search terms auto-converts to <strong>Negate (Exact)</strong> when generating the Amazon file.
             </p>
           </div>
@@ -514,7 +514,7 @@ export const ReviewAllMode = ({
                       {hasAcos ? (
                         <span
                           className="inline-block text-[11px] font-mono-nums px-2 py-0.5 rounded-full font-medium text-white"
-                          style={{ background: acosNum >= 100 ? "#DC2626" : "#EA580C" }}
+                          style={{ background: acosNum >= 100 ? "#EF4444" : "#F59E0B" }}
                         >
                           {row.acos}
                         </span>
