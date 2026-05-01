@@ -688,8 +688,11 @@ export const ReviewAllMode = ({
       </div>
     </div>
 
-      {/* "/" hint */}
-      <div className="fixed bottom-3 left-3 text-[11px] z-20" style={{ color: '#9CA3AF' }}>
+      {/* "/" command-palette hint — fixed, anchored 24px past sidebar's right edge */}
+      <div
+        className="fixed text-[11px]"
+        style={{ bottom: 16, left: 188, color: '#9CA3AF', zIndex: 50 }}
+      >
         Press <kbd className="px-1.5 py-0.5 rounded font-mono-nums" style={{ background: '#F3F4F6', color: '#374151' }}>/</kbd> for commands
       </div>
 
