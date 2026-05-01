@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { ArrowRight } from "lucide-react";
 import { BulkBreadcrumb } from "@/components/shared/BulkBreadcrumb";
 import {
   PipelineHeader,
@@ -80,17 +81,18 @@ export const UploadCard = ({ onFileUpload, isVisible }: UploadCardProps) => {
         <div className="flex items-center justify-end gap-2 pt-1 animate-fade-in">
           <button
             onClick={handleClear}
-            className="rounded-[10px] btn-press"
-            style={{ background: '#FFFFFF', border: '1px solid #D1D5DB', color: '#111827', padding: '12px 24px', fontSize: 14, fontWeight: 600 }}
+            className="rounded-lg btn-press"
+            style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', color: '#374151', height: 36, padding: '0 16px', fontSize: 14, fontWeight: 500 }}
           >
             Cancel
           </button>
           <button
             onClick={handleAnalyze}
-            className="rounded-[10px] btn-press"
-            style={{ background: '#4F6EF7', color: '#FFFFFF', padding: '12px 24px', fontSize: 14, fontWeight: 600 }}
+            className="rounded-lg btn-press inline-flex items-center gap-1.5"
+            style={{ background: '#4F6EF7', color: '#FFFFFF', height: 36, padding: '0 16px', fontSize: 14, fontWeight: 500 }}
           >
-            Analyze File →
+            Analyze File
+            <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.2} />
           </button>
         </div>
       )}
