@@ -422,18 +422,6 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   );
 };
 
-const ShortcutRow: React.FC<{ label: string; k: string }> = ({ label, k }) => (
-  <div className="flex justify-between gap-3 items-center">
-    <span style={{ color: '#9CA3AF' }}>{label}</span>
-    <kbd
-      className="font-mono-nums"
-      style={{ padding: '1px 6px', borderRadius: 4, background: '#374151', color: '#FFFFFF', fontSize: 11 }}
-    >
-      {k}
-    </kbd>
-  </div>
-);
-
 const Metric: React.FC<{ label: string; value: string; accent?: string }> = ({ label, value, accent }) => (
   <div>
     <div
@@ -461,27 +449,6 @@ const Metric: React.FC<{ label: string; value: string; accent?: string }> = ({ l
       {value}
     </div>
   </div>
-);
-
-const PipelineStep: React.FC<{ state: 'done' | 'active' | 'pending'; label: string }> = ({ state, label }) => {
-  const dot =
-    state === 'done' ? '#059669'
-    : state === 'active' ? '#0D9488'
-    : 'rgba(255,255,255,0.30)';
-  const text =
-    state === 'active' ? '#FFFFFF'
-    : state === 'done' ? 'rgba(255,255,255,0.75)'
-    : 'rgba(255,255,255,0.45)';
-  return (
-    <span className="inline-flex items-center gap-1.5" style={{ color: text, fontWeight: state === 'active' ? 600 : 400 }}>
-      <span className="inline-block w-1.5 h-1.5 rounded-full" style={{ background: dot }} />
-      {label}
-    </span>
-  );
-};
-
-const Arrow: React.FC = () => (
-  <ArrowRight style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.30)' }} strokeWidth={2} />
 );
 
 const CompletionCard: React.FC<{
