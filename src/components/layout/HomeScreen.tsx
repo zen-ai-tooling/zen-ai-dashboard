@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Clock, ChevronRight, ArrowRight, CheckCircle2, AlertTriangle, HelpCircle, SlidersHorizontal, FileText, Sparkles } from 'lucide-react';
 import { useHistory } from '@/context/HistoryContext';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 type ActiveModule = 'bleeders_1' | 'bleeders_2' | 'lifetime_bleeders' | null;
 
