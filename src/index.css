@@ -230,10 +230,10 @@
     transform: translateY(-1px);
   }
 
-  /* Module-tinted stat cards */
-  .stat-accent-red    { border-top: 2px solid hsl(var(--destructive)); background: rgba(255, 59, 48, 0.02); }
-  .stat-accent-amber  { border-top: 2px solid hsl(var(--amber));       background: rgba(255, 149, 0, 0.025); }
-  .stat-accent-purple { border-top: 2px solid hsl(265 70% 60%);        background: rgba(168, 85, 247, 0.025); }
+  /* Module-tinted stat cards — module identity colors */
+  .stat-accent-red    { border-top: 2px solid hsl(var(--destructive)); background: hsl(var(--destructive) / 0.04); }
+  .stat-accent-amber  { border-top: 2px solid hsl(var(--amber));       background: hsl(var(--amber) / 0.04); }
+  .stat-accent-purple { border-top: 2px solid hsl(258 90% 66%);        background: hsl(258 90% 66% / 0.04); }
   .shadow-pop { box-shadow: var(--shadow-pop); }
   .shadow-sidebar { box-shadow: 1px 0 6px rgba(0, 0, 0, 0.04); }
 
@@ -253,20 +253,20 @@
     gap: 8px;
     padding: 0 18px;
   }
-  .btn-primary-action:hover:not(:disabled) { background: hsl(211 100% 42%); }
+  .btn-primary-action:hover:not(:disabled) { background: hsl(227 91% 58%); }
   .btn-primary-action:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-primary-action.is-done {
     background: hsl(var(--success));
     color: #fff;
   }
-  .btn-primary-action.is-done:hover { background: hsl(142 71% 44%); }
+  .btn-primary-action.is-done:hover { background: hsl(160 84% 34%); }
 
   /* Card hover elevation */
   .card-hover-lift {
     transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
   }
   .card-hover-lift:hover {
-    border-color: #C7C7CC;
+    border-color: hsl(var(--border-strong));
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
   }
 
@@ -279,11 +279,11 @@
             mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 24px), transparent 100%);
   }
 
-  /* Decision row indicators — match spec colors */
-  .row-decision-keep   { box-shadow: inset 3px 0 0 #34C759; }
-  .row-decision-pause  { box-shadow: inset 3px 0 0 #FF3B30; }
-  .row-decision-cut    { box-shadow: inset 3px 0 0 #FF9500; }
-  .row-decision-negate { box-shadow: inset 3px 0 0 #0071E3; }
+  /* Decision row indicators — unified spec colors */
+  .row-decision-keep   { box-shadow: inset 3px 0 0 hsl(var(--success)); }       /* #10B981 */
+  .row-decision-pause  { box-shadow: inset 3px 0 0 hsl(var(--destructive)); }   /* #EF4444 */
+  .row-decision-cut    { box-shadow: inset 3px 0 0 hsl(var(--amber)); }         /* #F59E0B */
+  .row-decision-negate { box-shadow: inset 3px 0 0 hsl(var(--info-violet)); }   /* #6366F1 */
 
 
   /* Page enter — content area only (sidebar stays fixed) */
