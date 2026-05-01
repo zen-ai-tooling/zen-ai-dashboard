@@ -66,14 +66,18 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         onClick={() => { onSelectModule(null); setShowHistoryView?.(false); }}
         className="px-6 pt-6 pb-6 text-left btn-press"
       >
-        <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-md bg-white text-[#111827] flex items-center justify-center text-[12px] font-semibold">
-            Z
-          </div>
-          <div>
-            <div className="text-[18px] font-semibold leading-tight text-white tracking-tight">Zen AI</div>
-            <div className="text-[12px] text-[#9CA3AF] mt-0.5">Amazon Ads Workflow</div>
-          </div>
+        <div>
+          <svg width="160" viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+            <circle cx="118" cy="162" r="72" fill="#9333ea"/>
+            <path d="M118,90 C132,100 142,128 140,162 C138,196 128,220 118,234 C128,230 148,212 160,188 C172,164 172,136 160,114 C152,98 136,88 118,90 Z" fill="#3b0764"/>
+            <path d="M118,90 C122,118 114,148 118,234" strokeWidth="1.5" strokeLinecap="round" fill="none" stroke="rgba(255,255,255,0.1)"/>
+            <ellipse cx="96" cy="130" rx="14" ry="20" transform="rotate(-15 96 130)" fill="rgba(255,255,255,0.1)"/>
+            <path d="M118,90 C116,80 120,72 118,64" strokeWidth="3.5" strokeLinecap="round" fill="none" stroke="#ffffff"/>
+            <path d="M118,70 C132,54 158,52 160,62 C148,76 124,76 118,70 Z" fill="#a78bfa"/>
+            <path d="M119,70 C134,60 154,55 158,62" strokeWidth="1" strokeLinecap="round" fill="none" stroke="rgba(0,0,0,0.2)"/>
+            <text x="218" y="196" fontFamily="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" fontSize="108" fontWeight="700" letterSpacing="-5" fill="#c084fc">adprune</text>
+          </svg>
+          <div className="text-[12px] text-[#9CA3AF] mt-1">Amazon Ads Optimization</div>
         </div>
       </button>
       <div className="border-b border-white/[0.08] mx-4" />
