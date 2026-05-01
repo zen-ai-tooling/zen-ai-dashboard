@@ -307,7 +307,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             style={{
               width: '85%',
               maxWidth: 640,
-              maxHeight: 'calc(100vh - 160px)',
+              maxHeight: '100%',
               borderRadius: 16,
               padding: 22,
               boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
