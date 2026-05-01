@@ -600,8 +600,9 @@ export const TriageMode: React.FC<TriageModeProps> = ({
           <div
             className="absolute"
             style={{
-              right: 16,
-              bottom: 8,
+              right: 24,
+              top: '50%',
+              transform: 'translateY(-50%)',
               width: 176,
               background: '#1F2937',
               border: '1px solid #374151',
