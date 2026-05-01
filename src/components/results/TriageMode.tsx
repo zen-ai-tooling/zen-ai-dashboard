@@ -533,81 +533,92 @@ export const TriageMode: React.FC<TriageModeProps> = ({
         )}
       </div>
 
-      {/* 8. Floating Generate file pill — bottom-center of CONTENT area (not viewport) */}
-      {!allDone && (
-        <button
-          onClick={onGenerate}
-          disabled={decisionsMade === 0}
-          className="absolute inline-flex items-center gap-1.5 hover:opacity-90 btn-press disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{
-            left: '50%',
-            transform: 'translateX(-50%)',
-            bottom: 16,
-            background: '#0D9488',
-            color: '#FFFFFF',
-            borderRadius: 24,
-            padding: '8px 20px',
-            fontSize: 12,
-            fontWeight: 600,
-            boxShadow: '0 4px 16px rgba(13,148,136,0.4)',
-            zIndex: 40,
-          }}
-        >
-          Generate file ({decisionsMade}/{total}) <ArrowRight className="w-3.5 h-3.5" />
-        </button>
-      )}
+      {/* ── Row 3: bottom bar (64px) — generate centered, shortcuts right ── */}
+      <div
+        className="relative"
+        style={{ height: 64, padding: '0 16px' }}
+      >
+        {/* Generate file pill — centered in row */}
+        {!allDone && (
+          <button
+            onClick={onGenerate}
+            disabled={decisionsMade === 0}
+            className="absolute inline-flex items-center gap-1.5 hover:opacity-90 btn-press disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              background: '#0D9488',
+              color: '#FFFFFF',
+              borderRadius: 24,
+              padding: '8px 20px',
+              fontSize: 12,
+              fontWeight: 600,
+              boxShadow: '0 4px 16px rgba(13,148,136,0.4)',
+              zIndex: 40,
+            }}
+          >
+            Generate file ({decisionsMade}/{total}) <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        )}
 
-      {/* 9. Shortcuts panel — absolute bottom-right of content area */}
-      {showLegend ? (
-        <div
-          className="absolute"
-          style={{
-            right: 16,
-            bottom: 16,
-            width: 176,
-            background: '#1F2937',
-            border: '1px solid #374151',
-            borderRadius: 10,
-            padding: '10px 12px',
-            zIndex: 45,
-          }}
-        >
-          <div className="flex items-center justify-between" style={{ marginBottom: 8 }}>
-            <span className="inline-flex items-center gap-1.5" style={{ color: '#FFFFFF', fontSize: 11, fontWeight: 600 }}>
-              ⌨ Shortcuts
-            </span>
-            <button
-              onClick={() => setShowLegend(false)}
-              className="hover:opacity-70"
-              aria-label="Hide shortcuts"
-              style={{ color: '#9CA3AF', fontSize: 13, lineHeight: 1 }}
-            >
-              ×
-            </button>
+        {/* Shortcuts — right-aligned. Open panel grows upward (absolute) so it
+            never collides with the centered generate pill. */}
+        {showLegend ? (
+          <div
+            className="absolute"
+            style={{
+              right: 16,
+              bottom: 8,
+              width: 176,
+              background: '#1F2937',
+              border: '1px solid #374151',
+              borderRadius: 10,
+              padding: '10px 12px',
+              zIndex: 45,
+            }}
+          >
+            <div className="flex items-center justify-between" style={{ marginBottom: 8 }}>
+              <span className="inline-flex items-center gap-1.5" style={{ color: '#FFFFFF', fontSize: 11, fontWeight: 600 }}>
+                ⌨ Shortcuts
+              </span>
+              <button
+                onClick={() => setShowLegend(false)}
+                className="hover:opacity-70"
+                aria-label="Hide shortcuts"
+                style={{ color: '#9CA3AF', fontSize: 13, lineHeight: 1 }}
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex flex-col" style={{ gap: 6, fontSize: 11 }}>
+              {currentSpecs.map(s => (
+                <ShortcutRow key={s.value} label={s.label} k={s.shortcut.toUpperCase()} />
+              ))}
+              <ShortcutRow label="SKIP" k="S" />
+              <ShortcutRow label="UNDO" k="Z" />
+              <ShortcutRow label="PREV" k="←" />
+              <ShortcutRow label="NEXT" k="→" />
+            </div>
           </div>
-          <div className="flex flex-col" style={{ gap: 6, fontSize: 11 }}>
-            {currentSpecs.map(s => (
-              <ShortcutRow key={s.value} label={s.label} k={s.shortcut.toUpperCase()} />
-            ))}
-            <ShortcutRow label="SKIP" k="S" />
-            <ShortcutRow label="UNDO" k="Z" />
-            <ShortcutRow label="PREV" k="←" />
-            <ShortcutRow label="NEXT" k="→" />
-          </div>
-        </div>
-      ) : (
-        <button
-          onClick={() => setShowLegend(true)}
-          className="absolute inline-flex items-center gap-1.5 rounded-full px-3 h-7 text-[11px] hover:opacity-90"
-          style={{
-            right: 16, bottom: 16,
-            background: '#1F2937', border: '1px solid #374151', color: '#FFFFFF',
-            zIndex: 45,
-          }}
-        >
-          ⌨ Shortcuts
-        </button>
-      )}
+        ) : (
+          <button
+            onClick={() => setShowLegend(true)}
+            className="absolute inline-flex items-center gap-1.5 rounded-full px-3 h-7 text-[11px] hover:opacity-90"
+            style={{
+              right: 16,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: '#1F2937',
+              border: '1px solid #374151',
+              color: '#FFFFFF',
+              zIndex: 45,
+            }}
+          >
+            ⌨ Shortcuts
+          </button>
+        )}
+      </div>
 
     </div>
   );
