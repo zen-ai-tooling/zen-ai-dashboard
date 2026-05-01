@@ -274,10 +274,22 @@ export const TriageMode: React.FC<TriageModeProps> = ({
 
       {/* 4. Flex-centered card area */}
       <div
-        className="flex items-center justify-center px-4"
-        style={{ minHeight: 'calc(100vh - 52px - 3px)' }}
+        className="flex items-start justify-center px-4"
+        style={{ minHeight: 'calc(100vh - 52px - 3px)', paddingTop: 56, paddingBottom: 96 }}
       >
-        {allDone ? (
+        {total === 0 ? (
+          <div className="bg-white text-center" style={{ borderRadius: 16, padding: 40, maxWidth: 640, width: '85%' }}>
+            <h2 className="text-[20px] font-semibold" style={{ color: '#111827' }}>No bleeders to review</h2>
+            <p className="mt-2 text-[13px]" style={{ color: '#6B7280' }}>There's nothing to triage right now.</p>
+            <button
+              onClick={onSwitchToReview}
+              className="mt-5 inline-flex items-center justify-center h-10 px-5 rounded-lg text-[13px] font-semibold text-white"
+              style={{ background: '#0D9488' }}
+            >
+              Exit triage
+            </button>
+          </div>
+        ) : allDone ? (
           <CompletionCard
             total={total}
             savings={savingsTarget}
@@ -286,17 +298,22 @@ export const TriageMode: React.FC<TriageModeProps> = ({
           />
         ) : current ? (
           <div
-            key={current.key + (direction === 'right' ? '-r' : '-l')}
-            className="bg-white text-[#111827]"
+            key={current.key + ':' + (phase === 'exiting' ? 'out' : 'in') + ':' + direction}
+            className="bg-white text-[#111827] overflow-y-auto"
             style={{
               width: '85%',
               maxWidth: 640,
+              maxHeight: 'calc(100vh - 160px)',
               borderRadius: 16,
-              padding: 32,
+              padding: 22,
               boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
-              animation: direction === 'right'
-                ? 'triage-in-right 220ms ease-out'
-                : 'triage-in-left 220ms ease-out',
+              animation: phase === 'exiting'
+                ? (direction === 'right'
+                    ? 'triage-out-left 120ms ease-in forwards'
+                    : 'triage-out-right 120ms ease-in forwards')
+                : (direction === 'right'
+                    ? 'triage-in-right 150ms ease-out'
+                    : 'triage-in-left 150ms ease-out'),
             }}
           >
             {/* a. Header row */}
@@ -307,8 +324,20 @@ export const TriageMode: React.FC<TriageModeProps> = ({
               >
                 {shortSheetLabel(current.sheet)}
               </span>
-              <div className="text-[12px] tabular-nums" style={{ color: '#9CA3AF' }}>
-                <span className="font-semibold" style={{ color: '#374151' }}>{cursor + 1}</span> of {queue.length}
+              <div className="text-[12px] tabular-nums flex items-center gap-2" style={{ color: '#9CA3AF' }}>
+                <span>
+                  <span className="font-semibold" style={{ color: '#374151' }}>{cursor + 1}</span> of {queue.length}
+                </span>
+                {currentDecision && (() => {
+                  const spec = currentSpecs.find(s => s.value === currentDecision);
+                  if (!spec) return null;
+                  return (
+                    <span className="inline-flex items-center gap-1.5" style={{ color: spec.bg }}>
+                      <span style={{ width: 6, height: 6, borderRadius: 999, background: spec.bg, display: 'inline-block' }} />
+                      <span style={{ fontWeight: 600 }}>{spec.label}</span>
+                    </span>
+                  );
+                })()}
               </div>
             </div>
             {/* card progress bar — overall session completion */}
@@ -319,7 +348,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             {/* b. Entity name */}
             <h2
               className="break-words"
-              style={{ marginTop: 16, fontSize: 28, fontWeight: 700, color: '#111827', lineHeight: 1.2, letterSpacing: '-0.02em' }}
+              style={{ marginTop: 14, fontSize: 24, fontWeight: 700, color: '#111827', lineHeight: 1.2, letterSpacing: '-0.02em' }}
             >
               {current.entity}
             </h2>
@@ -345,7 +374,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             </div>
 
             {/* d. Metrics row — 4 equal columns */}
-            <div className="grid grid-cols-4 gap-4" style={{ marginTop: 20 }}>
+            <div className="grid grid-cols-4 gap-4" style={{ marginTop: 16 }}>
               <Metric label="Spend" value={`$${current.spend.toFixed(2)}`} accent="#EF4444" />
               <Metric label="Clicks" value={current.clicks.toLocaleString()} accent="#111827" />
               <Metric
@@ -376,10 +405,10 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                 <div
                   className="rounded-lg"
                   style={{
-                    marginTop: 16,
+                    marginTop: 14,
                     background: s.bg,
                     borderLeft: `4px solid ${s.accent}`,
-                    padding: '14px 16px',
+                    padding: '12px 14px',
                   }}
                 >
                   <div className="flex items-start gap-3">
@@ -408,6 +437,97 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                         </div>
                       )}
                     </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* f. Action buttons — equal-width grid filling card inner width */}
+            <div
+              className="grid"
+              style={{
+                marginTop: 16,
+                gap: 8,
+                width: '100%',
+                gridTemplateColumns: `repeat(${currentSpecs.length}, 1fr)`,
+              }}
+            >
+              {currentSpecs.map((spec) => {
+                const isSelected = currentDecision === spec.value;
+                const hasDecision = !!currentDecision;
+                return (
+                  <button
+                    key={spec.value}
+                    onClick={() => handleDecide(spec.value)}
+                    className="relative btn-press transition-all flex items-center justify-center w-full"
+                    style={{
+                      height: 46,
+                      borderRadius: 10,
+                      background: spec.bg,
+                      color: '#FFFFFF',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      letterSpacing: '0.05em',
+                      textTransform: 'uppercase',
+                      boxShadow: isSelected ? '0 0 0 2px #FFFFFF, 0 0 0 4px ' + spec.bg + '55' : undefined,
+                      opacity: hasDecision && !isSelected ? 0.8 : 1,
+                    }}
+                  >
+                    {isSelected && <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" strokeWidth={2.6} />}
+                    {spec.label}
+                    <span
+                      className="absolute font-mono-nums"
+                      style={{
+                        right: 6,
+                        bottom: 5,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        padding: '1px 5px',
+                        borderRadius: 3,
+                        background: 'rgba(0,0,0,0.15)',
+                        color: '#FFFFFF',
+                      }}
+                    >
+                      {spec.shortcut.toUpperCase()}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* g. Secondary actions */}
+            <div className="flex items-center justify-between" style={{ marginTop: 10 }}>
+              <button
+                onClick={handleUndo}
+                disabled={!currentDecision && history.length === 0}
+                className="text-[13px] inline-flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-80"
+                style={{ color: '#9CA3AF' }}
+              >
+                <Undo2 className="w-3.5 h-3.5" /> {currentDecision ? 'Clear decision (Z)' : 'Undo last (Z)'}
+              </button>
+              <button
+                onClick={handleSkip}
+                className="text-[13px] inline-flex items-center gap-1.5 hover:opacity-80"
+                style={{ color: '#9CA3AF' }}
+              >
+                Skip for now (S) <SkipForward className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white text-center" style={{ borderRadius: 16, padding: 40, maxWidth: 640, width: '85%' }}>
+            <h2 className="text-[20px] font-semibold" style={{ color: '#111827' }}>No bleeders to review</h2>
+            <p className="mt-2 text-[13px]" style={{ color: '#6B7280' }}>There's nothing to triage right now.</p>
+            <button
+              onClick={onSwitchToReview}
+              className="mt-5 inline-flex items-center justify-center h-10 px-5 rounded-lg text-[13px] font-semibold text-white"
+              style={{ background: '#0D9488' }}
+            >
+              Exit triage
+            </button>
+          </div>
+        )}
+      </div>
                   </div>
                 </div>
               );
