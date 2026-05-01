@@ -391,9 +391,12 @@ export const ReviewAllMode = ({
 
         {/* ─── Contextual callout for Search Terms ─── */}
         {isSearchTermSheet && (
-          <div className="px-4 py-2.5 bg-[rgba(79, 110, 247, 0.08)] border-b border-[rgba(79, 110, 247, 0.25)] flex items-start gap-2">
-            <Info className="w-4 h-4 text-[#4F6EF7] mt-px flex-shrink-0" />
-            <p className="text-[12.5px] text-[#1E40AF]">
+          <div
+            className="px-4 py-2.5 border-b flex items-start gap-2"
+            style={{ background: 'rgba(99, 102, 241, 0.08)', borderBottomColor: 'rgba(99, 102, 241, 0.25)' }}
+          >
+            <Info className="w-4 h-4 mt-px flex-shrink-0" style={{ color: '#6366F1' }} />
+            <p className="text-[12.5px]" style={{ color: '#4338CA' }}>
               <strong>Pause</strong> on search terms auto-converts to <strong>Negate (Exact)</strong> when generating the Amazon file.
             </p>
           </div>
