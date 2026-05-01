@@ -282,10 +282,10 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
           { label: 'Ranking excluded', value: result.excludedRankingCount.toLocaleString() },
         ]}
         breakdown={[
-          { label: 'Paused', count: breakdownCounts['Pause'] ?? 0, color: '#FF3B30' },
-          { label: 'Cut Bid', count: breakdownCounts['Cut Bid 50%'] ?? 0, color: '#FF9500' },
-          { label: 'Keep', count: breakdownCounts['Keep'] ?? 0, color: '#34C759' },
-          { label: 'No decision', count: Math.max(0, bleeders.length - decisionsMade), color: '#D2D2D7' },
+          { label: 'Paused', count: breakdownCounts['Pause'] ?? 0, color: '#EF4444' },
+          { label: 'Cut Bid', count: breakdownCounts['Cut Bid 50%'] ?? 0, color: '#F59E0B' },
+          { label: 'Keep', count: breakdownCounts['Keep'] ?? 0, color: '#10B981' },
+          { label: 'No decision', count: Math.max(0, bleeders.length - decisionsMade), color: '#D1D5DB' },
         ]}
         onDownload={handleDownloadAmazon}
         onStartNew={onStartNew}
@@ -303,7 +303,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
       {amazonFile && showFullResults && (
         <button
           onClick={() => setShowFullResults(false)}
-          className="text-[12.5px] text-[#0071E3] hover:underline btn-press"
+          className="text-[12.5px] text-[#4F6EF7] hover:underline btn-press"
         >
           ← Back to summary
         </button>
@@ -350,15 +350,15 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
               }}
               className="bulk-btn btn-press"
             >
-              <span className="decision-dot" style={{ background: '#0071E3' }} />
+              <span className="decision-dot" style={{ background: '#4F6EF7' }} />
               Apply all suggestions
             </button>
             <button onClick={() => setAll('Pause')} className="bulk-btn btn-press">
-              <span className="decision-dot" style={{ background: '#FF3B30' }} />
+              <span className="decision-dot" style={{ background: '#EF4444' }} />
               Select all → Pause
             </button>
             <button onClick={() => setAll('Keep')} className="bulk-btn btn-press">
-              <span className="decision-dot" style={{ background: '#34C759' }} />
+              <span className="decision-dot" style={{ background: '#10B981' }} />
               Select all → Keep
             </button>
             <button onClick={handleClearAll} className="bulk-btn bulk-btn-ghost btn-press">
@@ -453,7 +453,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                           {b.acos.toFixed(1)}%
                         </span>
                       ) : (
-                        <span className="text-[13px] text-[#D2D2D7]">—</span>
+                        <span className="text-[13px] text-[#D1D5DB]">—</span>
                       )}
                     </TableCell>
                     <TableCell onClick={(e) => e.stopPropagation()}>
@@ -474,7 +474,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                     <TableCell onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-1.5">
                         {decision && (
-                          <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#34C759' }} />
+                          <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#10B981' }} />
                         )}
                         <DecisionSelect
                           value={decision}
@@ -497,10 +497,10 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
             <div className="min-w-0 flex-1">
               {decisionsMade >= bleeders.length && bleeders.length > 0 ? (
                 <div className="flex items-baseline gap-2">
-                  <span className="text-[14px] font-semibold font-mono-nums" style={{ color: '#34C759' }}>
+                  <span className="text-[14px] font-semibold font-mono-nums" style={{ color: '#10B981' }}>
                     All {bleeders.length} decisions complete
                   </span>
-                  <CheckCircle2 className="w-4 h-4" style={{ color: '#34C759' }} />
+                  <CheckCircle2 className="w-4 h-4" style={{ color: '#10B981' }} />
                 </div>
               ) : (
                 <div className="flex items-baseline gap-2">
@@ -514,9 +514,9 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                 <DecisionProgressBar
                   total={bleeders.length}
                   segments={[
-                    { key: 'Pause', count: Object.values(decisions).filter((d) => d === 'Pause').length, color: '#FF3B30' },
-                    { key: 'Cut', count: Object.values(decisions).filter((d) => d === 'Cut Bid 50%').length, color: '#FF9500' },
-                    { key: 'Keep', count: Object.values(decisions).filter((d) => d === 'Keep').length, color: '#34C759' },
+                    { key: 'Pause', count: Object.values(decisions).filter((d) => d === 'Pause').length, color: '#EF4444' },
+                    { key: 'Cut', count: Object.values(decisions).filter((d) => d === 'Cut Bid 50%').length, color: '#F59E0B' },
+                    { key: 'Keep', count: Object.values(decisions).filter((d) => d === 'Keep').length, color: '#10B981' },
                   ]}
                 />
               </div>
@@ -547,9 +547,9 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
         const decision = idx != null ? decisions[idx] : undefined;
 
         const buttonSpecs: DecisionButtonSpec[] = [
-          { value: 'Pause',       label: 'Pause',       bg: '#FFE5E5', color: '#CC0000', border: '#FFCCCC', hoverBg: '#FFCCCC' },
-          { value: 'Cut Bid 50%', label: 'Cut Bid 50%', bg: '#FFF3E0', color: '#CC7700', border: '#FFE0B2', hoverBg: '#FFE0B2' },
-          { value: 'Keep',        label: 'Keep',        bg: '#E8F5E9', color: '#1B7A2B', border: '#C8E6C9', hoverBg: '#C8E6C9' },
+          { value: 'Pause',       label: 'Pause',       bg: 'rgba(239, 68, 68, 0.10)', color: '#B91C1C', border: 'rgba(239, 68, 68, 0.20)', hoverBg: 'rgba(239, 68, 68, 0.20)' },
+          { value: 'Cut Bid 50%', label: 'Cut Bid 50%', bg: 'rgba(245, 158, 11, 0.10)', color: '#B45309', border: 'rgba(245, 158, 11, 0.20)', hoverBg: 'rgba(245, 158, 11, 0.20)' },
+          { value: 'Keep',        label: 'Keep',        bg: 'rgba(16, 185, 129, 0.10)', color: '#047857', border: 'rgba(16, 185, 129, 0.20)', hoverBg: 'rgba(16, 185, 129, 0.20)' },
         ];
 
         const detail: RowDetail | null = b && idx != null ? (() => {
@@ -565,10 +565,10 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
             matchType: b.matchType || undefined,
             metrics: [
               { label: 'Clicks', value: (b.clicks ?? 0).toLocaleString() },
-              { label: 'Spend', value: `$${b.spend.toFixed(2)}`, color: isHighSpend ? '#FF3B30' : undefined },
+              { label: 'Spend', value: `$${b.spend.toFixed(2)}`, color: isHighSpend ? '#EF4444' : undefined },
               { label: 'Sales', value: `$${b.sales.toFixed(2)}` },
               acosVal > 0
-                ? { label: 'ACoS', value: `${acosVal.toFixed(1)}%`, pill: true, pillBg: acosVal >= 100 ? '#FF3B30' : '#FF9500' }
+                ? { label: 'ACoS', value: `${acosVal.toFixed(1)}%`, pill: true, pillBg: acosVal >= 100 ? '#EF4444' : '#F59E0B' }
                 : { label: 'ACoS', value: '—' },
               { label: 'CPC', value: cpc > 0 ? `$${cpc.toFixed(2)}` : '—' },
             ],

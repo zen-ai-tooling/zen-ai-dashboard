@@ -108,13 +108,13 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
           {/* Step 1 — Lifetime Targeting Report */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#2563EB] text-white text-[11px] font-semibold font-mono-nums">
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#4F6EF7] text-white text-[11px] font-semibold font-mono-nums">
                 1
               </span>
               <h3 className="text-[14px] font-semibold text-foreground">
                 Lifetime Targeting Report
               </h3>
-              <span className="text-[12px] text-[#86868B]">
+              <span className="text-[12px] text-[#9CA3AF]">
                 · Campaign Manager → Targeting → Lifetime filter → Export
               </span>
             </div>
@@ -138,13 +138,13 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
           {/* Step 2 — Reference Bulk File */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#2563EB] text-white text-[11px] font-semibold font-mono-nums">
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#4F6EF7] text-white text-[11px] font-semibold font-mono-nums">
                 2
               </span>
               <h3 className="text-[14px] font-semibold text-foreground">
                 Reference Bulk File
               </h3>
-              <span className="text-[12px] text-[#86868B]">
+              <span className="text-[12px] text-[#9CA3AF]">
                 · Amazon Ads → Bulk Operations → Create Spreadsheet (30-day)
               </span>
             </div>
@@ -172,9 +172,9 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
         <div
           className="rounded-lg px-3.5 py-2.5 text-[13px]"
           style={{
-            background: 'rgba(255, 59, 48, 0.06)',
-            border: '1px solid rgba(255, 59, 48, 0.25)',
-            color: '#B71C1C',
+            background: 'rgba(239, 68, 68, 0.06)',
+            border: '1px solid rgba(239, 68, 68, 0.25)',
+            color: '#B91C1C',
           }}
         >
           {error}
@@ -183,7 +183,7 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
 
       {/* Action row */}
       <div className="flex items-center justify-between gap-3 pt-1">
-        <div className="text-[12px] text-[#86868B]">
+        <div className="text-[12px] text-[#9CA3AF]">
           {!lifetimeFile && !bulkFile && 'Upload both files to continue'}
           {lifetimeFile && !bulkFile && 'Upload reference bulk file to continue'}
           {!lifetimeFile && bulkFile && 'Upload lifetime targeting report to continue'}
@@ -194,7 +194,7 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
           disabled={!ready}
           className="rounded-[10px] btn-press disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
           style={{
-            background: '#2563EB',
+            background: '#4F6EF7',
             color: '#FFFFFF',
             padding: '12px 24px',
             fontSize: 14,

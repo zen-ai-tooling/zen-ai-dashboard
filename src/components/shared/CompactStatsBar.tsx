@@ -27,9 +27,9 @@ const ACCENT_BORDER: Record<Accent, string> = {
 };
 
 const ACCENT_BG: Record<Accent, string> = {
-  red: 'rgba(255, 59, 48, 0.02)',
-  amber: 'rgba(255, 149, 0, 0.025)',
-  purple: 'rgba(168, 85, 247, 0.025)',
+  red: 'rgba(239, 68, 68, 0.02)',
+  amber: 'rgba(245, 158, 11, 0.025)',
+  purple: 'rgba(139, 92, 246, 0.025)',
 };
 
 export const CompactStatsBar: React.FC<Props> = ({ stats, steps, accent = 'red' }) => {
@@ -51,14 +51,14 @@ export const CompactStatsBar: React.FC<Props> = ({ stats, steps, accent = 'red' 
               >
                 {s.value}
               </span>
-              <span className="text-[12px] text-[#86868B]">{s.label}</span>
+              <span className="text-[12px] text-[#9CA3AF]">{s.label}</span>
             </div>
           </React.Fragment>
         ))}
       </div>
 
       {/* Divider */}
-      <div className="border-t border-[#E5E5EA]" />
+      <div className="border-t border-[#E5E7EB]" />
 
       {/* Steps */}
       <div className="px-5 py-3 bg-card/60">

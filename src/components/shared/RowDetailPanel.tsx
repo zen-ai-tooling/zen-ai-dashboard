@@ -185,11 +185,11 @@ export const RowDetailPanel: React.FC<RowDetailPanelProps> = ({
 
         {allComplete ? (
           <div className="row-panel-complete">
-            <CheckCircle2 className="w-12 h-12" style={{ color: '#34C759' }} />
-            <h3 className="text-[16px] font-semibold text-[#1D1D1F] mt-3">
+            <CheckCircle2 className="w-12 h-12" style={{ color: '#10B981' }} />
+            <h3 className="text-[16px] font-semibold text-[#111827] mt-3">
               All decisions complete
             </h3>
-            <p className="text-[13px] text-[#6E6E73] mt-1.5 text-center max-w-[280px]">
+            <p className="text-[13px] text-[#374151] mt-1.5 text-center max-w-[280px]">
               You've reviewed every bleeder. Generate the Amazon bulk file to download your changes.
             </p>
             <div className="flex flex-col gap-2 w-full mt-5">
@@ -199,9 +199,9 @@ export const RowDetailPanel: React.FC<RowDetailPanelProps> = ({
                   onClick={onGenerate}
                   className="row-panel-decision-btn"
                   style={{
-                    background: '#0071E3',
+                    background: '#4F6EF7',
                     color: '#FFFFFF',
-                    border: '1px solid #0071E3',
+                    border: '1px solid #4F6EF7',
                   }}
                 >
                   Generate Amazon file <ArrowRight className="w-4 h-4" />
@@ -213,8 +213,8 @@ export const RowDetailPanel: React.FC<RowDetailPanelProps> = ({
                 className="row-panel-decision-btn"
                 style={{
                   background: '#FFFFFF',
-                  color: '#1D1D1F',
-                  border: '1px solid #E5E5EA',
+                  color: '#111827',
+                  border: '1px solid #E5E7EB',
                 }}
               >
                 Close panel
@@ -228,11 +228,11 @@ export const RowDetailPanel: React.FC<RowDetailPanelProps> = ({
           >
             {/* Header */}
             <div className="row-panel-header">
-              <div className="text-[16px] font-semibold text-[#1D1D1F] leading-[1.3]">
+              <div className="text-[16px] font-semibold text-[#111827] leading-[1.3]">
                 {detail.campaign || '—'}
               </div>
               {detail.adGroup && (
-                <div className="text-[13px] text-[#6E6E73] mt-1">{detail.adGroup}</div>
+                <div className="text-[13px] text-[#374151] mt-1">{detail.adGroup}</div>
               )}
               <div className="mt-3 flex items-start gap-2 flex-wrap">
                 <span className="row-panel-entity-pill">{detail.entity || '—'}</span>
@@ -250,7 +250,7 @@ export const RowDetailPanel: React.FC<RowDetailPanelProps> = ({
                   {m.pill ? (
                     <span
                       className="inline-block text-[12px] font-mono-nums px-2.5 py-1 rounded-full font-medium text-white"
-                      style={{ background: m.pillBg ?? '#86868B' }}
+                      style={{ background: m.pillBg ?? '#9CA3AF' }}
                     >
                       {m.value}
                     </span>

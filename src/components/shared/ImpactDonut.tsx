@@ -45,7 +45,7 @@ export const ImpactDonut: React.FC<ImpactDonutProps> = ({
           cy={cy}
           r={r}
           fill="none"
-          stroke="#E5E5EA"
+          stroke="#E5E7EB"
           strokeWidth={stroke}
         />
         {/* Addressed arc */}
@@ -55,7 +55,7 @@ export const ImpactDonut: React.FC<ImpactDonutProps> = ({
             cy={cy}
             r={r}
             fill="none"
-            stroke="#0071E3"
+            stroke="#4F6EF7"
             strokeWidth={stroke}
             strokeDasharray={`${dash} ${circumference - dash}`}
             strokeLinecap="butt"
@@ -69,14 +69,14 @@ export const ImpactDonut: React.FC<ImpactDonutProps> = ({
         {allDone ? (
           <span
             className="rounded-full flex items-center justify-center"
-            style={{ width: 28, height: 28, background: '#0071E3' }}
+            style={{ width: 28, height: 28, background: '#4F6EF7' }}
           >
             <Check className="w-4 h-4 text-white" strokeWidth={2.6} />
           </span>
         ) : (
           <span
             className="font-mono-nums"
-            style={{ fontSize: 14, fontWeight: 600, color: '#1D1D1F' }}
+            style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}
           >
             {pct}%
           </span>

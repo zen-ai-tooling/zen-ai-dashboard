@@ -143,20 +143,21 @@ export const AnalysisResults = ({
   const [panelComplete, setPanelComplete] = useState(false);
   useEffect(() => { setSelectedRowIdx(null); setPanelComplete(false); }, [currentSheet]);
 
-  // Build the side-panel button spec from the active sheet's decision options.
+  // Build the side-panel button spec — uses unified color system.
+  // PAUSE #EF4444 · CUT BID #F59E0B · KEEP #10B981 · NEGATIVE #6366F1
   const panelButtonSpecs: DecisionButtonSpec[] = useMemo(() => {
     return decisionOptions.map((opt) => {
       if (opt === 'Pause') {
-        return { value: 'Pause', label: 'Pause', bg: '#FFE5E5', color: '#CC0000', border: '#FFCCCC', hoverBg: '#FFCCCC' };
+        return { value: 'Pause', label: 'Pause', bg: 'rgba(239, 68, 68, 0.10)', color: '#B91C1C', border: 'rgba(239, 68, 68, 0.25)', hoverBg: 'rgba(239, 68, 68, 0.18)' };
       }
       if (opt === 'Cut Bid 50%') {
-        return { value: 'Cut Bid 50%', label: 'Cut Bid 50%', bg: '#FFF3E0', color: '#CC7700', border: '#FFE0B2', hoverBg: '#FFE0B2' };
+        return { value: 'Cut Bid 50%', label: 'Cut Bid 50%', bg: 'rgba(245, 158, 11, 0.10)', color: '#B45309', border: 'rgba(245, 158, 11, 0.25)', hoverBg: 'rgba(245, 158, 11, 0.18)' };
       }
       if (opt === 'Keep') {
-        return { value: 'Keep', label: 'Keep', bg: '#E8F5E9', color: '#1B7A2B', border: '#C8E6C9', hoverBg: '#C8E6C9' };
+        return { value: 'Keep', label: 'Keep', bg: 'rgba(16, 185, 129, 0.10)', color: '#047857', border: 'rgba(16, 185, 129, 0.25)', hoverBg: 'rgba(16, 185, 129, 0.18)' };
       }
-      // Negate (Exact) / Negate (Phrase)
-      return { value: opt, label: opt, bg: '#E3F2FD', color: '#0D47A1', border: '#BBDEFB', hoverBg: '#BBDEFB' };
+      // Negate (Exact) / Negate (Phrase) → INFO/NEGATIVE violet
+      return { value: opt, label: opt, bg: 'rgba(99, 102, 241, 0.10)', color: '#4338CA', border: 'rgba(99, 102, 241, 0.25)', hoverBg: 'rgba(99, 102, 241, 0.18)' };
     });
   }, [decisionOptions]);
 
@@ -343,11 +344,11 @@ export const AnalysisResults = ({
     const counts: Record<string, number> = { Pause: 0, 'Cut Bid 50%': 0, Keep: 0, 'Negate (Exact)': 0, 'Negate (Phrase)': 0 };
     Object.values(decisions).forEach(d => { if (d) counts[d] = (counts[d] ?? 0) + 1; });
     const items = [
-      { label: 'Paused', count: counts['Pause'] ?? 0, color: '#FF3B30' },
-      { label: 'Cut Bid 50%', count: counts['Cut Bid 50%'] ?? 0, color: '#FF9500' },
-      { label: 'Negative', count: (counts['Negate (Exact)'] ?? 0) + (counts['Negate (Phrase)'] ?? 0), color: '#0071E3' },
-      { label: 'Keep', count: counts['Keep'] ?? 0, color: '#34C759' },
-      { label: 'No decision', count: Math.max(0, allRows.length - decisionsMade), color: '#D2D2D7' },
+      { label: 'Paused', count: counts['Pause'] ?? 0, color: '#EF4444' },
+      { label: 'Cut Bid 50%', count: counts['Cut Bid 50%'] ?? 0, color: '#F59E0B' },
+      { label: 'Negative', count: (counts['Negate (Exact)'] ?? 0) + (counts['Negate (Phrase)'] ?? 0), color: '#6366F1' },
+      { label: 'Keep', count: counts['Keep'] ?? 0, color: '#10B981' },
+      { label: 'No decision', count: Math.max(0, allRows.length - decisionsMade), color: '#E5E7EB' },
     ];
     return items;
   }, [decisions, allRows.length, decisionsMade]);
@@ -481,12 +482,12 @@ export const AnalysisResults = ({
         const decisionSpecsBySheet = (sheet: string): TriageDecisionSpec[] => {
           const opts = getDecisionOptions(sheet);
           return opts.map((opt) => {
-            if (opt === 'Pause') return { value: 'Pause', label: 'PAUSE', bg: '#DC2626', color: '#FFFFFF', shortcut: 'P', countsAsSavings: true };
-            if (opt === 'Cut Bid 50%') return { value: 'Cut Bid 50%', label: 'CUT BID', bg: '#EA580C', color: '#FFFFFF', shortcut: 'C', countsAsSavings: true };
-            if (opt === 'Keep') return { value: 'Keep', label: 'KEEP', bg: '#16A34A', color: '#FFFFFF', shortcut: 'K', countsAsSavings: false };
-            // Negate variants → blue NEGATIVE; map both to single shortcut N (last wins, but typically only one is shown alongside Keep)
-            if (opt.startsWith('Negat')) return { value: opt, label: opt.includes('Phrase') ? 'NEG (PHRASE)' : 'NEGATIVE', bg: '#2563EB', color: '#FFFFFF', shortcut: opt.includes('Phrase') ? 'N' : 'N', countsAsSavings: true };
-            return { value: opt, label: opt.toUpperCase(), bg: '#6B7280', color: '#FFFFFF', shortcut: opt[0].toUpperCase(), countsAsSavings: false };
+            if (opt === 'Pause') return { value: 'Pause', label: 'PAUSE', bg: '#EF4444', color: '#FFFFFF', shortcut: 'P', countsAsSavings: true };
+            if (opt === 'Cut Bid 50%') return { value: 'Cut Bid 50%', label: 'CUT BID', bg: '#F59E0B', color: '#FFFFFF', shortcut: 'C', countsAsSavings: true };
+            if (opt === 'Keep') return { value: 'Keep', label: 'KEEP', bg: '#10B981', color: '#FFFFFF', shortcut: 'K', countsAsSavings: false };
+            // Negate variants → INFO/NEGATIVE violet
+            if (opt.startsWith('Negat')) return { value: opt, label: opt.includes('Phrase') ? 'NEG (PHRASE)' : 'NEGATIVE', bg: '#6366F1', color: '#FFFFFF', shortcut: opt.includes('Phrase') ? 'N' : 'N', countsAsSavings: true };
+            return { value: opt, label: opt.toUpperCase(), bg: '#9CA3AF', color: '#FFFFFF', shortcut: opt[0].toUpperCase(), countsAsSavings: false };
           });
         };
 

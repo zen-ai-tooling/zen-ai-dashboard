@@ -3,28 +3,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 export function decisionDotColor(d: string | undefined | null): string {
   if (!d) return 'transparent';
-  if (d === 'Keep') return '#34C759';
-  if (d === 'Pause') return '#FF3B30';
-  if (d.startsWith('Cut')) return '#FF9500';
-  if (d.startsWith('Negat')) return '#0071E3';
-  return '#86868B';
+  if (d === 'Keep') return '#10B981';
+  if (d === 'Pause') return '#EF4444';
+  if (d.startsWith('Cut')) return '#F59E0B';
+  if (d.startsWith('Negat')) return '#4F6EF7';
+  return '#9CA3AF';
 }
 
 /**
  * Spec colors:
- *  Pause   → #FF3B30 (red)
- *  Cut Bid → #FF9500 (amber)
- *  Keep    → #34C759 (green)
- *  Negative→ #0071E3 (blue)
- *  Action  → #86868B (gray, no decision)
+ *  Pause   → #EF4444 (red)
+ *  Cut Bid → #F59E0B (amber)
+ *  Keep    → #10B981 (green)
+ *  Negative→ #4F6EF7 (blue)
+ *  Action  → #9CA3AF (gray, no decision)
  */
 export function decisionTextColor(d: string | undefined | null): string {
-  if (!d) return '#86868B';
-  if (d === 'Keep') return '#34C759';
-  if (d === 'Pause') return '#FF3B30';
-  if (d.startsWith('Cut')) return '#FF9500';
-  if (d.startsWith('Negat')) return '#0071E3';
-  return '#1D1D1F';
+  if (!d) return '#9CA3AF';
+  if (d === 'Keep') return '#10B981';
+  if (d === 'Pause') return '#EF4444';
+  if (d.startsWith('Cut')) return '#F59E0B';
+  if (d.startsWith('Negat')) return '#4F6EF7';
+  return '#111827';
 }
 
 export function decisionRowClass(d: string | undefined | null): string {
@@ -83,7 +83,7 @@ export const DecisionSelect: React.FC<DecisionSelectProps> = ({
           height: 30,
           padding: '6px 12px',
           background: '#FFFFFF',
-          border: '1.5px solid #D2D2D7',
+          border: '1.5px solid #D1D5DB',
           borderRadius: 8,
           boxShadow: `inset 3px 0 0 ${insetColor}`,
           transition: 'box-shadow 150ms ease, color 150ms ease, border-color 150ms ease',

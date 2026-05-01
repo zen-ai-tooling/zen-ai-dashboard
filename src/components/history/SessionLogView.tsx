@@ -59,7 +59,7 @@ export const SessionLogView = () => {
               border: confirmClear ? '1px solid #FECACA' : '1px solid hsl(var(--border))',
               borderRadius: '8px',
               background: confirmClear ? '#FEF2F2' : 'transparent',
-              color: confirmClear ? '#DC2626' : 'hsl(var(--text-tertiary))',
+              color: confirmClear ? '#EF4444' : 'hsl(var(--text-tertiary))',
               cursor: 'pointer',
               fontFamily: 'DM Sans, sans-serif',
               transition: 'all 150ms ease',
@@ -142,16 +142,16 @@ export const SessionLogView = () => {
                   <td style={{ padding: '10px 14px', color: 'hsl(var(--text-secondary))', fontFamily: 'DM Mono, monospace', fontSize: '12px' }}>
                     {truncate(entry.fileName, 28)}
                   </td>
-                  <td style={{ padding: '10px 14px', fontFamily: 'DM Mono, monospace', color: entry.bleedersFound > 0 ? '#DC2626' : '#16A34A', fontWeight: '500' }}>
+                  <td style={{ padding: '10px 14px', fontFamily: 'DM Mono, monospace', color: entry.bleedersFound > 0 ? '#EF4444' : '#10B981', fontWeight: '500' }}>
                     {entry.bleedersFound}
                   </td>
-                  <td style={{ padding: '10px 14px', fontFamily: 'DM Mono, monospace', color: entry.atRiskSpend > 0 ? '#DC2626' : 'hsl(var(--text-tertiary))', fontWeight: '500' }}>
+                  <td style={{ padding: '10px 14px', fontFamily: 'DM Mono, monospace', color: entry.atRiskSpend > 0 ? '#EF4444' : 'hsl(var(--text-tertiary))', fontWeight: '500' }}>
                     ${entry.atRiskSpend.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </td>
                   <td style={{ padding: '10px 14px' }}>
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                       {entry.pausedCount > 0 && (
-                        <span style={{ fontSize: '11px', background: '#FEF2F2', color: '#DC2626', padding: '2px 6px', borderRadius: '4px' }}>
+                        <span style={{ fontSize: '11px', background: '#FEF2F2', color: '#EF4444', padding: '2px 6px', borderRadius: '4px' }}>
                           {entry.pausedCount} paused
                         </span>
                       )}
@@ -161,7 +161,7 @@ export const SessionLogView = () => {
                         </span>
                       )}
                       {entry.bidsCutCount > 0 && (
-                        <span style={{ fontSize: '11px', background: '#EFF6FF', color: '#2563EB', padding: '2px 6px', borderRadius: '4px' }}>
+                        <span style={{ fontSize: '11px', background: '#EFF6FF', color: '#4F6EF7', padding: '2px 6px', borderRadius: '4px' }}>
                           {entry.bidsCutCount} bids cut
                         </span>
                       )}
@@ -176,7 +176,7 @@ export const SessionLogView = () => {
                       padding: '2px 8px',
                       borderRadius: '4px',
                       background: entry.decisionsMode === 'inline' ? '#F0FDF4' : '#EFF6FF',
-                      color: entry.decisionsMode === 'inline' ? '#16A34A' : '#2563EB',
+                      color: entry.decisionsMode === 'inline' ? '#10B981' : '#4F6EF7',
                       fontWeight: '500',
                     }}>
                       {entry.decisionsMode === 'inline' ? 'inline' : 'excel'}

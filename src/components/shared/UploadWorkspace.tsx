@@ -48,16 +48,16 @@ export const PipelineHeader: React.FC<PipelineHeaderProps> = ({
     >
       <div className="flex items-start justify-between gap-6 flex-wrap">
         <div className="min-w-0">
-          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: '#86868B' }}>
+          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: '#9CA3AF' }}>
             Active Workflow
           </p>
-          <h2 className="mt-1" style={{ fontSize: 20, fontWeight: 700, color: '#1D1D1F', letterSpacing: '-0.3px' }}>
+          <h2 className="mt-1" style={{ fontSize: 20, fontWeight: 700, color: '#111827', letterSpacing: '-0.3px' }}>
             {workflowName}
             {workflowVariant && (
-              <span style={{ color: '#6E6E73', fontWeight: 500 }}> ({workflowVariant})</span>
+              <span style={{ color: '#374151', fontWeight: 500 }}> ({workflowVariant})</span>
             )}
           </h2>
-          <p className="mt-1" style={{ fontSize: 12, color: '#6E6E73', maxWidth: 600 }}>
+          <p className="mt-1" style={{ fontSize: 12, color: '#374151', maxWidth: 600 }}>
             {description}
           </p>
         </div>
@@ -75,9 +75,9 @@ export const PipelineHeader: React.FC<PipelineHeaderProps> = ({
                       width: 26,
                       height: 26,
                       borderRadius: 999,
-                      background: isActive ? '#2563EB' : isDone ? '#34C759' : '#FFFFFF',
-                      border: isActive || isDone ? 'none' : '1.5px solid #D2D2D7',
-                      color: isActive || isDone ? '#FFFFFF' : '#86868B',
+                      background: isActive ? '#4F6EF7' : isDone ? '#10B981' : '#FFFFFF',
+                      border: isActive || isDone ? 'none' : '1.5px solid #D1D5DB',
+                      color: isActive || isDone ? '#FFFFFF' : '#9CA3AF',
                       fontSize: 12,
                       fontWeight: 700,
                       boxShadow: isActive ? '0 0 0 4px rgba(37, 99, 235, 0.12)' : 'none',
@@ -91,14 +91,14 @@ export const PipelineHeader: React.FC<PipelineHeaderProps> = ({
                     style={{
                       fontSize: 11,
                       fontWeight: isActive ? 600 : 500,
-                      color: isActive ? '#1D1D1F' : '#86868B',
+                      color: isActive ? '#111827' : '#9CA3AF',
                     }}
                   >
                     {step.label}
                   </span>
                 </div>
                 {i < steps.length - 1 && (
-                  <div style={{ width: 32, height: 1.5, background: '#D2D2D7', marginBottom: 18 }} />
+                  <div style={{ width: 32, height: 1.5, background: '#D1D5DB', marginBottom: 18 }} />
                 )}
               </div>
             );
@@ -139,26 +139,26 @@ export const SmartDropzone: React.FC<SmartDropzoneProps> = ({
         className="flex items-start justify-between animate-fade-in"
         style={{
           background: '#FFFFFF',
-          border: '1px solid #E5E5EA',
-          borderLeft: '3px solid #34C759',
+          border: '1px solid #E5E7EB',
+          borderLeft: '3px solid #10B981',
           borderRadius: 10,
           padding: '14px 16px',
           minHeight,
         }}
       >
         <div className="flex items-start gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-lg bg-[#F5F5F7] flex items-center justify-center flex-shrink-0">
-            <FileSpreadsheet className="w-4 h-4 text-[#86868B]" strokeWidth={1.6} />
+          <div className="w-10 h-10 rounded-lg bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
+            <FileSpreadsheet className="w-4 h-4 text-[#9CA3AF]" strokeWidth={1.6} />
           </div>
           <div className="min-w-0">
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#1D1D1F' }} className="truncate" title={selectedFile.name}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#111827' }} className="truncate" title={selectedFile.name}>
               {selectedFile.name}
             </p>
-            <p className="mt-0.5 font-mono-nums" style={{ fontSize: 12, color: '#86868B' }}>
+            <p className="mt-0.5 font-mono-nums" style={{ fontSize: 12, color: '#9CA3AF' }}>
               {(selectedFile.size / 1024).toFixed(1)} KB
             </p>
-            <span className="inline-flex items-center gap-1.5 mt-2" style={{ fontSize: 12, color: '#34C759', fontWeight: 600 }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 mt-2" style={{ fontSize: 12, color: '#10B981', fontWeight: 600 }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
               Ready to analyze
             </span>
           </div>
@@ -166,7 +166,7 @@ export const SmartDropzone: React.FC<SmartDropzoneProps> = ({
         {onClear && (
           <button
             onClick={onClear}
-            className="w-7 h-7 rounded-md flex items-center justify-center text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F5F5F7] btn-press"
+            className="w-7 h-7 rounded-md flex items-center justify-center text-[#9CA3AF] hover:text-[#111827] hover:bg-[#F3F4F6] btn-press"
             aria-label="Remove file"
           >
             <X className="w-3.5 h-3.5" />
@@ -193,7 +193,7 @@ export const SmartDropzone: React.FC<SmartDropzoneProps> = ({
         borderRadius: 12,
         borderStyle: 'dashed',
         borderWidth: isDragging ? 2 : 1,
-        borderColor: isDragging ? '#2563EB' : 'rgba(0,0,0,0.08)',
+        borderColor: isDragging ? '#4F6EF7' : 'rgba(0,0,0,0.08)',
         background: '#FFFFFF',
         backgroundImage: isDragging
           ? 'radial-gradient(circle at center, rgba(37, 99, 235, 0.08) 0%, rgba(255,255,255,0) 70%)'
@@ -214,16 +214,16 @@ export const SmartDropzone: React.FC<SmartDropzoneProps> = ({
         style={{
           width: 36,
           height: 36,
-          color: isDragging ? '#2563EB' : '#86868B',
+          color: isDragging ? '#4F6EF7' : '#9CA3AF',
           transform: isDragging ? 'scale(1.15)' : 'scale(1)',
           transition: 'transform 200ms ease, color 150ms ease',
         }}
         strokeWidth={1.4}
       />
-      <p className="mt-3" style={{ fontSize: 15, fontWeight: 600, color: isDragging ? '#2563EB' : '#1D1D1F' }}>
+      <p className="mt-3" style={{ fontSize: 15, fontWeight: 600, color: isDragging ? '#4F6EF7' : '#111827' }}>
         {isDragging ? 'Release to upload' : primaryText}
       </p>
-      <p className="mt-1" style={{ fontSize: 13, color: '#2563EB' }}>
+      <p className="mt-1" style={{ fontSize: 13, color: '#4F6EF7' }}>
         or <span className="underline underline-offset-2">click to browse</span>
       </p>
       <div className="flex items-center justify-center gap-1.5 mt-4">
@@ -231,7 +231,7 @@ export const SmartDropzone: React.FC<SmartDropzoneProps> = ({
           <span
             key={fmt}
             className="font-mono-nums"
-            style={{ fontSize: 11, background: '#FAFAFA', border: '1px solid rgba(0,0,0,0.05)', borderRadius: 4, padding: '2px 8px', color: '#6E6E73' }}
+            style={{ fontSize: 11, background: '#FAFAFA', border: '1px solid rgba(0,0,0,0.05)', borderRadius: 4, padding: '2px 8px', color: '#374151' }}
           >
             {fmt}
           </span>
@@ -253,12 +253,12 @@ export const AssetInventory: React.FC<AssetInventoryProps> = ({
   sheets,
 }) => {
   return (
-    <div style={{ padding: 22, background: '#FAFBFC', height: '100%' }}>
-      <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: '#86868B' }}>
+    <div style={{ padding: 22, background: '#F9FAFB', height: '100%' }}>
+      <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: '#9CA3AF' }}>
         {title}
       </p>
       {subtitle && (
-        <p className="mt-1" style={{ fontSize: 12, color: '#86868B' }}>
+        <p className="mt-1" style={{ fontSize: 12, color: '#9CA3AF' }}>
           {subtitle}
         </p>
       )}
@@ -270,8 +270,8 @@ export const AssetInventory: React.FC<AssetInventoryProps> = ({
               key={sheet.name}
               className="flex items-center gap-2"
               style={{
-                background: detected ? 'rgba(52, 199, 89, 0.08)' : '#FAFAFA',
-                border: `1px solid ${detected ? 'rgba(52, 199, 89, 0.25)' : 'rgba(0,0,0,0.05)'}`,
+                background: detected ? 'rgba(16, 185, 129, 0.08)' : '#FAFAFA',
+                border: `1px solid ${detected ? 'rgba(16, 185, 129, 0.25)' : 'rgba(0,0,0,0.05)'}`,
                 borderRadius: 8,
                 padding: '8px 10px',
                 transition: 'all 200ms ease',
@@ -283,13 +283,13 @@ export const AssetInventory: React.FC<AssetInventoryProps> = ({
                   width: 16,
                   height: 16,
                   borderRadius: 999,
-                  background: detected ? '#34C759' : 'transparent',
-                  border: detected ? 'none' : '1.5px solid #D2D2D7',
+                  background: detected ? '#10B981' : 'transparent',
+                  border: detected ? 'none' : '1.5px solid #D1D5DB',
                 }}
               >
                 {detected && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
               </span>
-              <span style={{ fontSize: 12, fontWeight: 500, color: detected ? '#1D1D1F' : '#6E6E73' }}>
+              <span style={{ fontSize: 12, fontWeight: 500, color: detected ? '#111827' : '#374151' }}>
                 {sheet.name}
               </span>
             </div>
@@ -311,7 +311,7 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({ sectionLabel, chil
     <div
       style={{
         background: '#FFFFFF',
-        border: '1px solid #E5E5EA',
+        border: '1px solid #E5E7EB',
         borderRadius: 12,
         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
         overflow: 'hidden',
@@ -320,18 +320,18 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({ sectionLabel, chil
       <div
         style={{
           padding: '14px 22px',
-          borderBottom: '1px solid #F2F2F7',
-          background: '#FAFBFC',
+          borderBottom: '1px solid #F3F4F6',
+          background: '#F9FAFB',
         }}
       >
-        <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: '#86868B' }}>
+        <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: '#9CA3AF' }}>
           {sectionLabel}
         </p>
       </div>
 
       {sidebar ? (
         <div className="grid" style={{ gridTemplateColumns: 'minmax(0, 1fr) 280px' }}>
-          <div style={{ padding: 22, borderRight: '1px solid #F2F2F7' }}>{children}</div>
+          <div style={{ padding: 22, borderRight: '1px solid #F3F4F6' }}>{children}</div>
           {sidebar}
         </div>
       ) : (

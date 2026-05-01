@@ -58,14 +58,14 @@ export const SpendDistributionStrip: React.FC<SpendDistributionStripProps> = ({
   const dotColor = (spend: number) => {
     if (spend >= highCutoff && spend > 0) return '#FF453A';
     if (spend <= lowCutoff) return '#8E8E93';
-    return '#FF9500';
+    return '#F59E0B';
   };
 
   return (
     <div
       style={{
         background: '#FFFFFF',
-        border: '1px solid #E5E5EA',
+        border: '1px solid #E5E7EB',
         borderRadius: 10,
         padding: '12px 16px',
       }}
@@ -77,7 +77,7 @@ export const SpendDistributionStrip: React.FC<SpendDistributionStripProps> = ({
       >
         <span className="flex items-center gap-2">
           <ChevronDown
-            className="w-3.5 h-3.5 text-[#86868B]"
+            className="w-3.5 h-3.5 text-[#9CA3AF]"
             style={{
               transform: open ? 'rotate(0deg)' : 'rotate(-90deg)',
               transition: 'transform 200ms ease',
@@ -89,13 +89,13 @@ export const SpendDistributionStrip: React.FC<SpendDistributionStripProps> = ({
               fontWeight: 600,
               textTransform: 'uppercase',
               letterSpacing: '1px',
-              color: '#86868B',
+              color: '#9CA3AF',
             }}
           >
             {title}
           </span>
         </span>
-        <span style={{ fontSize: 12, color: '#86868B' }}>
+        <span style={{ fontSize: 12, color: '#9CA3AF' }}>
           {sorted.length} {sorted.length === 1 ? 'bleeder' : 'bleeders'}
         </span>
       </button>
@@ -131,9 +131,9 @@ export const SpendDistributionStrip: React.FC<SpendDistributionStripProps> = ({
           </div>
 
           {/* Summary line */}
-          <p className="mt-2.5" style={{ fontSize: 12, color: '#6E6E73' }}>
+          <p className="mt-2.5" style={{ fontSize: 12, color: '#374151' }}>
             Top {topN} {topN === 1 ? 'bleeder accounts' : 'bleeders account'} for{' '}
-            <span className="font-mono-nums" style={{ color: '#1D1D1F', fontWeight: 600 }}>
+            <span className="font-mono-nums" style={{ color: '#111827', fontWeight: 600 }}>
               {topShare.toFixed(0)}%
             </span>{' '}
             of at-risk spend
