@@ -254,10 +254,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
       </div>
 
       {/* ── Row 1: top bar (48px) ── */}
-      <div
-        className="flex items-center justify-between"
-        style={{ height: 48, padding: '0 16px', paddingTop: 3 }}
-      >
+      <div className="flex items-center justify-between" style={{ height: 48, paddingLeft: 24, paddingRight: 24, paddingTop: 3 }}>
         <button
           onClick={onSwitchToReview}
           className="hover:text-white transition-colors"
@@ -280,6 +277,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
         className="flex items-center justify-center px-4 min-h-0"
         style={{ overflow: 'hidden' }}
       >
+
 
         {total === 0 ? (
           <div className="bg-white text-center" style={{ borderRadius: 16, padding: 40, maxWidth: 640, width: '85%' }}>
