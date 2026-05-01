@@ -107,6 +107,7 @@ export const AnalysisResults = ({
   const [moreOpen, setMoreOpen] = useState(false);
   const [generatedFileName, setGeneratedFileName] = useState<string>('');
   const [flashKey, setFlashKey] = useState<{ key: string; cls: string; ts: number } | null>(null);
+  const [viewMode, setViewMode] = useState<'triage' | 'review'>('triage');
   const lastDownloadRef = useRef<(() => void) | null>(null);
 
   const setDecisionWithFlash = (key: string, val: string) => {
