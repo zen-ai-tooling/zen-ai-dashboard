@@ -222,6 +222,18 @@ export const AnalysisResults = ({
     return { addressedSpend: addressed, undecidedSpend: undecided };
   }, [rowsBySheet, decisions]);
 
+  // Savings counter — at-risk spend on rows decided to anything other than Keep
+  const addressedSavings = useMemo(() => {
+    let s = 0;
+    Object.entries(rowsBySheet).forEach(([sheet, rows]) => {
+      rows.forEach((row, idx) => {
+        const dec = decisions[`${sheet}-ROWINDEX-${idx}`];
+        if (dec && dec !== 'Keep') s += row.spend || 0;
+      });
+    });
+    return s;
+  }, [rowsBySheet, decisions]);
+
   const handleDownload = () => {
     if (formattedWorkbook) {
       formattedWorkbook.xlsx.writeBuffer().then((buffer: ArrayBuffer) => {
@@ -441,48 +453,34 @@ export const AnalysisResults = ({
       </div>
 
       {/* Single command bar — stats · stepper · decisions · addressed */}
-      {(() => {
-        const addressedSavings = useMemo(() => {
-          let s = 0;
-          Object.entries(rowsBySheet).forEach(([sheet, rows]) => {
-            rows.forEach((row, idx) => {
-              const dec = decisions[`${sheet}-ROWINDEX-${idx}`];
-              if (dec && dec !== 'Keep') s += row.spend || 0;
-            });
-          });
-          return s;
-        }, [rowsBySheet, decisions]);
-        return (
-          <CompactStatsBar
-            accent={mode === 'lifetime' ? 'purple' : 'red'}
-            stats={[
-              { value: allRows.length.toLocaleString(), label: 'bleeders' },
-              { value: `$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}`, label: 'at risk' },
-              { value: String(sheetsCount), label: 'sheets' },
-            ]}
-            steps={[
-              { label: 'File analyzed', status: 'complete' },
-              { label: 'Make decisions', status: generateDone ? 'complete' : 'active' },
-              { label: 'Generate Amazon file', status: generateDone ? 'complete' : 'pending' },
-            ]}
-            trailing={
-              <>
-                <span className="text-[12.5px] tabular-nums">
-                  <span className="font-semibold text-[#111827]">{decisionsMade}/{allRows.length}</span>
-                  <span className="ml-1 text-[#9CA3AF]">decisions</span>
-                </span>
-                <span className="text-[12.5px] tabular-nums inline-flex items-center gap-1">
-                  <span aria-hidden>💰</span>
-                  <span className="font-semibold" style={{ color: '#10B981' }}>
-                    ${Math.round(addressedSavings).toLocaleString()}
-                  </span>
-                  <span className="text-[#9CA3AF]">addressed</span>
-                </span>
-              </>
-            }
-          />
-        );
-      })()}
+      <CompactStatsBar
+        accent={mode === 'lifetime' ? 'purple' : 'red'}
+        stats={[
+          { value: allRows.length.toLocaleString(), label: 'bleeders' },
+          { value: `$${totalSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}`, label: 'at risk' },
+          { value: String(sheetsCount), label: 'sheets' },
+        ]}
+        steps={[
+          { label: 'File analyzed', status: 'complete' },
+          { label: 'Make decisions', status: generateDone ? 'complete' : 'active' },
+          { label: 'Generate Amazon file', status: generateDone ? 'complete' : 'pending' },
+        ]}
+        trailing={
+          <>
+            <span className="text-[12.5px] tabular-nums">
+              <span className="font-semibold text-[#111827]">{decisionsMade}/{allRows.length}</span>
+              <span className="ml-1 text-[#9CA3AF]">decisions</span>
+            </span>
+            <span className="text-[12.5px] tabular-nums inline-flex items-center gap-1">
+              <span aria-hidden>💰</span>
+              <span className="font-semibold" style={{ color: '#10B981' }}>
+                ${Math.round(addressedSavings).toLocaleString()}
+              </span>
+              <span className="text-[#9CA3AF]">addressed</span>
+            </span>
+          </>
+        }
+      />
 
       {/* TRIAGE MODE ─────────────────────────────────────── */}
       {viewMode === 'triage' && sheetNames.length > 0 && (() => {
