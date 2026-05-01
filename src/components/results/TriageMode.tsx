@@ -586,9 +586,9 @@ export const TriageMode: React.FC<TriageModeProps> = ({
 const Metric: React.FC<{ label: string; value: string; accent?: string }> = ({ label, value, accent }) => (
   <div>
     <div
-      className="font-semibold"
       style={{
         fontSize: 11,
+        fontWeight: 500,
         textTransform: 'uppercase',
         letterSpacing: '0.08em',
         color: '#9CA3AF',
@@ -597,9 +597,9 @@ const Metric: React.FC<{ label: string; value: string; accent?: string }> = ({ l
       {label}
     </div>
     <div
-      className="mt-1.5 font-mono-nums tabular-nums"
+      className="mt-1.5 tabular-nums"
       style={{
-        fontSize: 32,
+        fontSize: 28,
         fontWeight: 700,
         color: accent ?? '#111827',
         lineHeight: 1.05,
