@@ -87,6 +87,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   const [cursor, setCursor] = React.useState(0);
   const [direction, setDirection] = React.useState<'left' | 'right'>('right');
   const [showThreshold, setShowThreshold] = React.useState(false);
+  const [showLegend, setShowLegend] = React.useState(true);
 
   // Toggle the body class so the global sidebar slides out and the topbar hides.
   React.useEffect(() => {
