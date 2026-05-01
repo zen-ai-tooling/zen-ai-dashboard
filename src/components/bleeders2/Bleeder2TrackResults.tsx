@@ -367,6 +367,95 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         </button>
       )}
 
+      {/* Mode toggle — Triage vs Review All (matches Bleeders 1.0) */}
+      <div className="flex items-center justify-end">
+        <div
+          className="inline-flex items-center p-0.5 rounded-full border border-border bg-card"
+          role="tablist"
+          aria-label="View mode"
+        >
+          <button
+            role="tab"
+            aria-selected={viewMode === 'triage'}
+            onClick={() => setViewMode('triage')}
+            className={`inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full text-[12.5px] font-medium transition-colors ${
+              viewMode === 'triage' ? 'text-white shadow-sm' : 'text-[hsl(var(--text-secondary))] hover:text-foreground'
+            }`}
+            style={viewMode === 'triage' ? { background: '#0D9488' } : undefined}
+          >
+            <Zap className="w-3.5 h-3.5" /> Triage
+          </button>
+          <button
+            role="tab"
+            aria-selected={viewMode === 'review'}
+            onClick={() => setViewMode('review')}
+            className={`inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full text-[12.5px] font-medium transition-colors ${
+              viewMode === 'review' ? 'text-white shadow-sm' : 'text-[hsl(var(--text-secondary))] hover:text-foreground'
+            }`}
+            style={viewMode === 'review' ? { background: '#0D9488' } : undefined}
+          >
+            <ListIcon className="w-3.5 h-3.5" /> Review All
+          </button>
+        </div>
+      </div>
+
+      {/* TRIAGE MODE — full-bleed one-card-at-a-time */}
+      {viewMode === 'triage' && (() => {
+        const items: TriageItem[] = result.bleeders.map((b, idx) => ({
+          key: String(idx),
+          sheet: TRACK_LABELS[result.trackType],
+          campaign: b.campaignName || '—',
+          adGroup: b.adGroupName || '',
+          entity: b.entity || '—',
+          matchType: b.matchType || undefined,
+          clicks: b.clicks ?? 0,
+          spend: b.spend ?? 0,
+          sales: (b as any).sales ?? 0,
+          acos: b.acos ? `${b.acos.toFixed(1)}%` : '',
+          acosNum: b.acos ?? 0,
+          orders: b.orders ?? 0,
+        }));
+        items.sort((a, b) => b.spend - a.spend);
+
+        const triageDecisions: Record<string, string> = {};
+        Object.entries(decisions).forEach(([k, v]) => { triageDecisions[String(k)] = v; });
+
+        const decisionSpecsBySheet = (_sheet: string): TriageDecisionSpec[] => {
+          const opts = getDecisionOptions();
+          return opts.map((opt) => {
+            if (opt === 'Pause') return { value: 'Pause', label: 'PAUSE', bg: '#EF4444', color: '#FFFFFF', shortcut: 'P', countsAsSavings: true };
+            if (opt === 'Cut Bid') return { value: 'Cut Bid', label: 'CUT BID', bg: '#F59E0B', color: '#FFFFFF', shortcut: 'C', countsAsSavings: true };
+            if (opt === 'Keep') return { value: 'Keep', label: 'KEEP', bg: '#059669', color: '#FFFFFF', shortcut: 'K', countsAsSavings: false };
+            if (opt === 'Negative') return { value: 'Negative', label: 'NEGATIVE', bg: '#6366F1', color: '#FFFFFF', shortcut: 'N', countsAsSavings: true };
+            return { value: opt, label: opt.toUpperCase(), bg: '#9CA3AF', color: '#FFFFFF', shortcut: opt[0].toUpperCase(), countsAsSavings: false };
+          });
+        };
+
+        return (
+          <TriageMode
+            items={items}
+            decisions={triageDecisions}
+            decisionSpecsBySheet={decisionSpecsBySheet}
+            onDecide={(key, val) => setDecisionWithFlash(Number(key), val)}
+            onUndo={(key) => setDecisions(prev => { const n = { ...prev }; delete n[Number(key)]; return n; })}
+            onGenerate={async () => {
+              await handleGenerateInline();
+              toast.success('Amazon file ready', {
+                description: `${decisionsMade} decisions exported`,
+                duration: 3000,
+              });
+            }}
+            onSwitchToReview={() => setViewMode('review')}
+            totalSpend={result.totalSpend}
+            sheetsCount={1}
+            addressedSavings={addressedSpend}
+            shortSheetLabel={(s) => s}
+          />
+        );
+      })()}
+
+      {viewMode === 'review' && (<>
+
       {/* Compact stats + 4-step workflow — single unified container */}
       <CompactStatsBar
         accent="amber"
