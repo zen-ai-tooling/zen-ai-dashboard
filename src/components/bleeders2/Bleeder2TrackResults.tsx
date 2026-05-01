@@ -489,6 +489,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                   </SortHeader>
                 </TableHead>
                 <TableHead style={{ letterSpacing: '0.08em' }}>Match</TableHead>
+                <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>Clicks</TableHead>
                 <TableHead className="text-right" style={{ letterSpacing: '0.08em' }}>
                   <SortHeader active={sortKey === 'spend'} dir={sortDir} onClick={() => toggleSort('spend')} align="right">Spend</SortHeader>
                 </TableHead>
