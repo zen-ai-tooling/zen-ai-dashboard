@@ -423,34 +423,59 @@ export const ReviewAllMode = ({
           </div>
         )}
 
-        {/* ─── Table with frozen first two columns ─── */}
+        {/* ─── Table ─── enforced widths · Decision sticky right · Ad Group toggleable ─── */}
         <div className="review-table-scroll w-full max-h-[60vh] overflow-auto">
-          <Table className="w-full review-table">
+          <Table className="w-full review-table" style={{ tableLayout: 'fixed' }}>
+            <colgroup>
+              <col style={{ width: 220 }} />
+              <col style={{ width: 160 }} />
+              {showAdGroup && <col style={{ width: 160 }} />}
+              <col style={{ width: 70 }} />
+              <col style={{ width: 70 }} />
+              <col style={{ width: 90 }} />
+              <col style={{ width: 80 }} />
+              <col style={{ width: 80 }} />
+              <col style={{ width: 100 }} />
+              <col style={{ width: 140 }} />
+            </colgroup>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
-                <TableHead className="freeze-col freeze-col-1" style={{ minWidth: 240, letterSpacing: "0.06em" }}>
+                <TableHead style={{ width: 220, letterSpacing: "0.06em" }}>
                   <SortHeader active={sortKey === "campaign"} dir={sortDir} onClick={() => toggleSort("campaign")}>Campaign</SortHeader>
                 </TableHead>
-                <TableHead className="freeze-col freeze-col-2" style={{ minWidth: 200, letterSpacing: "0.06em" }}>
+                <TableHead style={{ width: 160, letterSpacing: "0.06em" }}>
                   <SortHeader active={sortKey === "entity"} dir={sortDir} onClick={() => toggleSort("entity")}>Entity</SortHeader>
                 </TableHead>
-                <TableHead style={{ minWidth: 180, letterSpacing: "0.06em" }}>
-                  <SortHeader active={sortKey === "ad_group"} dir={sortDir} onClick={() => toggleSort("ad_group")}>Ad Group</SortHeader>
-                </TableHead>
-                <TableHead style={{ minWidth: 90, letterSpacing: "0.06em" }}>Match</TableHead>
-                <TableHead className="text-right" style={{ minWidth: 80, letterSpacing: "0.06em" }}>
+                {showAdGroup && (
+                  <TableHead style={{ width: 160, letterSpacing: "0.06em" }}>
+                    <span className="inline-flex items-center gap-1">
+                      <SortHeader active={sortKey === "ad_group"} dir={sortDir} onClick={() => toggleSort("ad_group")}>Ad Group</SortHeader>
+                      <button
+                        type="button"
+                        onClick={() => toggleOptionalCol('ad_group')}
+                        className="text-[hsl(var(--text-tertiary))] hover:text-foreground"
+                        aria-label="Hide Ad Group column"
+                        title="Hide Ad Group"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  </TableHead>
+                )}
+                <TableHead style={{ width: 70, letterSpacing: "0.06em" }}>Match</TableHead>
+                <TableHead className="text-right" style={{ width: 70, letterSpacing: "0.06em" }}>
                   <SortHeader active={sortKey === "clicks"} dir={sortDir} onClick={() => toggleSort("clicks")} align="right">Clicks</SortHeader>
                 </TableHead>
-                <TableHead className="text-right" style={{ minWidth: 90, letterSpacing: "0.06em" }}>
+                <TableHead className="text-right" style={{ width: 90, letterSpacing: "0.06em" }}>
                   <SortHeader active={sortKey === "spend"} dir={sortDir} onClick={() => toggleSort("spend")} align="right">Spend</SortHeader>
                 </TableHead>
-                <TableHead className="text-right" style={{ minWidth: 90, letterSpacing: "0.06em" }}>
+                <TableHead className="text-right" style={{ width: 80, letterSpacing: "0.06em" }}>
                   <SortHeader active={sortKey === "sales"} dir={sortDir} onClick={() => toggleSort("sales")} align="right">Sales</SortHeader>
                 </TableHead>
-                <TableHead className="text-right" style={{ minWidth: 80, letterSpacing: "0.06em" }}>
+                <TableHead className="text-right" style={{ width: 80, letterSpacing: "0.06em" }}>
                   <SortHeader active={sortKey === "acos"} dir={sortDir} onClick={() => toggleSort("acos")} align="right">ACoS</SortHeader>
                 </TableHead>
-                <TableHead style={{ minWidth: 130, letterSpacing: "0.06em" }}>
+                <TableHead style={{ width: 100, letterSpacing: "0.06em" }}>
                   <span className="inline-flex items-center gap-1">
                     Suggestion
                     <TooltipProvider delayDuration={150}>
@@ -472,7 +497,42 @@ export const ReviewAllMode = ({
                     </TooltipProvider>
                   </span>
                 </TableHead>
-                <TableHead style={{ minWidth: 160, letterSpacing: "0.06em" }}>Decision</TableHead>
+                <TableHead
+                  className="freeze-col-right"
+                  style={{ width: 140, letterSpacing: "0.06em", position: 'sticky', right: 0, zIndex: 7, background: '#F9FAFB', boxShadow: '-1px 0 0 #E5E7EB' }}
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    Decision
+                    {/* Column picker — adds Ad Group back when hidden */}
+                    {!showAdGroup && (
+                      <span className="relative" ref={colPickerRef}>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); setColPickerOpen(o => !o); }}
+                          className="inline-flex items-center justify-center w-4 h-4 rounded text-[hsl(var(--text-tertiary))] hover:bg-secondary hover:text-foreground"
+                          aria-label="Add columns"
+                          title="Add columns"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                        {colPickerOpen && (
+                          <div
+                            className="absolute right-0 top-6 min-w-[160px] rounded-lg border border-border bg-popover shadow-pop p-1 z-30 animate-scale-in"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button
+                              onClick={() => { toggleOptionalCol('ad_group'); setColPickerOpen(false); }}
+                              className="w-full flex items-center gap-2 px-2.5 py-1.5 text-[12px] text-foreground hover:bg-secondary rounded-md text-left normal-case font-normal tracking-normal"
+                            >
+                              <Check className="w-3 h-3 opacity-0" />
+                              Ad Group
+                            </button>
+                          </div>
+                        )}
+                      </span>
+                    )}
+                  </span>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -487,18 +547,21 @@ export const ReviewAllMode = ({
                 const acosNum = parseAcosNum(row.acos);
                 const hasAcos = acosNum >= 0 && row.acos && row.acos !== "0" && row.acos !== "0%";
                 const decisionPill = DECISION_PILL(decision);
+                // Sticky-right Decision cell needs a solid bg matching the row stripe.
+                const isEven = rowIdx % 2 === 1;
+                const decisionCellBg = isEven ? '#F9FAFB' : '#FFFFFF';
 
                 return (
                   <TableRow
                     key={rowIdx}
                     className={`${indicatorClass} transition-opacity`}
-                    style={{ opacity: decision ? 0.55 : 1 }}
+                    style={{ opacity: decision ? 0.9 : 1 }}
                   >
-                    <TableCell className="freeze-col freeze-col-1 font-medium">
+                    <TableCell className="font-medium" style={{ width: 220 }}>
                       <TooltipProvider delayDuration={300}>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="block truncate max-w-[230px]">{row.campaign || "—"}</span>
+                            <span className="block truncate" style={{ maxWidth: 200 }}>{row.campaign || "—"}</span>
                           </TooltipTrigger>
                           <TooltipContent side="top" className="max-w-[420px] break-words text-[12px]">
                             {row.campaign || "—"}
@@ -506,35 +569,28 @@ export const ReviewAllMode = ({
                         </Tooltip>
                       </TooltipProvider>
                     </TableCell>
-                    <TableCell className="freeze-col freeze-col-2">
-                      <TooltipProvider delayDuration={300}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="block whitespace-normal break-words text-[12.5px]">{entityDisplay}</span>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" className="max-w-[420px] break-words text-[12px]">
-                            {entityDisplay}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                    <TableCell style={{ width: 160 }}>
+                      <span className="block whitespace-normal break-words text-[12.5px]">{entityDisplay}</span>
                     </TableCell>
-                    <TableCell className="text-[hsl(var(--text-secondary))]">
-                      <TooltipProvider delayDuration={300}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="block truncate max-w-[180px]">{row.ad_group || "—"}</span>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" className="max-w-[420px] break-words text-[12px]">
-                            {row.ad_group || "—"}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </TableCell>
-                    <TableCell className="text-[hsl(var(--text-tertiary))] text-[12px]">{row.match_type || "—"}</TableCell>
-                    <TableCell className="text-right font-mono-nums text-[12.5px]">{row.clicks}</TableCell>
-                    <TableCell className="text-right font-mono-nums text-[12.5px] font-medium">${row.spend.toFixed(2)}</TableCell>
-                    <TableCell className="text-right font-mono-nums text-[12.5px] text-[hsl(var(--text-secondary))]">${row.sales.toFixed(2)}</TableCell>
-                    <TableCell className="text-right">
+                    {showAdGroup && (
+                      <TableCell className="text-[hsl(var(--text-secondary))]" style={{ width: 160 }}>
+                        <TooltipProvider delayDuration={300}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="block truncate" style={{ maxWidth: 140 }}>{row.ad_group || "—"}</span>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-[420px] break-words text-[12px]">
+                              {row.ad_group || "—"}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </TableCell>
+                    )}
+                    <TableCell className="text-[hsl(var(--text-tertiary))] text-[12px]" style={{ width: 70 }}>{row.match_type || "—"}</TableCell>
+                    <TableCell className="text-right font-mono-nums text-[12.5px]" style={{ width: 70 }}>{row.clicks}</TableCell>
+                    <TableCell className="text-right font-mono-nums text-[12.5px] font-medium" style={{ width: 90 }}>${row.spend.toFixed(2)}</TableCell>
+                    <TableCell className="text-right font-mono-nums text-[12.5px] text-[hsl(var(--text-secondary))]" style={{ width: 80 }}>${row.sales.toFixed(2)}</TableCell>
+                    <TableCell className="text-right" style={{ width: 80 }}>
                       {hasAcos ? (
                         <span
                           className="inline-block text-[11px] font-mono-nums px-2 py-0.5 rounded-full font-medium text-white"
@@ -546,7 +602,7 @@ export const ReviewAllMode = ({
                         <span className="text-[12px] text-[hsl(var(--text-tertiary))]">—</span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell style={{ width: 100 }}>
                       <span
                         className="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full"
                         style={{ background: sugStyle.bg, color: sugStyle.color }}
@@ -554,7 +610,18 @@ export const ReviewAllMode = ({
                         {sugStyle.label}
                       </span>
                     </TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
+                    <TableCell
+                      className="freeze-col-right"
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        width: 140,
+                        position: 'sticky',
+                        right: 0,
+                        zIndex: 4,
+                        background: decisionCellBg,
+                        boxShadow: '-1px 0 0 #E5E7EB',
+                      }}
+                    >
                       {decisionPill ? (
                         <Select value={decision} onValueChange={(val) => setDecision(key, val)}>
                           <SelectTrigger
