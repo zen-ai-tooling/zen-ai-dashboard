@@ -195,29 +195,44 @@ export const TriageMode: React.FC<TriageModeProps> = ({
     return { ...banner, rationale: sug.rationale, kind: sug.kind };
   };
 
+  const counterValue = addressedSavings ?? savingsTarget;
+
   return (
-    <div className="triage-fullbleed">
-      {/* 3px teal progress bar flush to top of viewport */}
-      <div className="absolute top-0 left-0 right-0" style={{ height: 3, background: 'rgba(255,255,255,0.06)' }}>
+    <div className="triage-content">
+      {/* 1. 3px teal progress bar — top of content area */}
+      <div style={{ height: 3, width: '100%', background: 'rgba(255,255,255,0.06)' }}>
         <div
           className="h-full transition-all duration-500 ease-out"
           style={{ width: `${progressPct}%`, background: '#0D9488' }}
         />
       </div>
 
-      {/* Top-left exit link */}
+      {/* 2. Top-left exit link */}
       <button
         onClick={onSwitchToReview}
         className="absolute hover:text-white transition-colors"
-        style={{ top: 16, left: 20, color: '#9CA3AF', fontSize: 13 }}
+        style={{ top: 16, left: 16, color: '#9CA3AF', fontSize: 13, zIndex: 5 }}
       >
         ← Exit triage
       </button>
 
-      {/* Centered card area — fills viewport below the 3px progress bar */}
+      {/* 3. Top-right counter */}
       <div
-        className="absolute left-0 right-0 flex items-center justify-center px-4"
-        style={{ top: 3, bottom: 0 }}
+        className="absolute flex items-center gap-3 tabular-nums"
+        style={{ top: 16, right: 16, color: '#FFFFFF', fontSize: 13, zIndex: 5 }}
+      >
+        <span>{decisionsMade}/{total}</span>
+        <span style={{ width: 1, height: 14, background: 'rgba(255,255,255,0.25)' }} />
+        <span className="inline-flex items-center gap-1.5">
+          <span aria-hidden>💰</span>
+          <span>${Math.round(counterValue).toLocaleString()} addressed</span>
+        </span>
+      </div>
+
+      {/* 4. Flex-centered card area */}
+      <div
+        className="flex items-center justify-center px-4"
+        style={{ minHeight: 'calc(100vh - 52px - 3px)' }}
       >
         {allDone ? (
           <CompletionCard
