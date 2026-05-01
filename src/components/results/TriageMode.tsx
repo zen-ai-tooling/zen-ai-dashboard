@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CheckCircle2, SkipForward, Undo2, Info, Keyboard, X, Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, SkipForward, Undo2, Info, Sparkles, ArrowRight } from 'lucide-react';
 import { suggestB1Row } from '@/lib/ui/bleeder1Suggestion';
 
 /**
@@ -76,15 +76,14 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   onUndo,
   onGenerate,
   onSwitchToReview,
-  totalSpend,
-  sheetsCount,
+  totalSpend: _totalSpend,
+  sheetsCount: _sheetsCount,
   shortSheetLabel,
 }) => {
   const [skipped, setSkipped] = React.useState<Set<string>>(new Set());
   const [history, setHistory] = React.useState<string[]>([]);
   const [cursor, setCursor] = React.useState(0);
   const [direction, setDirection] = React.useState<'left' | 'right'>('right');
-  const [showLegend, setShowLegend] = React.useState(true);
   const [showThreshold, setShowThreshold] = React.useState(false);
 
   // Toggle the body class so the global sidebar slides out and the topbar hides.
@@ -129,7 +128,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
     });
     return s;
   }, [items, decisions, decisionSpecsBySheet]);
-  const savingsAnimated = useCountUp(savingsTarget);
+  const _savingsAnimated = useCountUp(savingsTarget);
 
   const current = queue[cursor];
   const currentSpecs = current ? decisionSpecsBySheet(current.sheet) : [];
@@ -195,8 +194,8 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   };
 
   return (
-    <div className="triage-fullbleed text-white">
-      {/* Top edge: 3px progress bar */}
+    <div className="triage-fullbleed">
+      {/* 3px teal progress bar flush to top of viewport */}
       <div className="absolute top-0 left-0 right-0" style={{ height: 3, background: 'rgba(255,255,255,0.06)' }}>
         <div
           className="h-full transition-all duration-500 ease-out"
@@ -204,50 +203,19 @@ export const TriageMode: React.FC<TriageModeProps> = ({
         />
       </div>
 
-      {/* Floating header (48px) */}
-      <div
-        className="absolute left-0 right-0 flex items-center px-6"
-        style={{ top: 3, height: 48 }}
+      {/* Top-left exit link */}
+      <button
+        onClick={onSwitchToReview}
+        className="absolute hover:text-white transition-colors"
+        style={{ top: 16, left: 20, color: '#9CA3AF', fontSize: 13 }}
       >
-        {/* Left: Exit */}
-        <button
-          onClick={onSwitchToReview}
-          className="inline-flex items-center gap-1.5 text-[13px] hover:text-white transition-colors"
-          style={{ color: '#9CA3AF' }}
-        >
-          <ArrowLeft className="w-3.5 h-3.5" /> Exit triage
-        </button>
+        ← Exit triage
+      </button>
 
-        {/* Center: pipeline stepper */}
-        <div className="hidden md:flex items-center gap-2 text-[11.5px] flex-1 justify-center" style={{ color: 'rgba(255,255,255,0.45)' }}>
-          <PipelineStep state="done" label="File analyzed" />
-          <Arrow />
-          <PipelineStep state={allDone ? 'done' : 'active'} label="Make decisions" />
-          <Arrow />
-          <PipelineStep state={allDone ? 'active' : 'pending'} label="Generate file" />
-        </div>
-
-        {/* Right: counters */}
-        <div className="flex items-center gap-4 ml-auto whitespace-nowrap">
-          <div className="text-[12.5px] tabular-nums">
-            <span className="font-semibold" style={{ color: '#FFFFFF' }}>{decisionsMade} / {total}</span>
-            <span className="ml-1" style={{ color: 'rgba(255,255,255,0.55)' }}>decisions</span>
-          </div>
-          <span style={{ color: 'rgba(255,255,255,0.18)' }}>|</span>
-          <div className="text-[12.5px] tabular-nums inline-flex items-center gap-1.5">
-            <span aria-hidden>💰</span>
-            <span className="font-semibold" style={{ color: '#0D9488' }}>
-              ${savingsAnimated.toLocaleString()}
-            </span>
-            <span style={{ color: 'rgba(255,255,255,0.55)' }}>addressed</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Centered card area */}
+      {/* Centered card area — fills viewport below the 3px progress bar */}
       <div
         className="absolute left-0 right-0 flex items-center justify-center px-4"
-        style={{ top: 51, bottom: 0 }}
+        style={{ top: 3, bottom: 0 }}
       >
         {allDone ? (
           <CompletionCard
@@ -450,93 +418,9 @@ export const TriageMode: React.FC<TriageModeProps> = ({
         )}
       </div>
 
-      {/* Floating Generate pill (always accessible while there are pending decisions) */}
-      {!allDone && decisionsMade > 0 && (
-        <button
-          onClick={onGenerate}
-          className="fixed z-[110] inline-flex items-center gap-1.5 hover:opacity-90 btn-press"
-          style={{
-            left: '50%',
-            transform: 'translateX(-50%)',
-            bottom: 88,
-            background: '#0D9488',
-            color: '#FFFFFF',
-            borderRadius: 24,
-            padding: '10px 24px',
-            fontSize: 13,
-            fontWeight: 600,
-            boxShadow: '0 8px 24px rgba(13,148,136,0.4)',
-          }}
-        >
-          Generate file ({decisionsMade}/{total}) <ArrowRight className="w-3.5 h-3.5" />
-        </button>
-      )}
-
-      {/* Shortcuts panel */}
-      {showLegend ? (
-        <div
-          className="fixed z-[110] animate-fade-in"
-          style={{
-            bottom: 24,
-            right: 24,
-            width: 200,
-            background: '#1F2937',
-            border: '1px solid #374151',
-            borderRadius: 10,
-            padding: '12px 16px',
-            fontSize: 12,
-          }}
-        >
-          <div className="flex items-center justify-between mb-2">
-            <span className="inline-flex items-center gap-1.5 font-semibold" style={{ color: '#FFFFFF' }}>
-              <Keyboard className="w-3.5 h-3.5" /> Shortcuts
-            </span>
-            <button
-              onClick={() => setShowLegend(false)}
-              className="hover:opacity-70"
-              aria-label="Hide shortcuts"
-              style={{ color: '#9CA3AF' }}
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-          <div className="space-y-1">
-            {currentSpecs.map(s => (
-              <ShortcutRow key={s.value} label={s.label} k={s.shortcut.toUpperCase()} />
-            ))}
-            <ShortcutRow label="Skip" k="S" />
-            <ShortcutRow label="Undo" k="Z" />
-            <ShortcutRow label="Prev" k="←" />
-            <ShortcutRow label="Next" k="→" />
-          </div>
-        </div>
-      ) : (
-        <button
-          onClick={() => setShowLegend(true)}
-          className="fixed z-[110] inline-flex items-center gap-1.5 rounded-full px-3 h-8 text-[11.5px] hover:opacity-90"
-          style={{
-            bottom: 24, right: 24,
-            background: '#1F2937', border: '1px solid #374151', color: '#FFFFFF',
-          }}
-        >
-          <Keyboard className="w-3.5 h-3.5" /> Shortcuts
-        </button>
-      )}
     </div>
   );
 };
-
-const ShortcutRow: React.FC<{ label: string; k: string }> = ({ label, k }) => (
-  <div className="flex justify-between gap-3 items-center">
-    <span style={{ color: '#9CA3AF' }}>{label}</span>
-    <kbd
-      className="font-mono-nums"
-      style={{ padding: '1px 6px', borderRadius: 4, background: '#374151', color: '#FFFFFF', fontSize: 11 }}
-    >
-      {k}
-    </kbd>
-  </div>
-);
 
 const Metric: React.FC<{ label: string; value: string; accent?: string }> = ({ label, value, accent }) => (
   <div>
@@ -565,27 +449,6 @@ const Metric: React.FC<{ label: string; value: string; accent?: string }> = ({ l
       {value}
     </div>
   </div>
-);
-
-const PipelineStep: React.FC<{ state: 'done' | 'active' | 'pending'; label: string }> = ({ state, label }) => {
-  const dot =
-    state === 'done' ? '#059669'
-    : state === 'active' ? '#0D9488'
-    : 'rgba(255,255,255,0.30)';
-  const text =
-    state === 'active' ? '#FFFFFF'
-    : state === 'done' ? 'rgba(255,255,255,0.75)'
-    : 'rgba(255,255,255,0.45)';
-  return (
-    <span className="inline-flex items-center gap-1.5" style={{ color: text, fontWeight: state === 'active' ? 600 : 400 }}>
-      <span className="inline-block w-1.5 h-1.5 rounded-full" style={{ background: dot }} />
-      {label}
-    </span>
-  );
-};
-
-const Arrow: React.FC = () => (
-  <ArrowRight style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.30)' }} strokeWidth={2} />
 );
 
 const CompletionCard: React.FC<{
