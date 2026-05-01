@@ -67,17 +67,18 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         className="px-6 pt-6 pb-6 text-left btn-press"
       >
         <div>
-          <svg width="160" viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
-            <circle cx="118" cy="162" r="72" fill="#9333ea"/>
-            <path d="M118,90 C132,100 142,128 140,162 C138,196 128,220 118,234 C128,230 148,212 160,188 C172,164 172,136 160,114 C152,98 136,88 118,90 Z" fill="#3b0764"/>
-            <path d="M118,90 C122,118 114,148 118,234" strokeWidth="1.5" strokeLinecap="round" fill="none" stroke="rgba(255,255,255,0.1)"/>
-            <ellipse cx="96" cy="130" rx="14" ry="20" transform="rotate(-15 96 130)" fill="rgba(255,255,255,0.1)"/>
-            <path d="M118,90 C116,80 120,72 118,64" strokeWidth="3.5" strokeLinecap="round" fill="none" stroke="#ffffff"/>
-            <path d="M118,70 C132,54 158,52 160,62 C148,76 124,76 118,70 Z" fill="#a78bfa"/>
-            <path d="M119,70 C134,60 154,55 158,62" strokeWidth="1" strokeLinecap="round" fill="none" stroke="rgba(0,0,0,0.2)"/>
-            <text x="218" y="196" fontFamily="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" fontSize="108" fontWeight="700" letterSpacing="-5" fill="#c084fc">adprune</text>
+          <svg width="175" viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+            <g transform="translate(72,160)">
+              <circle cx="0" cy="0" r="52" fill="#9333ea"/>
+              <path d="M0,-52 C10,-42 18,-18 16,10 C14,36 6,50 0,52 C6,50 22,36 32,14 C42,2 40,-26 28,-42 C20,-52 10,-56 0,-52 Z" fill="#3b0764"/>
+              <path d="M0,-52 C3,-28 -3,0 0,52" strokeWidth="1.2" strokeLinecap="round" fill="none" stroke="rgba(255,255,255,0.1)"/>
+              <ellipse cx="-14" cy="-16" rx="10" ry="14" transform="rotate(-15 -14 -16)" fill="rgba(255,255,255,0.1)"/>
+              <path d="M0,-52 C-1,-60 1,-68 0,-74" strokeWidth="3" strokeLinecap="round" fill="none" stroke="#ffffff"/>
+              <path d="M0,-66 C10,-78 28,-80 30,-72 C20,-62 4,-62 0,-66 Z" fill="#a78bfa"/>
+            </g>
+            <text x="140" y="172" fontFamily="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" fontSize="72" fontWeight="700" letterSpacing="-3.5" fill="#c084fc">adprune</text>
+            <text x="141" y="202" fontFamily="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" fontSize="13" fontWeight="400" letterSpacing="0.2" fill="#555">Amazon Ads Optimization</text>
           </svg>
-          <div className="text-[12px] text-[#9CA3AF] mt-1">Amazon Ads Optimization</div>
         </div>
       </button>
       <div className="border-b border-white/[0.08] mx-4" />
