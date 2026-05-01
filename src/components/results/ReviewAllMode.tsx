@@ -454,7 +454,7 @@ export const ReviewAllMode = ({
         <div className="review-table-scroll w-full max-h-[60vh] overflow-auto">
           <Table className="w-full review-table" style={{ tableLayout: 'fixed' }}>
             <colgroup>
-              <col style={{ width: 220 }} />
+              <col style={{ width: 240 }} />
               <col style={{ width: 160 }} />
               {showAdGroup && <col style={{ width: 160 }} />}
               <col style={{ width: 70 }} />
@@ -467,7 +467,7 @@ export const ReviewAllMode = ({
             </colgroup>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
-                <TableHead style={{ width: 220, letterSpacing: "0.06em" }}>
+                <TableHead style={{ width: 240, letterSpacing: "0.06em" }}>
                   <SortHeader active={sortKey === "campaign"} dir={sortDir} onClick={() => toggleSort("campaign")}>Campaign</SortHeader>
                 </TableHead>
                 <TableHead style={{ width: 160, letterSpacing: "0.06em" }}>
@@ -584,11 +584,11 @@ export const ReviewAllMode = ({
                     className={`${indicatorClass} transition-opacity`}
                     style={{ opacity: decision ? 0.88 : 1, boxShadow: `inset 3px 0 0 ${heatColor}` }}
                   >
-                    <TableCell className="font-medium" style={{ width: 220 }}>
+                    <TableCell className="font-medium" style={{ width: 240 }}>
                       <TooltipProvider delayDuration={300}>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="block truncate" style={{ maxWidth: 200 }}>{row.campaign || "—"}</span>
+                            <span className="block truncate" style={{ maxWidth: 220 }}>{row.campaign || "—"}</span>
                           </TooltipTrigger>
                           <TooltipContent side="top" className="max-w-[420px] break-words text-[12px]">
                             {row.campaign || "—"}
