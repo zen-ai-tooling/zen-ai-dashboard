@@ -528,6 +528,24 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   );
 };
 
+const ShortcutRow: React.FC<{ label: string; k: string }> = ({ label, k }) => (
+  <div className="flex justify-between items-center">
+    <span style={{ color: '#9CA3AF' }}>{label}</span>
+    <kbd
+      className="font-mono-nums"
+      style={{
+        padding: '1px 6px',
+        borderRadius: 3,
+        background: '#374151',
+        color: '#FFFFFF',
+        fontSize: 11,
+      }}
+    >
+      {k}
+    </kbd>
+  </div>
+);
+
 const Metric: React.FC<{ label: string; value: string; accent?: string }> = ({ label, value, accent }) => (
   <div>
     <div
