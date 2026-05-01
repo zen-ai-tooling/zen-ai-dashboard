@@ -507,6 +507,7 @@ export const AnalysisResults = ({
 
       {/* Completion banner removed — replaced by full CompletionView page */}
 
+      {viewMode === 'review' && (<>
       {/* Insights — collapsible top spenders */}
       {topSpenders.length > 0 && (
         <details className="group rounded-xl border border-border bg-card shadow-card overflow-hidden">
@@ -1001,6 +1002,7 @@ export const AnalysisResults = ({
           />
         );
       })()}
+      </>)}
     </div>
   );
 };
