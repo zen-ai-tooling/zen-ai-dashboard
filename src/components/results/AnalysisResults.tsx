@@ -453,7 +453,8 @@ export const AnalysisResults = ({
         </div>
       </div>
 
-      {/* Single command bar — stats · stepper · decisions · addressed */}
+      {/* Single command bar — hidden during Triage */}
+      {viewMode !== 'triage' && (
       <CompactStatsBar
         accent={mode === 'lifetime' ? 'purple' : 'red'}
         stats={[
@@ -504,6 +505,7 @@ export const AnalysisResults = ({
           </>
         }
       />
+      )}
 
       {/* TRIAGE MODE ─────────────────────────────────────── */}
       {viewMode === 'triage' && sheetNames.length > 0 && (() => {
