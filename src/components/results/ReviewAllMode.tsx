@@ -257,6 +257,7 @@ export const ReviewAllMode = ({
   const filteredCommands = paletteCommands.filter(c => c.label.toLowerCase().includes(paletteQuery.toLowerCase()));
 
   return (
+    <>
     <div className="space-y-3">
       {/* Top command bar — generate + more options (no duplicate summary) */}
       <div className="flex items-center justify-end gap-2 relative" ref={moreRef}>
