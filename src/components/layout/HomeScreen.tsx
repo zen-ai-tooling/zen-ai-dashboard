@@ -331,9 +331,22 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                         {MODULE_LABELS[e.module] ?? e.module}
                       </span>
                       {e.track && (
-                        <span className="text-[10.5px] font-mono-nums px-1.5 py-px rounded bg-[#F3F4F6] text-[#9CA3AF]">
-                          {e.track}
-                        </span>
+                        e.track === 'SBSD' ? (
+                          <TooltipProvider delayDuration={200}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="text-[10.5px] font-mono-nums px-1.5 py-px rounded bg-[#F3F4F6] text-[#9CA3AF] cursor-help">
+                                  {e.track}
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent side="top">Sponsored Brands + Sponsored Display</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        ) : (
+                          <span className="text-[10.5px] font-mono-nums px-1.5 py-px rounded bg-[#F3F4F6] text-[#9CA3AF]">
+                            {e.track}
+                          </span>
+                        )
                       )}
                     </div>
                     <p className="text-[12px] text-[#9CA3AF] truncate mt-0.5 ml-5">
