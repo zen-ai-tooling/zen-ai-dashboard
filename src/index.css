@@ -662,20 +662,21 @@
 }
 
 @keyframes action-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 113, 227, 0.5); opacity: 1; }
-  50%      { box-shadow: 0 0 0 4px rgba(0, 113, 227, 0); opacity: 0.5; }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(79, 110, 247, 0.5); opacity: 1; }
+  50%      { box-shadow: 0 0 0 4px rgba(79, 110, 247, 0); opacity: 0.5; }
 }
 
 .drag-pulse { animation: drag-pulse 1.4s ease-out infinite; }
 
-@keyframes row-flash-pause  { 0% { background: rgba(255, 59, 48, 0.16); } 100% { background: transparent; } }
-@keyframes row-flash-keep   { 0% { background: rgba(52, 199, 89, 0.16); } 100% { background: transparent; } }
-@keyframes row-flash-cut    { 0% { background: rgba(255, 149, 0, 0.16); } 100% { background: transparent; } }
-@keyframes row-flash-negate { 0% { background: rgba(0, 113, 227, 0.16); } 100% { background: transparent; } }
+/* Row flash colors — match unified spec (PAUSE red, KEEP emerald, CUT amber, NEGATIVE violet) */
+@keyframes row-flash-pause  { 0% { background: rgba(239, 68, 68, 0.14); }  100% { background: transparent; } }
+@keyframes row-flash-keep   { 0% { background: rgba(16, 185, 129, 0.14); } 100% { background: transparent; } }
+@keyframes row-flash-cut    { 0% { background: rgba(245, 158, 11, 0.14); } 100% { background: transparent; } }
+@keyframes row-flash-negate { 0% { background: rgba(99, 102, 241, 0.14); } 100% { background: transparent; } }
 
 @keyframes ready-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 113, 227, 0.45); }
-  50%      { box-shadow: 0 0 0 10px rgba(0, 113, 227, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(79, 110, 247, 0.45); }
+  50%      { box-shadow: 0 0 0 10px rgba(79, 110, 247, 0); }
 }
 
 
