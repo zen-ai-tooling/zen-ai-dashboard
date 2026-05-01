@@ -1,6 +1,6 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CheckCircle2, MoreHorizontal, Info, HelpCircle, Sparkles, Loader2, Download, RotateCcw, Upload as UploadIcon, X, ArrowRight } from "lucide-react";
+import { CheckCircle2, MoreHorizontal, Info, HelpCircle, Sparkles, Loader2, Download, RotateCcw, Upload as UploadIcon, X, ArrowRight, Plus, Check } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { SortHeader, useSortable } from "@/components/shared/SortHeader";
