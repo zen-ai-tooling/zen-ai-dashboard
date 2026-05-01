@@ -240,7 +240,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                 {isEmptyState && (
                   <div
                     className="mt-3 flex items-center gap-1.5 text-[11.5px] font-medium"
-                    style={{ color: '#4F46E5' }}
+                    style={{ color: '#0D9488' }}
                   >
                     <Sparkles style={{ width: 12, height: 12 }} strokeWidth={2} />
                     Recommended first workflow
