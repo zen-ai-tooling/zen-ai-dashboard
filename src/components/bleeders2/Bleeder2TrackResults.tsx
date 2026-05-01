@@ -505,7 +505,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedIndices.map((idx) => {
+              {filteredSortedIndices.map((idx) => {
                 const bleeder = result.bleeders[idx];
                 const suggestion = suggestions[idx];
                 const decision = decisions[idx];
