@@ -347,13 +347,44 @@ export const TriageMode: React.FC<TriageModeProps> = ({
               <div className="h-full transition-all duration-300" style={{ width: `${progressPct}%`, background: '#0D9488', borderRadius: 2 }} />
             </div>
 
-            {/* b. Entity name */}
-            <h2
-              className="break-words"
-              style={{ marginTop: 14, fontSize: 24, fontWeight: 700, color: '#111827', lineHeight: 1.2, letterSpacing: '-0.02em' }}
-            >
-              {current.entity}
-            </h2>
+            {/* b. Entity name — ASINs render muted with prefix label */}
+            {(() => {
+              const isAsin = /^B[A-Z0-9]{9}$/.test(current.entity || '');
+              if (isAsin) {
+                return (
+                  <div className="flex items-baseline gap-2 break-words" style={{ marginTop: 14 }}>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.10em',
+                        color: '#9CA3AF',
+                        padding: '2px 6px',
+                        background: '#F3F4F6',
+                        borderRadius: 4,
+                      }}
+                    >
+                      ASIN
+                    </span>
+                    <h2
+                      className="break-words tabular-nums"
+                      style={{ fontSize: 24, fontWeight: 600, color: '#9CA3AF', lineHeight: 1.2, letterSpacing: '-0.01em' }}
+                    >
+                      {current.entity}
+                    </h2>
+                  </div>
+                );
+              }
+              return (
+                <h2
+                  className="break-words"
+                  style={{ marginTop: 14, fontSize: 24, fontWeight: 700, color: '#111827', lineHeight: 1.2, letterSpacing: '-0.02em' }}
+                >
+                  {current.entity}
+                </h2>
+              );
+            })()}
 
             {/* c. Metadata row — campaign (≤35 chars) · match pill */}
             <div className="flex items-center gap-2 flex-wrap" style={{ marginTop: 6, fontSize: 13, color: '#9CA3AF' }}>
