@@ -84,12 +84,12 @@ const formatRelative = (iso: string) => {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
-const decisionsSummary = (e: { pausedCount: number; negativesCreated: number; bidsCutCount: number }) => {
+const decisionsSummary = (e: { pausedCount: number; negativesCreated: number; bidsCutCount: number }): string | null => {
   const parts: string[] = [];
   if (e.pausedCount) parts.push(`${e.pausedCount} paused`);
   if (e.bidsCutCount) parts.push(`${e.bidsCutCount} bid${e.bidsCutCount === 1 ? '' : 's'} cut`);
   if (e.negativesCreated) parts.push(`${e.negativesCreated} negative${e.negativesCreated === 1 ? '' : 's'}`);
-  return parts.length ? parts.join(', ') : 'No decisions recorded';
+  return parts.length ? parts.join(', ') : null;
 };
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
@@ -329,9 +329,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                     <p className="text-[12px] text-[#9CA3AF] truncate mt-0.5 ml-5">
                       {e.clientName} · {e.fileName}
                     </p>
-                    <p className="text-[12px] text-[#374151] truncate mt-0.5 ml-5">
-                      {decisionsSummary(e)}
-                    </p>
+                    {decisionsSummary(e) && (
+                      <p className="text-[12px] text-[#374151] truncate mt-0.5 ml-5">
+                        {decisionsSummary(e)}
+                      </p>
+                    )}
                   </div>
                   <div className="text-right flex-shrink-0">
                     <div className="flex items-center justify-end gap-1.5">
