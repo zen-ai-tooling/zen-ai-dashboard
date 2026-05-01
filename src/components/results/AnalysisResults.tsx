@@ -384,7 +384,7 @@ export const AnalysisResults = ({
         onDownload={() => lastDownloadRef.current?.()}
         onStartNew={handleStartNew}
         onViewFullResults={() => setShowFullResults(true)}
-        accentColor="#FF3B30"
+        accentColor="#10B981"
         addressedSpend={addressedSpend}
         undecidedSpend={undecidedSpend}
       />
@@ -410,7 +410,8 @@ export const AnalysisResults = ({
       {generateDone && showFullResults && (
         <button
           onClick={() => setShowFullResults(false)}
-          className="text-[12.5px] text-[#0071E3] hover:underline btn-press"
+          className="text-[12.5px] hover:underline btn-press inline-flex items-center gap-1"
+          style={{ color: '#4F6EF7' }}
         >
           ← Back to summary
         </button>
