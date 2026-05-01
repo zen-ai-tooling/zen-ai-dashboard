@@ -119,8 +119,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
     return { sessions: monthEntries.length, totalSpend };
   }, [entries]);
 
-  const hasSessions = entries.length > 0;
-  const greetingHeadline = firstName ? `${getGreeting()}, ${firstName}` : getGreeting();
+  const greetingHeadline = getGreetingHeadline(firstName);
 
   return (
     <div className="flex flex-col" style={{ paddingTop: 40 }}>
