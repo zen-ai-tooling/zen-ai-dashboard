@@ -561,6 +561,7 @@ export const AnalysisResults = ({
             onSwitchToReview={() => setViewMode('review')}
             totalSpend={totalSpend}
             sheetsCount={sheetsCount}
+            addressedSavings={addressedSavings}
             shortSheetLabel={shortTabLabel}
           />
         );
