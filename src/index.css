@@ -905,14 +905,22 @@
 /* Workflow card start-arrow shift on hover */
 .workflow-card:hover .start-arrow { transform: translateX(4px); }
 
-/* ───── Triage Mode animations ───── */
+/* ───── Triage Mode animations — sequential exit/enter ───── */
 @keyframes triage-in-right {
-  from { opacity: 0; transform: translateX(24px); }
+  from { opacity: 0; transform: translateX(32px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 @keyframes triage-in-left {
-  from { opacity: 0; transform: translateX(-24px); }
+  from { opacity: 0; transform: translateX(-32px); }
   to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes triage-out-left {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-32px); }
+}
+@keyframes triage-out-right {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(32px); }
 }
 
 /* ───── Triage Mode — dark content area + dark topbar ───── */
