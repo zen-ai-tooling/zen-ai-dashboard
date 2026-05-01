@@ -184,38 +184,82 @@ export const ReviewAllMode = ({
     setPauseConfirm(false);
   };
 
+  // ── Focus filter (above table) ──
+  type FocusFilter = 'all' | 'pause' | 'review' | 'decided' | 'highspend';
+  const [focusFilter, setFocusFilter] = useState<FocusFilter>('all');
+
+  // Compute filter counts + spend quartiles for current sheet
+  const focusMeta = useMemo(() => {
+    const spends = currentRows.map(r => r.spend || 0).slice().sort((a, b) => a - b);
+    const q75 = spends.length ? spends[Math.floor(spends.length * 0.75)] : 0;
+    let pause = 0, review = 0, decided = 0, highspend = 0;
+    currentRows.forEach((r, idx) => {
+      const sug = suggestB1Row({ clicks: r.clicks ?? 0, spend: r.spend ?? 0, sales: r.sales ?? 0, orders: r.orders ?? 0 });
+      if (sug.kind === 'pause') pause++;
+      if (sug.kind === 'review' || sug.kind === 'monitor') review++;
+      if (decisions[`${currentSheet}-ROWINDEX-${idx}`]) decided++;
+      if ((r.spend || 0) >= q75 && q75 > 0) highspend++;
+    });
+    return { all: currentRows.length, pause, review, decided, highspend, q75 };
+  }, [currentRows, decisions, currentSheet]);
+
+  const passesFilter = (rowIdx: number): boolean => {
+    if (focusFilter === 'all') return true;
+    const r = currentRows[rowIdx];
+    const dec = decisions[`${currentSheet}-ROWINDEX-${rowIdx}`];
+    if (focusFilter === 'decided') return !!dec;
+    if (focusFilter === 'highspend') return (r.spend || 0) >= focusMeta.q75 && focusMeta.q75 > 0;
+    const sug = suggestB1Row({ clicks: r.clicks ?? 0, spend: r.spend ?? 0, sales: r.sales ?? 0, orders: r.orders ?? 0 });
+    if (focusFilter === 'pause') return sug.kind === 'pause';
+    if (focusFilter === 'review') return sug.kind === 'review' || sug.kind === 'monitor';
+    return true;
+  };
+
+  // Spend quartiles for heat-map left border
+  const spendBands = useMemo(() => {
+    const spends = currentRows.map(r => r.spend || 0).slice().sort((a, b) => a - b);
+    if (!spends.length) return { top: Infinity, bottom: 0 };
+    return {
+      top: spends[Math.floor(spends.length * 0.75)],
+      bottom: spends[Math.floor(spends.length * 0.25)],
+    };
+  }, [currentRows]);
+  const spendBandColor = (spend: number, hasDecision: boolean): string => {
+    if (hasDecision) return '#E5E7EB';
+    if (spend >= spendBands.top) return '#EF4444';
+    if (spend >= spendBands.bottom) return '#F59E0B';
+    return '#E5E7EB';
+  };
+
+  // ── Command palette ──
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [paletteQuery, setPaletteQuery] = useState('');
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.target && (e.target as HTMLElement).closest('input,textarea,select,[contenteditable="true"]')) return;
+      if (e.key === '/') { e.preventDefault(); setPaletteOpen(true); return; }
+      if (e.key === 'Escape' && paletteOpen) { setPaletteOpen(false); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [paletteOpen]);
+
   const allDone = decisionsMade >= totalRows && totalRows > 0;
   const anyDecided = decisionsMade > 0;
 
+  const paletteCommands = [
+    { id: 'pause-tab', label: `Pause all in ${shortTabLabel(currentSheet)}`, run: () => { if (confirm('Pause every row in this tab?')) confirmPauseAll(); } },
+    { id: 'apply-ai', label: 'Apply AI suggestions for current tab', run: () => applyAISuggestions() },
+    { id: 'show-undecided', label: 'Show only undecided', run: () => setFocusFilter('all') },
+    { id: 'mark-keep', label: 'Mark all as Keep', run: () => decisionOptions.includes('Keep') && setAllInSheet('Keep') },
+    { id: 'export-csv', label: 'Export decisions as CSV', run: () => onDownloadLegacy() },
+  ];
+  const filteredCommands = paletteCommands.filter(c => c.label.toLowerCase().includes(paletteQuery.toLowerCase()));
+
   return (
     <div className="space-y-3">
-      {/* ─── Top command bar (progress + Generate) ─── */}
-      <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl border border-border bg-card px-4 py-3 shadow-card">
-        <div className="flex items-center gap-3 flex-wrap">
-          <div
-            className="inline-flex items-center gap-2 h-8 px-3 rounded-full font-mono-nums text-[12.5px] font-semibold"
-            style={{
-              background: allDone ? "rgba(5, 150, 105, 0.12)" : "rgba(13, 148, 136, 0.08)",
-              color: allDone ? "#047857" : "#0D9488",
-            }}
-          >
-            {allDone && <CheckCircle2 className="w-3.5 h-3.5" />}
-            {decisionsMade}/{totalRows} decisions
-          </div>
-          <div className="flex items-center gap-3 text-[11px] text-[hsl(var(--text-tertiary))]">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full" style={{ background: "#EF4444" }} /> Pause suggested
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full" style={{ background: "#F59E0B" }} /> Review suggested
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full" style={{ background: "#F59E0B" }} /> Monitor
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 relative" ref={moreRef}>
+      {/* Top command bar — generate + more options (no duplicate summary) */}
+      <div className="flex items-center justify-end gap-2 relative" ref={moreRef}>
           <TooltipProvider delayDuration={120}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -229,7 +273,6 @@ export const ReviewAllMode = ({
                     style={{
                       background: !anyDecided ? "#E5E7EB" : "#0D9488",
                       color: !anyDecided ? "#9CA3AF" : "#FFFFFF",
-                      boxShadow: allDone && !generateDone ? "0 0 0 0 rgba(37,99,235,0.5)" : undefined,
                     }}
                   >
                     {isGenerating ? (
@@ -239,7 +282,7 @@ export const ReviewAllMode = ({
                     ) : allDone ? (
                       <>Generate Amazon file <ArrowRight className="w-3.5 h-3.5" /></>
                     ) : anyDecided ? (
-                      <>Generate file ({decisionsMade}/{totalRows})</>
+                      <>Generate file ({decisionsMade}/{totalRows}) <ArrowRight className="w-3.5 h-3.5" /></>
                     ) : (
                       <>Generate Amazon file</>
                     )}
@@ -295,7 +338,6 @@ export const ReviewAllMode = ({
             </div>
           )}
         </div>
-      </div>
 
       {/* ─── Tab bar ─── */}
       <div className="flex items-end gap-2 overflow-x-auto pb-1">
