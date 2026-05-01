@@ -373,13 +373,13 @@
   /* Surface card — used everywhere instead of gray-on-gray */
   .surface-card {
     background: #FFFFFF;
-    border: 1px solid #E5E5EA;
+    border: 1px solid #E5E7EB;
     border-radius: 12px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   }
   .surface-card-elevated {
     background: #FFFFFF;
-    border: 1px solid #E5E5EA;
+    border: 1px solid #E5E7EB;
     border-radius: 12px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   }
@@ -391,12 +391,12 @@
   .tile-hover:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
-    border-color: #D2D2D7;
+    border-color: #D1D5DB;
   }
 
   /* Table row hover */
   .row-hover { transition: background-color 100ms ease; }
-  .row-hover:hover { background: #F5F5F7; }
+  .row-hover:hover { background: #F3F4F6; }
 
   /* Decision left-border animation */
   .row-indicator-anim {
@@ -406,13 +406,13 @@
   /* Step complete pop */
   .step-complete-pop { animation: step-pop 300ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 
-  /* Premium input focus ring */
+  /* Premium input focus ring — uses unified primary indigo-blue */
   input.h-10:focus-visible,
   input[class*="rounded-lg"]:focus-visible,
   .focus-ring:focus-visible {
     outline: none;
-    border-color: #0071E3 !important;
-    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.10);
+    border-color: #4F6EF7 !important;
+    box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.15);
   }
 
   /* Computed number pulse on key change */
@@ -421,21 +421,21 @@
     animation: num-pulse 220ms ease-out;
   }
 
-  /* Track card colored hover tints */
-  .track-card-hover-red:hover    { background: rgba(255, 59, 48, 0.03); }
-  .track-card-hover-amber:hover  { background: rgba(255, 149, 0, 0.03); }
-  .track-card-hover-blue:hover   { background: rgba(0, 113, 227, 0.03); }
-  .track-card-hover-purple:hover { background: rgba(168, 85, 247, 0.03); }
+  /* Track card colored hover tints — module identity */
+  .track-card-hover-red:hover    { background: rgba(239, 68, 68, 0.04); }
+  .track-card-hover-amber:hover  { background: rgba(245, 158, 11, 0.04); }
+  .track-card-hover-blue:hover   { background: rgba(79, 110, 247, 0.04); }
+  .track-card-hover-purple:hover { background: rgba(139, 92, 246, 0.04); }
 
-  /* Pulse dot for "Action needed" cells */
+  /* Pulse dot for "Action needed" cells — primary */
   .action-pulse-dot {
-    width: 6px; height: 6px; border-radius: 999px; background: #0071E3;
+    width: 6px; height: 6px; border-radius: 999px; background: #4F6EF7;
     animation: action-pulse 1.6s ease-out infinite;
   }
 
   /* ── Decision-table urgency banding ── */
   .row-urgency-high  { box-shadow: inset 4px 0 0 #EF4444; }
-  .row-urgency-low td { color: #6E6E73; }
+  .row-urgency-low td { color: #9CA3AF; }
   /* When a decision is made, its color overrides urgency via more specific row-decision-* */
 
   /* Row flash on decision change */
@@ -450,30 +450,30 @@
   }
 
   /* Pinned table sub-headers */
-  .table-sticky-header thead { position: sticky; top: 0; z-index: 5; background: #FAFAFA; }
-  .table-sticky-header thead th { background: #FAFAFA; }
+  .table-sticky-header thead { position: sticky; top: 0; z-index: 5; background: #F9FAFB; }
+  .table-sticky-header thead th { background: #F9FAFB; }
 
   /* Bulk action button — outlined */
   .bulk-btn {
     display: inline-flex; align-items: center; gap: 6px;
-    border: 1px solid #D2D2D7;
+    border: 1px solid #E5E7EB;
     border-radius: 8px;
     padding: 6px 14px;
     font-size: 13px;
     font-weight: 500;
-    color: #1D1D1F;
+    color: #111827;
     background: #fff;
     transition: background 120ms ease, border-color 120ms ease;
   }
-  .bulk-btn:hover { background: #F5F5F7; border-color: #C7C7CC; }
+  .bulk-btn:hover { background: #F3F4F6; border-color: #D1D5DB; }
   .bulk-btn-ghost {
-    color: #86868B;
+    color: #9CA3AF;
     border-color: transparent;
     background: transparent;
   }
-  .bulk-btn-ghost:hover { background: #F5F5F7; color: #1D1D1F; }
+  .bulk-btn-ghost:hover { background: #F3F4F6; color: #111827; }
 
-  /* Suggestion pills — unified, muted spec colors (Tailwind-50/700 family) */
+  /* Suggestion pills — unified spec colors */
   .pill-suggest {
     display: inline-flex; align-items: center;
     padding: 2px 8px; border-radius: 4px;
@@ -481,10 +481,10 @@
     line-height: 1.4;
     letter-spacing: 0.01em;
   }
-  .pill-suggest-red    { background: #FEF2F2; color: #B91C1C; border: none; }
-  .pill-suggest-amber  { background: #FFFBEB; color: #B45309; border: none; }
-  .pill-suggest-blue   { background: #F1F5F9; color: #475569; border: none; }
-  .pill-suggest-green  { background: #F0FDF4; color: #15803D; border: none; }
+  .pill-suggest-red    { background: rgba(239, 68, 68, 0.08);  color: #B91C1C; border: none; }
+  .pill-suggest-amber  { background: rgba(245, 158, 11, 0.08); color: #B45309; border: none; }
+  .pill-suggest-blue   { background: rgba(79, 110, 247, 0.08); color: #4F6EF7; border: none; }
+  .pill-suggest-green  { background: rgba(16, 185, 129, 0.08); color: #047857; border: none; }
   .pill-suggest { transition: opacity 150ms ease; }
   /* Dim suggestion pill once a decision is made on this row */
   tr.row-decision-keep .pill-suggest,
@@ -494,7 +494,7 @@
 
   /* ── Decision table polish ── */
   .decision-table-card {
-    border: 1px solid #E5E5EA;
+    border: 1px solid #E5E7EB;
     border-radius: 12px;
     overflow: hidden;
     background: #FFFFFF;
@@ -502,11 +502,11 @@
   }
   .decision-table-bar {
     background: #F9FAFB;
-    border-bottom: 1px solid #E5E5EA;
+    border-bottom: 1px solid #E5E7EB;
   }
   .decision-table-footer {
     background: #F9FAFB;
-    border-top: 1px solid #E5E5EA;
+    border-top: 1px solid #E5E7EB;
     position: sticky;
     bottom: 0;
     z-index: 10;
@@ -516,11 +516,11 @@
   .decision-table table tbody tr {
     background: #FFFFFF;
     transition: background-color 100ms ease, box-shadow 150ms ease;
-    border-bottom: 1px solid #F2F2F7;
+    border-bottom: 1px solid #F3F4F6;
   }
   .decision-table table tbody tr:nth-child(even) { background: #F9FAFB; }
   .decision-table table tbody tr:hover,
-  .decision-table table tbody tr:hover:nth-child(even) { background: #F0F5FF !important; }
+  .decision-table table tbody tr:hover:nth-child(even) { background: rgba(79, 110, 247, 0.06) !important; }
   /* Ensure row cells have at least 14px vertical padding */
   .decision-table table tbody td { padding-top: 14px; padding-bottom: 14px; }
   /* When a decision class adds a flash background animation, it overrides via animation */
@@ -528,12 +528,12 @@
   /* Column header styling inside decision tables */
   .decision-table thead th {
     background: #F9FAFB !important;
-    border-bottom: 1px solid #E5E5EA;
+    border-bottom: 1px solid #E5E7EB;
     text-transform: uppercase;
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.8px;
-    color: #86868B;
+    color: #9CA3AF;
   }
   /* Decision column — guarantee "Action" never truncates */
   .decision-table th:last-child,
@@ -542,19 +542,19 @@
   /* Tab bar area at the top of the B1 decision-table card */
   .decision-table-tabs {
     background: #F9FAFB;
-    border-bottom: 1px solid #E5E5EA;
+    border-bottom: 1px solid #E5E7EB;
   }
 
-  /* Generate button "ready" glow — replaces aggressive pulse */
+  /* Generate button "ready" glow */
   .btn-primary-action.is-ready {
-    box-shadow: 0 0 12px rgba(0, 113, 227, 0.30);
+    box-shadow: 0 0 12px rgba(79, 110, 247, 0.35);
   }
 
   /* ── Review All mode: frozen columns + visible scrollbar ── */
   .review-table-scroll { scrollbar-gutter: stable; }
   .review-table-scroll::-webkit-scrollbar { height: 12px; width: 12px; }
   .review-table-scroll::-webkit-scrollbar-track { background: #F3F4F6; }
-  .review-table-scroll::-webkit-scrollbar-thumb { background: #C7C7CC; border-radius: 8px; border: 2px solid #F3F4F6; }
+  .review-table-scroll::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 8px; border: 2px solid #F3F4F6; }
   .review-table-scroll::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
   .review-table { border-collapse: separate; border-spacing: 0; }
