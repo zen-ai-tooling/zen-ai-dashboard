@@ -393,8 +393,8 @@ export const AnalysisResults = ({
 
   return (
     <div className="space-y-5">
-      {/* Lifetime mode notice */}
-      {mode === 'lifetime' && (
+      {/* Lifetime mode notice — hidden during Triage */}
+      {mode === 'lifetime' && viewMode !== 'triage' && (
         <div className="rounded-lg border border-[hsl(var(--amber-border))] bg-[hsl(var(--amber-light))] px-4 py-3 flex items-start gap-2.5">
           <AlertTriangle className="w-4 h-4 text-[hsl(var(--amber))] flex-shrink-0 mt-px" strokeWidth={1.8} />
           <div>
