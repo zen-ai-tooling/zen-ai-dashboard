@@ -477,11 +477,11 @@ const CompletionCard: React.FC<{
   <div
     className="bg-white text-center animate-fade-in"
     style={{
-      width: '90vw',
+      width: '85%',
       maxWidth: 640,
       borderRadius: 16,
       padding: '48px 40px',
-      boxShadow: '0 25px 60px rgba(0,0,0,0.4)',
+      boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
     }}
   >
     <div
