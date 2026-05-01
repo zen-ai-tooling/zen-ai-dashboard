@@ -787,6 +787,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         </div>
       </details>
 
+      </>)}
+
       {/* Master/detail side panel */}
       {(() => {
         const idx = selectedIdx;
