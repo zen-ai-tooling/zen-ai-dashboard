@@ -551,6 +551,11 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                     </TableCell>
                     <TableCell className="text-right">
                       <span className="text-[13px] font-mono-nums text-foreground">
+                        {(bleeder.clicks ?? 0).toLocaleString()}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className="text-[13px] font-mono-nums text-foreground">
                         ${bleeder.spend.toFixed(2)}
                       </span>
                     </TableCell>
