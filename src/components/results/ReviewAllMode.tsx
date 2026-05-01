@@ -391,11 +391,12 @@ export const ReviewAllMode = ({
                 </button>
                 <button
                   onClick={() => setMoreOpen(o => !o)}
-                  className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press"
+                  className="inline-flex items-center h-8 px-2 text-[12px] hover:underline btn-press"
                   aria-label="More options"
                   title="More options"
+                  style={{ color: '#9CA3AF' }}
                 >
-                  <MoreHorizontal className="w-4 h-4" />
+                  More options
                 </button>
                 {moreOpen && (
                   <div className="absolute right-0 top-9 min-w-[260px] rounded-lg border border-border bg-popover shadow-pop p-1 z-30 animate-scale-in">
