@@ -133,6 +133,27 @@ export const ReviewAllMode = ({
     return () => document.removeEventListener("mousedown", onDoc);
   }, [moreOpen]);
 
+  // ── Optional/toggleable columns (Ad Group is no longer default) ──
+  type OptionalCol = 'ad_group';
+  const [optionalCols, setOptionalCols] = useState<Set<OptionalCol>>(new Set());
+  const [colPickerOpen, setColPickerOpen] = useState(false);
+  const colPickerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const onDoc = (e: MouseEvent) => {
+      if (colPickerRef.current && !colPickerRef.current.contains(e.target as Node)) setColPickerOpen(false);
+    };
+    if (colPickerOpen) document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [colPickerOpen]);
+  const toggleOptionalCol = (c: OptionalCol) => {
+    setOptionalCols(prev => {
+      const n = new Set(prev);
+      if (n.has(c)) n.delete(c); else n.add(c);
+      return n;
+    });
+  };
+  const showAdGroup = optionalCols.has('ad_group');
+
   // ── Apply all AI suggestions for current sheet ──
   const applyAISuggestions = () => {
     const next = { ...decisions };
