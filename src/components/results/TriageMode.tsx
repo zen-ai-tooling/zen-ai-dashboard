@@ -441,6 +441,9 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                     marginTop: 14,
                     background: s.bg,
                     borderLeft: `4px solid ${s.accent}`,
+                    borderLeftWidth: '4px',
+                    borderLeftStyle: 'solid',
+                    borderLeftColor: s.accent,
                     padding: '12px 14px',
                   }}
                 >
