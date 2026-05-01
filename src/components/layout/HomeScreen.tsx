@@ -119,6 +119,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
     return { sessions: monthEntries.length, totalSpend };
   }, [entries]);
 
+  const hasSessions = entries.length > 0;
   const greetingHeadline = getGreetingHeadline(firstName);
 
   return (
