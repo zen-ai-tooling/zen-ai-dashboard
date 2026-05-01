@@ -251,12 +251,15 @@ export const TriageMode: React.FC<TriageModeProps> = ({
       </div>
 
       {/* ZONE 2 — Centered triage card / completion */}
-      <div className="flex items-start justify-center px-5 py-10">
+      <div
+        className="flex items-center justify-center px-5"
+        style={{ minHeight: 'calc(100vh - 168px)', paddingTop: 24, paddingBottom: 24 }}
+      >
         {allDone ? (
           <div
             className="w-full bg-card text-center animate-fade-in"
             style={{
-              maxWidth: 680,
+              maxWidth: 640,
               borderRadius: 16,
               padding: '48px 40px',
               boxShadow: '0 4px 24px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.04)',
@@ -281,17 +284,19 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             <div className="mt-7 flex items-center justify-center gap-2.5">
               <button
                 onClick={onSwitchToReview}
-                className="px-4 h-10 rounded-lg border text-[13px] font-medium btn-press"
+                className="px-4 h-10 rounded-lg border text-[13px] font-medium btn-press inline-flex items-center gap-1.5"
                 style={{ borderColor: '#E5E7EB', background: '#FFFFFF', color: '#374151' }}
               >
-                Review decisions →
+                Review decisions
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={onGenerate}
-                className="px-5 h-10 rounded-lg text-[13px] font-semibold text-white btn-press"
+                className="px-5 h-10 rounded-lg text-[13px] font-semibold text-white btn-press inline-flex items-center gap-1.5"
                 style={{ background: '#4F6EF7' }}
               >
-                Generate Amazon file →
+                Generate Amazon file
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -300,7 +305,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             key={current.key + (direction === 'right' ? '-r' : '-l')}
             className="w-full bg-card"
             style={{
-              maxWidth: 680,
+              maxWidth: 640,
               borderRadius: 16,
               padding: '28px 32px 24px 32px',
               boxShadow: '0 4px 24px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.04)',
@@ -369,7 +374,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
               )}
             </div>
 
-            {/* d. Metrics row — 4 equal columns */}
+            {/* d. Metrics row — 4 equal columns. $0 sales rendered red (problem signal). */}
             <div className="mt-7 grid grid-cols-4 gap-4">
               <Metric
                 label="Spend"
@@ -377,7 +382,11 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                 accent="#EF4444"
               />
               <Metric label="Clicks" value={current.clicks.toLocaleString()} />
-              <Metric label="Sales" value={`$${current.sales.toFixed(2)}`} />
+              <Metric
+                label="Sales"
+                value={`$${current.sales.toFixed(2)}`}
+                accent={current.sales <= 0 ? '#EF4444' : undefined}
+              />
               <Metric
                 label="ACoS"
                 value={current.acosNum >= 0 && current.acos ? current.acos : '—'}
@@ -498,7 +507,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
           <div
             className="w-full text-center text-[13px] bg-card"
             style={{
-              maxWidth: 680,
+              maxWidth: 640,
               borderRadius: 16,
               padding: '40px',
               border: '1px solid #E5E7EB',
