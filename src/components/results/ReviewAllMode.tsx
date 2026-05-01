@@ -532,21 +532,19 @@ export const ReviewAllMode = ({
                     </TableCell>
                     <TableCell onClick={(e) => e.stopPropagation()}>
                       {decisionPill ? (
-                        <DecisionSelect
-                          value={decision}
-                          onChange={(val) => setDecision(key, val)}
-                          options={decisionOptions}
-                          width="100%"
-                          renderTrigger={() => (
-                            <button
-                              type="button"
-                              className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full text-[11.5px] font-semibold btn-press transition-transform hover:scale-[1.02]"
-                              style={{ background: decisionPill.bg, color: decisionPill.color }}
-                            >
-                              {decisionPill.label}
-                            </button>
-                          )}
-                        />
+                        <Select value={decision} onValueChange={(val) => setDecision(key, val)}>
+                          <SelectTrigger
+                            className="h-7 w-auto inline-flex border-0 px-2.5 rounded-full text-[11.5px] font-semibold gap-1.5 [&>svg]:opacity-70 [&>svg]:w-3 [&>svg]:h-3 hover:scale-[1.02] transition-transform"
+                            style={{ background: decisionPill.bg, color: decisionPill.color }}
+                          >
+                            {decisionPill.label}
+                          </SelectTrigger>
+                          <SelectContent>
+                            {decisionOptions.map((opt) => (
+                              <SelectItem key={opt} value={opt} className="text-[12.5px]">{opt}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       ) : (
                         <DecisionSelect
                           value={decision}
