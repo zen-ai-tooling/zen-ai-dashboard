@@ -482,12 +482,12 @@ export const AnalysisResults = ({
         const decisionSpecsBySheet = (sheet: string): TriageDecisionSpec[] => {
           const opts = getDecisionOptions(sheet);
           return opts.map((opt) => {
-            if (opt === 'Pause') return { value: 'Pause', label: 'PAUSE', bg: '#DC2626', color: '#FFFFFF', shortcut: 'P', countsAsSavings: true };
-            if (opt === 'Cut Bid 50%') return { value: 'Cut Bid 50%', label: 'CUT BID', bg: '#EA580C', color: '#FFFFFF', shortcut: 'C', countsAsSavings: true };
-            if (opt === 'Keep') return { value: 'Keep', label: 'KEEP', bg: '#16A34A', color: '#FFFFFF', shortcut: 'K', countsAsSavings: false };
-            // Negate variants → blue NEGATIVE; map both to single shortcut N (last wins, but typically only one is shown alongside Keep)
-            if (opt.startsWith('Negat')) return { value: opt, label: opt.includes('Phrase') ? 'NEG (PHRASE)' : 'NEGATIVE', bg: '#2563EB', color: '#FFFFFF', shortcut: opt.includes('Phrase') ? 'N' : 'N', countsAsSavings: true };
-            return { value: opt, label: opt.toUpperCase(), bg: '#6B7280', color: '#FFFFFF', shortcut: opt[0].toUpperCase(), countsAsSavings: false };
+            if (opt === 'Pause') return { value: 'Pause', label: 'PAUSE', bg: '#EF4444', color: '#FFFFFF', shortcut: 'P', countsAsSavings: true };
+            if (opt === 'Cut Bid 50%') return { value: 'Cut Bid 50%', label: 'CUT BID', bg: '#F59E0B', color: '#FFFFFF', shortcut: 'C', countsAsSavings: true };
+            if (opt === 'Keep') return { value: 'Keep', label: 'KEEP', bg: '#10B981', color: '#FFFFFF', shortcut: 'K', countsAsSavings: false };
+            // Negate variants → INFO/NEGATIVE violet
+            if (opt.startsWith('Negat')) return { value: opt, label: opt.includes('Phrase') ? 'NEG (PHRASE)' : 'NEGATIVE', bg: '#6366F1', color: '#FFFFFF', shortcut: opt.includes('Phrase') ? 'N' : 'N', countsAsSavings: true };
+            return { value: opt, label: opt.toUpperCase(), bg: '#9CA3AF', color: '#FFFFFF', shortcut: opt[0].toUpperCase(), countsAsSavings: false };
           });
         };
 
