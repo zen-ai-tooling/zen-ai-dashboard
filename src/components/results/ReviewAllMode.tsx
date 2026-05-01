@@ -420,15 +420,7 @@ export const ReviewAllMode = ({
                     Select all → Cut Bid
                   </button>
                 )}
-                {decisionOptions.includes("Pause") && (
-                  <button
-                    onClick={() => setPauseConfirm(true)}
-                    className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12.5px] font-medium border border-border bg-card text-foreground hover:bg-secondary btn-press"
-                  >
-                    <span className="w-2 h-2 rounded-full" style={{ background: "#EF4444" }} />
-                    Select all → Pause
-                  </button>
-                )}
+                {/* "Select all → Pause" removed (too dangerous as one-click). Available in command palette (/). */}
                 {decisionOptions.includes("Keep") && (
                   <button
                     onClick={() => setAllInSheet("Keep")}
@@ -452,14 +444,14 @@ export const ReviewAllMode = ({
           )}
         </div>
 
-        {/* ─── Contextual callout for Search Terms ─── */}
+        {/* ─── Contextual amber callout for Search Terms ─── */}
         {isSearchTermSheet && (
           <div
             className="px-4 py-2.5 border-b flex items-start gap-2"
-            style={{ background: 'rgba(99, 102, 241, 0.08)', borderBottomColor: 'rgba(99, 102, 241, 0.25)' }}
+            style={{ background: '#FFFBEB', borderBottomColor: '#FDE68A', borderLeft: '3px solid #F59E0B' }}
           >
-            <Info className="w-4 h-4 mt-px flex-shrink-0" style={{ color: '#6366F1' }} />
-            <p className="text-[12.5px]" style={{ color: '#4338CA' }}>
+            <Info className="w-4 h-4 mt-px flex-shrink-0" style={{ color: '#F59E0B' }} />
+            <p className="text-[12.5px]" style={{ color: '#92400E' }}>
               <strong>Pause</strong> on search terms auto-converts to <strong>Negate (Exact)</strong> when generating the Amazon file.
             </p>
           </div>
