@@ -558,18 +558,18 @@
   .review-table-scroll::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
   .review-table { border-collapse: separate; border-spacing: 0; }
-  .review-table th, .review-table td { border-bottom: 1px solid #F2F2F7; padding: 12px 14px; }
+  .review-table th, .review-table td { border-bottom: 1px solid #F3F4F6; padding: 12px 14px; }
   .review-table thead th {
     position: sticky; top: 0; z-index: 6;
     background: #F9FAFB;
     text-transform: uppercase;
     font-size: 11px; font-weight: 600;
-    letter-spacing: 0.06em; color: #86868B;
-    border-bottom: 1px solid #E5E5EA;
+    letter-spacing: 0.06em; color: #9CA3AF;
+    border-bottom: 1px solid #E5E7EB;
   }
   .review-table tbody tr { background: #FFFFFF; transition: background 100ms ease; }
-  .review-table tbody tr:nth-child(even) { background: #FAFBFC; }
-  .review-table tbody tr:hover { background: #F0F5FF; }
+  .review-table tbody tr:nth-child(even) { background: #F9FAFB; }
+  .review-table tbody tr:hover { background: rgba(79, 110, 247, 0.06); }
 
   .review-table .freeze-col {
     position: sticky; z-index: 4;
@@ -577,9 +577,9 @@
   }
   .review-table thead .freeze-col { z-index: 7; background: #F9FAFB; }
   .review-table .freeze-col-1 { left: 0; }
-  .review-table .freeze-col-2 { left: 240px; box-shadow: 1px 0 0 #E5E5EA; }
-  .review-table tbody tr:nth-child(even) .freeze-col { background: #FAFBFC; }
-  .review-table tbody tr:hover .freeze-col { background: #F0F5FF; }
+  .review-table .freeze-col-2 { left: 240px; box-shadow: 1px 0 0 #E5E7EB; }
+  .review-table tbody tr:nth-child(even) .freeze-col { background: #F9FAFB; }
+  .review-table tbody tr:hover .freeze-col { background: rgba(79, 110, 247, 0.06); }
   .review-table tbody .freeze-col { background: #FFFFFF; }
 
   /* Ready-pulse for Generate button */
