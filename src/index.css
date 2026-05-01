@@ -582,6 +582,10 @@
   .review-table tbody tr:hover .freeze-col { background: rgba(79, 110, 247, 0.06); }
   .review-table tbody .freeze-col { background: #FFFFFF; }
 
+  /* Decision column pinned to the right edge — always visible */
+  .review-table tbody tr:nth-child(even) .freeze-col-right { background: #F9FAFB !important; }
+  .review-table tbody tr:hover .freeze-col-right { background: rgba(79, 110, 247, 0.06) !important; }
+
   /* Ready-pulse for Generate button */
   @keyframes ready-pulse-kf {
     0%, 100% { box-shadow: 0 0 0 0 rgba(79, 110, 247, 0.45); }

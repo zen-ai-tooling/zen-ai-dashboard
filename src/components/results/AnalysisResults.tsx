@@ -108,7 +108,7 @@ export const AnalysisResults = ({
   const [moreOpen, setMoreOpen] = useState(false);
   const [generatedFileName, setGeneratedFileName] = useState<string>('');
   const [flashKey, setFlashKey] = useState<{ key: string; cls: string; ts: number } | null>(null);
-  const [viewMode, setViewMode] = useState<'triage' | 'review'>('triage');
+  const [viewMode, setViewMode] = useState<'triage' | 'review'>('review');
   const lastDownloadRef = useRef<(() => void) | null>(null);
 
   const setDecisionWithFlash = (key: string, val: string) => {
@@ -420,7 +420,7 @@ export const AnalysisResults = ({
                 ? 'text-white shadow-sm'
                 : 'text-[hsl(var(--text-secondary))] hover:text-foreground'
             }`}
-            style={viewMode === 'triage' ? { background: '#2563EB' } : undefined}
+            style={viewMode === 'triage' ? { background: '#4F6EF7' } : undefined}
           >
             <Zap className="w-3.5 h-3.5" /> Triage
           </button>
@@ -433,7 +433,7 @@ export const AnalysisResults = ({
                 ? 'text-white shadow-sm'
                 : 'text-[hsl(var(--text-secondary))] hover:text-foreground'
             }`}
-            style={viewMode === 'review' ? { background: '#2563EB' } : undefined}
+            style={viewMode === 'review' ? { background: '#4F6EF7' } : undefined}
           >
             <ListIcon className="w-3.5 h-3.5" /> Review All
           </button>
