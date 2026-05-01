@@ -915,10 +915,22 @@
   to   { opacity: 1; transform: translateX(0); }
 }
 
-/* ───── Triage Mode — dark content area, sidebar untouched ───── */
+/* ───── Triage Mode — dark content area + dark topbar ───── */
 body.triage-active main {
   background: #0F1117 !important;
   padding: 0 !important;
+}
+/* Dark, immersive top navbar in triage mode */
+body.triage-active .app-topbar {
+  background: #0F1117 !important;
+  border-bottom: 1px solid #1F2937 !important;
+}
+body.triage-active .app-topbar,
+body.triage-active .app-topbar * {
+  color: #E5E7EB !important;
+}
+body.triage-active .app-topbar button:hover {
+  background: rgba(255,255,255,0.06) !important;
 }
 
 .triage-content {
