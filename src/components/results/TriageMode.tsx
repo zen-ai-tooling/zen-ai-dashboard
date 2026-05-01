@@ -644,7 +644,7 @@ const Metric: React.FC<{ label: string; value: string; accent?: string }> = ({ l
     <div
       className="tabular-nums"
       style={{
-        fontSize: 28,
+        fontSize: 24,
         fontWeight: 700,
         color: accent ?? '#111827',
         lineHeight: 1.05,
