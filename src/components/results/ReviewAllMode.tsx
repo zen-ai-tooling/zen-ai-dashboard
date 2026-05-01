@@ -259,86 +259,7 @@ export const ReviewAllMode = ({
   return (
     <>
     <div className="space-y-3">
-      {/* Top command bar — generate + more options (no duplicate summary) */}
-      <div className="flex items-center justify-end gap-2 relative" ref={moreRef}>
-          <TooltipProvider delayDuration={120}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span tabIndex={0}>
-                  <button
-                    onClick={onGenerate}
-                    disabled={!anyDecided || isGenerating}
-                    className={`inline-flex items-center gap-2 h-9 px-4 rounded-lg text-[13px] font-semibold transition-all btn-press disabled:cursor-not-allowed ${
-                      allDone && !generateDone ? "ready-pulse" : ""
-                    }`}
-                    style={{
-                      background: !anyDecided ? "#E5E7EB" : "#0D9488",
-                      color: !anyDecided ? "#9CA3AF" : "#FFFFFF",
-                    }}
-                  >
-                    {isGenerating ? (
-                      <><Loader2 className="w-4 h-4 animate-spin" /> Generating…</>
-                    ) : generateDone ? (
-                      <><CheckCircle2 className="w-4 h-4" /> Downloaded</>
-                    ) : allDone ? (
-                      <>Generate Amazon file <ArrowRight className="w-3.5 h-3.5" /></>
-                    ) : anyDecided ? (
-                      <>Generate file ({decisionsMade}/{totalRows}) <ArrowRight className="w-3.5 h-3.5" /></>
-                    ) : (
-                      <>Generate Amazon file</>
-                    )}
-                  </button>
-                </span>
-              </TooltipTrigger>
-              {!anyDecided && (
-                <TooltipContent side="bottom">Make at least one decision to generate your file</TooltipContent>
-              )}
-            </Tooltip>
-          </TooltipProvider>
-
-          <button
-            onClick={() => setMoreOpen(o => !o)}
-            className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg border border-border bg-card text-[12.5px] text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press"
-          >
-            <MoreHorizontal className="w-4 h-4" />
-            More options
-          </button>
-          {moreOpen && (
-            <div className="absolute right-0 top-11 min-w-[260px] rounded-lg border border-border bg-popover shadow-pop p-1 z-30 animate-scale-in">
-              <button
-                onClick={() => { onDownloadLegacy(); setMoreOpen(false); }}
-                className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
-              >
-                <Download className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))]" />
-                Export decisions as CSV
-              </button>
-              <button
-                onClick={() => {
-                  if (confirm("Reset all decisions across every sheet?")) setDecisions({});
-                  setMoreOpen(false);
-                }}
-                className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
-              >
-                <RotateCcw className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))]" />
-                Reset all decisions
-              </button>
-              <label className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left cursor-pointer">
-                <UploadIcon className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))]" />
-                Upload decision file manually
-                <input
-                  type="file"
-                  accept=".xlsx,.xls,.csv"
-                  className="hidden"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) onUploadDecisionFile(f);
-                    setMoreOpen(false);
-                  }}
-                />
-              </label>
-            </div>
-          )}
-        </div>
+      {/* Generate button moved into the summary bar (AnalysisResults). */}
 
       {/* ─── Tab bar ─── */}
       <div className="flex items-end gap-2 overflow-x-auto pb-1">
@@ -377,8 +298,11 @@ export const ReviewAllMode = ({
         })}
       </div>
 
-      {/* ─── Focus filter pills ─── */}
+      {/* ─── Focus filter pills with tab-scoped label ─── */}
       <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-[11px] font-medium" style={{ color: '#9CA3AF' }}>
+          {shortTabLabel(currentSheet)}:
+        </span>
         {([
           { id: 'all', label: 'All', icon: '', count: focusMeta.all },
           { id: 'pause', label: 'Pause candidates', icon: '🔴', count: focusMeta.pause },
@@ -451,16 +375,64 @@ export const ReviewAllMode = ({
                   </button>
                 )}
               </div>
-              <button
-                onClick={() => {
-                  const next = { ...decisions };
-                  currentRows.forEach((_, idx) => { delete next[`${currentSheet}-ROWINDEX-${idx}`]; });
-                  setDecisions(next);
-                }}
-                className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press"
-              >
-                <X className="w-3 h-3" /> Clear sheet
-              </button>
+              <div className="flex items-center gap-1.5 relative" ref={moreRef}>
+                <button
+                  onClick={() => {
+                    const next = { ...decisions };
+                    currentRows.forEach((_, idx) => { delete next[`${currentSheet}-ROWINDEX-${idx}`]; });
+                    setDecisions(next);
+                  }}
+                  className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-[12px] font-medium btn-press transition-opacity"
+                  style={{ color: '#EF4444', opacity: 0.7 }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
+                >
+                  <X className="w-3 h-3" /> Clear sheet
+                </button>
+                <button
+                  onClick={() => setMoreOpen(o => !o)}
+                  className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-[12px] text-[hsl(var(--text-secondary))] hover:text-foreground hover:bg-secondary btn-press"
+                  aria-label="More options"
+                  title="More options"
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
+                {moreOpen && (
+                  <div className="absolute right-0 top-9 min-w-[260px] rounded-lg border border-border bg-popover shadow-pop p-1 z-30 animate-scale-in">
+                    <button
+                      onClick={() => { onDownloadLegacy(); setMoreOpen(false); }}
+                      className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
+                    >
+                      <Download className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))]" />
+                      Export decisions as CSV
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm("Reset all decisions across every sheet?")) setDecisions({});
+                        setMoreOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))]" />
+                      Reset all decisions
+                    </button>
+                    <label className="w-full flex items-center gap-2 px-2.5 py-2 text-[12.5px] text-foreground hover:bg-secondary rounded-md text-left cursor-pointer">
+                      <UploadIcon className="w-3.5 h-3.5 text-[hsl(var(--text-tertiary))]" />
+                      Upload decision file manually
+                      <input
+                        type="file"
+                        accept=".xlsx,.xls,.csv"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) onUploadDecisionFile(f);
+                          setMoreOpen(false);
+                        }}
+                      />
+                    </label>
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>
@@ -482,7 +454,7 @@ export const ReviewAllMode = ({
         <div className="review-table-scroll w-full max-h-[60vh] overflow-auto">
           <Table className="w-full review-table" style={{ tableLayout: 'fixed' }}>
             <colgroup>
-              <col style={{ width: 220 }} />
+              <col style={{ width: 240 }} />
               <col style={{ width: 160 }} />
               {showAdGroup && <col style={{ width: 160 }} />}
               <col style={{ width: 70 }} />
@@ -495,7 +467,7 @@ export const ReviewAllMode = ({
             </colgroup>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
-                <TableHead style={{ width: 220, letterSpacing: "0.06em" }}>
+                <TableHead style={{ width: 240, letterSpacing: "0.06em" }}>
                   <SortHeader active={sortKey === "campaign"} dir={sortDir} onClick={() => toggleSort("campaign")}>Campaign</SortHeader>
                 </TableHead>
                 <TableHead style={{ width: 160, letterSpacing: "0.06em" }}>
@@ -612,11 +584,11 @@ export const ReviewAllMode = ({
                     className={`${indicatorClass} transition-opacity`}
                     style={{ opacity: decision ? 0.88 : 1, boxShadow: `inset 3px 0 0 ${heatColor}` }}
                   >
-                    <TableCell className="font-medium" style={{ width: 220 }}>
+                    <TableCell className="font-medium" style={{ width: 240 }}>
                       <TooltipProvider delayDuration={300}>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="block truncate" style={{ maxWidth: 200 }}>{row.campaign || "—"}</span>
+                            <span className="block truncate" style={{ maxWidth: 220 }}>{row.campaign || "—"}</span>
                           </TooltipTrigger>
                           <TooltipContent side="top" className="max-w-[420px] break-words text-[12px]">
                             {row.campaign || "—"}

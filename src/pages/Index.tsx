@@ -585,13 +585,7 @@ const Index = () => {
         return { label: '0 bleeders', variant: 'neutral' as const };
       }
     }
-    if (activeModule === 'bleeders_1' && analysisResults) {
-      const allRows = analysisResults.allRows || [];
-      if (allRows.length > 0) {
-        const totalSpend = allRows.reduce((s: number, r: any) => s + (r.spend || 0), 0);
-        return { label: `${allRows.length} bleeders · $${totalSpend.toFixed(0)} at risk`, variant: 'danger' as const };
-      }
-    }
+    // Bleeders 1.0 Results screen — pill removed; same info shown in summary bar.
     return null;
   };
 

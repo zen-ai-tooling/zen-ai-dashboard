@@ -470,15 +470,37 @@ export const AnalysisResults = ({
           <>
             <span className="text-[12.5px] tabular-nums">
               <span className="font-semibold text-[#111827]">{decisionsMade}/{allRows.length}</span>
-              <span className="ml-1 text-[#9CA3AF]">decisions</span>
             </span>
             <span className="text-[12.5px] tabular-nums inline-flex items-center gap-1">
               <span aria-hidden>💰</span>
               <span className="font-semibold" style={{ color: '#059669' }}>
                 ${Math.round(addressedSavings).toLocaleString()}
               </span>
-              <span className="text-[#9CA3AF]">addressed</span>
             </span>
+            <button
+              onClick={handleGenerateDecisionFile}
+              disabled={decisionsMade === 0 || isGenerating}
+              title={decisionsMade === 0 ? 'Make at least one decision to generate your file' : undefined}
+              className={`inline-flex items-center gap-1.5 px-3 text-[13px] font-semibold transition-all btn-press disabled:cursor-not-allowed ${
+                decisionsMade === allRows.length && allRows.length > 0 && !generateDone ? 'ready-pulse' : ''
+              }`}
+              style={{
+                height: 32,
+                borderRadius: 6,
+                background: decisionsMade === 0 ? '#E5E7EB' : '#0D9488',
+                color: decisionsMade === 0 ? '#9CA3AF' : '#FFFFFF',
+              }}
+            >
+              {isGenerating ? (
+                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Generating…</>
+              ) : generateDone ? (
+                <><CheckCircle2 className="w-3.5 h-3.5" /> Downloaded</>
+              ) : decisionsMade === allRows.length && allRows.length > 0 ? (
+                <>Generate →</>
+              ) : (
+                <>Generate ({decisionsMade}/{allRows.length}) →</>
+              )}
+            </button>
           </>
         }
       />
