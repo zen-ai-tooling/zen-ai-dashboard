@@ -43,6 +43,7 @@ interface TriageModeProps {
   onSwitchToReview: () => void;
   totalSpend: number;
   sheetsCount: number;
+  addressedSavings?: number;
   shortSheetLabel: (s: string) => string;
 }
 
@@ -78,6 +79,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   onSwitchToReview,
   totalSpend: _totalSpend,
   sheetsCount: _sheetsCount,
+  addressedSavings,
   shortSheetLabel,
 }) => {
   const [skipped, setSkipped] = React.useState<Set<string>>(new Set());
