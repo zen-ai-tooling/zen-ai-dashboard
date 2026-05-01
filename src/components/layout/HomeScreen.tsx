@@ -15,6 +15,12 @@ const getGreeting = () => {
   return 'Good evening';
 };
 
+const getGreetingHeadline = (firstName: string | null): string => {
+  const base = getGreeting();
+  if (firstName) return `${base}, ${firstName}`;
+  return `${base}, welcome back`;
+};
+
 const getTimeString = () =>
   new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
