@@ -241,42 +241,46 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   const counterValue = addressedSavings ?? savingsTarget;
 
   return (
-    <div className="triage-content">
-      {/* 1. 3px teal progress bar — top of content area */}
-      <div style={{ height: 3, width: '100%', background: 'rgba(255,255,255,0.06)' }}>
+    <div className="triage-container">
+      {/* Progress bar — absolute, on top of grid, above row 1 */}
+      <div
+        className="absolute"
+        style={{ top: 0, left: 0, width: '100%', height: 3, background: 'rgba(255,255,255,0.06)', zIndex: 10 }}
+      >
         <div
           className="h-full transition-all duration-500 ease-out"
           style={{ width: `${progressPct}%`, background: '#0D9488' }}
         />
       </div>
 
-      {/* 2. Top-left exit link */}
-      <button
-        onClick={onSwitchToReview}
-        className="absolute hover:text-white transition-colors"
-        style={{ top: 16, left: 16, color: '#9CA3AF', fontSize: 13, zIndex: 5 }}
-      >
-        ← Exit triage
-      </button>
-
-      {/* 3. Top-right counter */}
+      {/* ── Row 1: top bar (48px) ── */}
       <div
-        className="absolute flex items-center gap-3 tabular-nums"
-        style={{ top: 16, right: 16, color: '#FFFFFF', fontSize: 13, zIndex: 5 }}
+        className="flex items-center justify-between"
+        style={{ height: 48, padding: '0 16px', paddingTop: 3 }}
       >
-        <span>{decisionsMade}/{total}</span>
-        <span style={{ width: 1, height: 14, background: 'rgba(255,255,255,0.25)' }} />
-        <span className="inline-flex items-center gap-1.5">
-          <span aria-hidden>💰</span>
-          <span>${Math.round(counterValue).toLocaleString()} addressed</span>
-        </span>
+        <button
+          onClick={onSwitchToReview}
+          className="hover:text-white transition-colors"
+          style={{ color: '#9CA3AF', fontSize: 13 }}
+        >
+          ← Exit triage
+        </button>
+        <div className="flex items-center gap-3 tabular-nums" style={{ color: '#FFFFFF', fontSize: 13 }}>
+          <span>{decisionsMade}/{total}</span>
+          <span style={{ width: 1, height: 14, background: 'rgba(255,255,255,0.25)' }} />
+          <span className="inline-flex items-center gap-1.5">
+            <span aria-hidden>💰</span>
+            <span>${Math.round(counterValue).toLocaleString()} addressed</span>
+          </span>
+        </div>
       </div>
 
-      {/* 4. Flex-centered card area */}
+      {/* ── Row 2: centered card zone (1fr) ── */}
       <div
-        className="flex items-start justify-center px-4"
-        style={{ minHeight: 'calc(100vh - 52px - 3px)', paddingTop: 56, paddingBottom: 96 }}
+        className="flex items-center justify-center px-4 min-h-0"
+        style={{ overflow: 'hidden' }}
       >
+
         {total === 0 ? (
           <div className="bg-white text-center" style={{ borderRadius: 16, padding: 40, maxWidth: 640, width: '85%' }}>
             <h2 className="text-[20px] font-semibold" style={{ color: '#111827' }}>No bleeders to review</h2>
@@ -303,7 +307,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             style={{
               width: '85%',
               maxWidth: 640,
-              maxHeight: 'calc(100vh - 160px)',
+              maxHeight: '100%',
               borderRadius: 16,
               padding: 22,
               boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
@@ -529,81 +533,92 @@ export const TriageMode: React.FC<TriageModeProps> = ({
         )}
       </div>
 
-      {/* 8. Floating Generate file pill — bottom-center of CONTENT area (not viewport) */}
-      {!allDone && (
-        <button
-          onClick={onGenerate}
-          disabled={decisionsMade === 0}
-          className="absolute inline-flex items-center gap-1.5 hover:opacity-90 btn-press disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{
-            left: '50%',
-            transform: 'translateX(-50%)',
-            bottom: 16,
-            background: '#0D9488',
-            color: '#FFFFFF',
-            borderRadius: 24,
-            padding: '8px 20px',
-            fontSize: 12,
-            fontWeight: 600,
-            boxShadow: '0 4px 16px rgba(13,148,136,0.4)',
-            zIndex: 40,
-          }}
-        >
-          Generate file ({decisionsMade}/{total}) <ArrowRight className="w-3.5 h-3.5" />
-        </button>
-      )}
+      {/* ── Row 3: bottom bar (64px) — generate centered, shortcuts right ── */}
+      <div
+        className="relative"
+        style={{ height: 64, padding: '0 16px' }}
+      >
+        {/* Generate file pill — centered in row */}
+        {!allDone && (
+          <button
+            onClick={onGenerate}
+            disabled={decisionsMade === 0}
+            className="absolute inline-flex items-center gap-1.5 hover:opacity-90 btn-press disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              background: '#0D9488',
+              color: '#FFFFFF',
+              borderRadius: 24,
+              padding: '8px 20px',
+              fontSize: 12,
+              fontWeight: 600,
+              boxShadow: '0 4px 16px rgba(13,148,136,0.4)',
+              zIndex: 40,
+            }}
+          >
+            Generate file ({decisionsMade}/{total}) <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        )}
 
-      {/* 9. Shortcuts panel — absolute bottom-right of content area */}
-      {showLegend ? (
-        <div
-          className="absolute"
-          style={{
-            right: 16,
-            bottom: 16,
-            width: 176,
-            background: '#1F2937',
-            border: '1px solid #374151',
-            borderRadius: 10,
-            padding: '10px 12px',
-            zIndex: 45,
-          }}
-        >
-          <div className="flex items-center justify-between" style={{ marginBottom: 8 }}>
-            <span className="inline-flex items-center gap-1.5" style={{ color: '#FFFFFF', fontSize: 11, fontWeight: 600 }}>
-              ⌨ Shortcuts
-            </span>
-            <button
-              onClick={() => setShowLegend(false)}
-              className="hover:opacity-70"
-              aria-label="Hide shortcuts"
-              style={{ color: '#9CA3AF', fontSize: 13, lineHeight: 1 }}
-            >
-              ×
-            </button>
+        {/* Shortcuts — right-aligned. Open panel grows upward (absolute) so it
+            never collides with the centered generate pill. */}
+        {showLegend ? (
+          <div
+            className="absolute"
+            style={{
+              right: 16,
+              bottom: 8,
+              width: 176,
+              background: '#1F2937',
+              border: '1px solid #374151',
+              borderRadius: 10,
+              padding: '10px 12px',
+              zIndex: 45,
+            }}
+          >
+            <div className="flex items-center justify-between" style={{ marginBottom: 8 }}>
+              <span className="inline-flex items-center gap-1.5" style={{ color: '#FFFFFF', fontSize: 11, fontWeight: 600 }}>
+                ⌨ Shortcuts
+              </span>
+              <button
+                onClick={() => setShowLegend(false)}
+                className="hover:opacity-70"
+                aria-label="Hide shortcuts"
+                style={{ color: '#9CA3AF', fontSize: 13, lineHeight: 1 }}
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex flex-col" style={{ gap: 6, fontSize: 11 }}>
+              {currentSpecs.map(s => (
+                <ShortcutRow key={s.value} label={s.label} k={s.shortcut.toUpperCase()} />
+              ))}
+              <ShortcutRow label="SKIP" k="S" />
+              <ShortcutRow label="UNDO" k="Z" />
+              <ShortcutRow label="PREV" k="←" />
+              <ShortcutRow label="NEXT" k="→" />
+            </div>
           </div>
-          <div className="flex flex-col" style={{ gap: 6, fontSize: 11 }}>
-            {currentSpecs.map(s => (
-              <ShortcutRow key={s.value} label={s.label} k={s.shortcut.toUpperCase()} />
-            ))}
-            <ShortcutRow label="SKIP" k="S" />
-            <ShortcutRow label="UNDO" k="Z" />
-            <ShortcutRow label="PREV" k="←" />
-            <ShortcutRow label="NEXT" k="→" />
-          </div>
-        </div>
-      ) : (
-        <button
-          onClick={() => setShowLegend(true)}
-          className="absolute inline-flex items-center gap-1.5 rounded-full px-3 h-7 text-[11px] hover:opacity-90"
-          style={{
-            right: 16, bottom: 16,
-            background: '#1F2937', border: '1px solid #374151', color: '#FFFFFF',
-            zIndex: 45,
-          }}
-        >
-          ⌨ Shortcuts
-        </button>
-      )}
+        ) : (
+          <button
+            onClick={() => setShowLegend(true)}
+            className="absolute inline-flex items-center gap-1.5 rounded-full px-3 h-7 text-[11px] hover:opacity-90"
+            style={{
+              right: 16,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: '#1F2937',
+              border: '1px solid #374151',
+              color: '#FFFFFF',
+              zIndex: 45,
+            }}
+          >
+            ⌨ Shortcuts
+          </button>
+        )}
+      </div>
 
     </div>
   );
