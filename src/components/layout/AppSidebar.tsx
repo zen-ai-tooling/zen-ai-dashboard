@@ -60,7 +60,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   const onHome = !activeModule && !showHistoryView;
 
   return (
-    <aside className="w-[240px] flex-shrink-0 h-screen sticky top-0 flex flex-col bg-sidebar text-sidebar-foreground relative z-10">
+    <aside className="app-sidebar w-[240px] flex-shrink-0 h-screen sticky top-0 flex flex-col bg-sidebar text-sidebar-foreground relative z-10">
       {/* Brand */}
       <button
         onClick={() => { onSelectModule(null); setShowHistoryView?.(false); }}

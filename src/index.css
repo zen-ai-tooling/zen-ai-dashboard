@@ -10,7 +10,7 @@
 @layer base {
   :root {
     /* ── Unified Color System ──
-       Primary  #4F6EF7  indigo-blue  (CTA, links, active, progress)
+       Primary  #0D9488  indigo-blue  (CTA, links, active, progress)
        Destruct #EF4444  red          (PAUSE, errors)
        Warning  #F59E0B  amber        (CUT BID, caution)
        Success  #10B981  emerald      (KEEP, completion)
@@ -30,8 +30,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 13% 26%;
 
-    /* Accent — indigo-blue */
-    --primary: 227 91% 64%;           /* #4F6EF7 */
+    /* Accent — teal */
+    --primary: 175 84% 32%;           /* #0D9488 teal */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 14% 96%;         /* near page bg, slightly lighter */
@@ -46,12 +46,12 @@
     --destructive: 0 84% 60%;         /* #EF4444 */
     --destructive-foreground: 0 0% 100%;
 
-    --success: 160 84% 39%;           /* #10B981 emerald */
+    --success: 161 94% 30%;           /* #059669 emerald (darker, distinct from teal primary) */
     --success-foreground: 0 0% 100%;
 
     --border: 220 13% 91%;            /* #E5E7EB */
     --input: 220 13% 91%;
-    --ring: 227 91% 64%;
+    --ring: 175 84% 32%;
     --radius: 0.75rem;
 
     /* Semantic text */
@@ -61,12 +61,12 @@
     /* Sidebar — dark contrast */
     --sidebar-background: 222 39% 11%;       /* #111827 */
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 227 91% 64%;
+    --sidebar-primary: 175 84% 32%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 222 30% 16%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 222 30% 18%;
-    --sidebar-ring: 227 91% 64%;
+    --sidebar-ring: 175 84% 32%;
     --sidebar-active-bg: 0 0% 100% / 0.08;
 
     --spend: 0 84% 60%;
@@ -74,13 +74,13 @@
     /* Named tokens (back-compat — remapped to new spec) */
     --page-bg: 220 14% 98%;
     --border-strong: 220 13% 82%;
-    --accent-blue: 227 91% 64%;        /* #4F6EF7 */
-    --accent-blue-light: 227 91% 96%;
-    --accent-blue-border: 227 80% 88%;
+    --accent-blue: 175 84% 32%;        /* #0D9488 (token name kept for back-compat) */
+    --accent-blue-light: 174 64% 95%;
+    --accent-blue-border: 174 60% 82%;
     --red: 0 84% 60%;
     --red-light: 0 86% 97%;
     --red-border: 0 80% 90%;
-    --green: 160 84% 39%;
+    --green: 161 94% 30%;              /* #059669 darker emerald */
     --green-light: 152 76% 96%;
     --green-border: 156 60% 82%;
     --amber: 38 92% 50%;               /* #F59E0B */
@@ -407,8 +407,8 @@
   input[class*="rounded-lg"]:focus-visible,
   .focus-ring:focus-visible {
     outline: none;
-    border-color: #4F6EF7 !important;
-    box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.15);
+    border-color: #0D9488 !important;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
   }
 
   /* Computed number pulse on key change */
@@ -420,12 +420,12 @@
   /* Track card colored hover tints — module identity */
   .track-card-hover-red:hover    { background: rgba(239, 68, 68, 0.04); }
   .track-card-hover-amber:hover  { background: rgba(245, 158, 11, 0.04); }
-  .track-card-hover-blue:hover   { background: rgba(79, 110, 247, 0.04); }
+  .track-card-hover-blue:hover   { background: rgba(13, 148, 136, 0.04); }
   .track-card-hover-purple:hover { background: rgba(139, 92, 246, 0.04); }
 
   /* Pulse dot for "Action needed" cells — primary */
   .action-pulse-dot {
-    width: 6px; height: 6px; border-radius: 999px; background: #4F6EF7;
+    width: 6px; height: 6px; border-radius: 999px; background: #0D9488;
     animation: action-pulse 1.6s ease-out infinite;
   }
 
@@ -479,7 +479,7 @@
   }
   .pill-suggest-red    { background: rgba(239, 68, 68, 0.08);  color: #B91C1C; border: none; }
   .pill-suggest-amber  { background: rgba(245, 158, 11, 0.08); color: #B45309; border: none; }
-  .pill-suggest-blue   { background: rgba(79, 110, 247, 0.08); color: #4F6EF7; border: none; }
+  .pill-suggest-blue   { background: rgba(13, 148, 136, 0.08); color: #0D9488; border: none; }
   .pill-suggest-green  { background: rgba(16, 185, 129, 0.08); color: #047857; border: none; }
   .pill-suggest { transition: opacity 150ms ease; }
   /* Dim suggestion pill once a decision is made on this row */
@@ -516,7 +516,7 @@
   }
   .decision-table table tbody tr:nth-child(even) { background: #F9FAFB; }
   .decision-table table tbody tr:hover,
-  .decision-table table tbody tr:hover:nth-child(even) { background: rgba(79, 110, 247, 0.06) !important; }
+  .decision-table table tbody tr:hover:nth-child(even) { background: rgba(13, 148, 136, 0.06) !important; }
   /* Ensure row cells have at least 14px vertical padding */
   .decision-table table tbody td { padding-top: 14px; padding-bottom: 14px; }
   /* When a decision class adds a flash background animation, it overrides via animation */
@@ -543,7 +543,7 @@
 
   /* Generate button "ready" glow */
   .btn-primary-action.is-ready {
-    box-shadow: 0 0 12px rgba(79, 110, 247, 0.35);
+    box-shadow: 0 0 12px rgba(13, 148, 136, 0.35);
   }
 
   /* ── Review All mode: frozen columns + visible scrollbar ── */
@@ -565,7 +565,7 @@
   }
   .review-table tbody tr { background: #FFFFFF; transition: background 100ms ease; }
   .review-table tbody tr:nth-child(even) { background: #F9FAFB; }
-  .review-table tbody tr:hover { background: rgba(79, 110, 247, 0.06); }
+  .review-table tbody tr:hover { background: rgba(13, 148, 136, 0.06); }
 
   .review-table .freeze-col {
     position: sticky; z-index: 4;
@@ -575,17 +575,17 @@
   .review-table .freeze-col-1 { left: 0; }
   .review-table .freeze-col-2 { left: 240px; box-shadow: 1px 0 0 #E5E7EB; }
   .review-table tbody tr:nth-child(even) .freeze-col { background: #F9FAFB; }
-  .review-table tbody tr:hover .freeze-col { background: rgba(79, 110, 247, 0.06); }
+  .review-table tbody tr:hover .freeze-col { background: rgba(13, 148, 136, 0.06); }
   .review-table tbody .freeze-col { background: #FFFFFF; }
 
   /* Decision column pinned to the right edge — always visible */
   .review-table tbody tr:nth-child(even) .freeze-col-right { background: #F9FAFB !important; }
-  .review-table tbody tr:hover .freeze-col-right { background: rgba(79, 110, 247, 0.06) !important; }
+  .review-table tbody tr:hover .freeze-col-right { background: rgba(13, 148, 136, 0.06) !important; }
 
   /* Ready-pulse for Generate button */
   @keyframes ready-pulse-kf {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(79, 110, 247, 0.45); }
-    50% { box-shadow: 0 0 0 8px rgba(79, 110, 247, 0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.45); }
+    50% { box-shadow: 0 0 0 8px rgba(13, 148, 136, 0); }
   }
   .ready-pulse { animation: ready-pulse-kf 1.8s ease-in-out infinite; }
 
@@ -662,8 +662,8 @@
 }
 
 @keyframes action-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(79, 110, 247, 0.5); opacity: 1; }
-  50%      { box-shadow: 0 0 0 4px rgba(79, 110, 247, 0); opacity: 0.5; }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.5); opacity: 1; }
+  50%      { box-shadow: 0 0 0 4px rgba(13, 148, 136, 0); opacity: 0.5; }
 }
 
 .drag-pulse { animation: drag-pulse 1.4s ease-out infinite; }
@@ -675,8 +675,8 @@
 @keyframes row-flash-negate { 0% { background: rgba(99, 102, 241, 0.14); } 100% { background: transparent; } }
 
 @keyframes ready-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(79, 110, 247, 0.45); }
-  50%      { box-shadow: 0 0 0 10px rgba(79, 110, 247, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.45); }
+  50%      { box-shadow: 0 0 0 10px rgba(13, 148, 136, 0); }
 }
 
 
@@ -892,10 +892,10 @@
 
 /* Selected row indicator — uses unified primary indigo-blue */
 .row-detail-selected {
-  background: rgba(79, 110, 247, 0.06) !important;
-  box-shadow: inset 4px 0 0 #4F6EF7;
+  background: rgba(13, 148, 136, 0.06) !important;
+  box-shadow: inset 4px 0 0 #0D9488;
 }
-.row-detail-selected:hover { background: rgba(79, 110, 247, 0.10) !important; }
+.row-detail-selected:hover { background: rgba(13, 148, 136, 0.10) !important; }
 
 /* Make every body row look clickable while the table is in inline-decision
    mode. The Action dropdown stops propagation so it stays usable. */
@@ -912,4 +912,50 @@
 @keyframes triage-in-left {
   from { opacity: 0; transform: translateX(-24px); }
   to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ───── Triage Mode full-bleed ───── */
+body.triage-active [data-sidebar="sidebar"],
+body.triage-active aside.app-sidebar {
+  transform: translateX(-100%);
+  transition: transform 200ms ease;
+}
+body.triage-active .app-topbar { display: none; }
+body.triage-active main { padding: 0 !important; }
+
+.triage-fullbleed {
+  position: fixed;
+  inset: 0;
+  background: #0F1117;
+  z-index: 100;
+  overflow: hidden;
+  animation: triage-fade-in 200ms ease-out;
+}
+@keyframes triage-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Focus filter pill */
+.focus-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 30px; padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid #E5E7EB;
+  background: #FFFFFF;
+  color: #374151;
+  font-size: 12.5px; font-weight: 500;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+  white-space: nowrap;
+}
+.focus-pill:hover { background: #F9FAFB; }
+.focus-pill.is-active {
+  background: #0D9488;
+  color: #FFFFFF;
+  border-color: #0D9488;
+}
+.focus-pill .count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  opacity: 0.85;
 }

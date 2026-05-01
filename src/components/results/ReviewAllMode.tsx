@@ -59,7 +59,7 @@ const DECISION_PILL = (decision: string): { bg: string; color: string; label: st
   if (!decision) return null;
   if (decision === "Pause") return { bg: "#EF4444", color: "#FFFFFF", label: "Pause" };
   if (decision.startsWith("Cut")) return { bg: "#F59E0B", color: "#FFFFFF", label: "Cut Bid" };
-  if (decision === "Keep") return { bg: "#10B981", color: "#FFFFFF", label: "Keep" };
+  if (decision === "Keep") return { bg: "#059669", color: "#FFFFFF", label: "Keep" };
   if (decision.startsWith("Negat")) return { bg: "#6366F1", color: "#FFFFFF", label: decision.includes("Phrase") ? "Negative (P)" : "Negative" };
   return { bg: "#9CA3AF", color: "#FFFFFF", label: decision };
 };
@@ -184,38 +184,83 @@ export const ReviewAllMode = ({
     setPauseConfirm(false);
   };
 
+  // ── Focus filter (above table) ──
+  type FocusFilter = 'all' | 'pause' | 'review' | 'decided' | 'highspend';
+  const [focusFilter, setFocusFilter] = useState<FocusFilter>('all');
+
+  // Compute filter counts + spend quartiles for current sheet
+  const focusMeta = useMemo(() => {
+    const spends = currentRows.map(r => r.spend || 0).slice().sort((a, b) => a - b);
+    const q75 = spends.length ? spends[Math.floor(spends.length * 0.75)] : 0;
+    let pause = 0, review = 0, decided = 0, highspend = 0;
+    currentRows.forEach((r, idx) => {
+      const sug = suggestB1Row({ clicks: r.clicks ?? 0, spend: r.spend ?? 0, sales: r.sales ?? 0, orders: r.orders ?? 0 });
+      if (sug.kind === 'pause') pause++;
+      if (sug.kind === 'review' || sug.kind === 'monitor') review++;
+      if (decisions[`${currentSheet}-ROWINDEX-${idx}`]) decided++;
+      if ((r.spend || 0) >= q75 && q75 > 0) highspend++;
+    });
+    return { all: currentRows.length, pause, review, decided, highspend, q75 };
+  }, [currentRows, decisions, currentSheet]);
+
+  const passesFilter = (rowIdx: number): boolean => {
+    if (focusFilter === 'all') return true;
+    const r = currentRows[rowIdx];
+    const dec = decisions[`${currentSheet}-ROWINDEX-${rowIdx}`];
+    if (focusFilter === 'decided') return !!dec;
+    if (focusFilter === 'highspend') return (r.spend || 0) >= focusMeta.q75 && focusMeta.q75 > 0;
+    const sug = suggestB1Row({ clicks: r.clicks ?? 0, spend: r.spend ?? 0, sales: r.sales ?? 0, orders: r.orders ?? 0 });
+    if (focusFilter === 'pause') return sug.kind === 'pause';
+    if (focusFilter === 'review') return sug.kind === 'review' || sug.kind === 'monitor';
+    return true;
+  };
+
+  // Spend quartiles for heat-map left border
+  const spendBands = useMemo(() => {
+    const spends = currentRows.map(r => r.spend || 0).slice().sort((a, b) => a - b);
+    if (!spends.length) return { top: Infinity, bottom: 0 };
+    return {
+      top: spends[Math.floor(spends.length * 0.75)],
+      bottom: spends[Math.floor(spends.length * 0.25)],
+    };
+  }, [currentRows]);
+  const spendBandColor = (spend: number, hasDecision: boolean): string => {
+    if (hasDecision) return '#E5E7EB';
+    if (spend >= spendBands.top) return '#EF4444';
+    if (spend >= spendBands.bottom) return '#F59E0B';
+    return '#E5E7EB';
+  };
+
+  // ── Command palette ──
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [paletteQuery, setPaletteQuery] = useState('');
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.target && (e.target as HTMLElement).closest('input,textarea,select,[contenteditable="true"]')) return;
+      if (e.key === '/') { e.preventDefault(); setPaletteOpen(true); return; }
+      if (e.key === 'Escape' && paletteOpen) { setPaletteOpen(false); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [paletteOpen]);
+
   const allDone = decisionsMade >= totalRows && totalRows > 0;
   const anyDecided = decisionsMade > 0;
 
-  return (
-    <div className="space-y-3">
-      {/* ─── Top command bar (progress + Generate) ─── */}
-      <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl border border-border bg-card px-4 py-3 shadow-card">
-        <div className="flex items-center gap-3 flex-wrap">
-          <div
-            className="inline-flex items-center gap-2 h-8 px-3 rounded-full font-mono-nums text-[12.5px] font-semibold"
-            style={{
-              background: allDone ? "rgba(16, 185, 129, 0.12)" : "rgba(79, 110, 247, 0.08)",
-              color: allDone ? "#047857" : "#4F6EF7",
-            }}
-          >
-            {allDone && <CheckCircle2 className="w-3.5 h-3.5" />}
-            {decisionsMade}/{totalRows} decisions
-          </div>
-          <div className="flex items-center gap-3 text-[11px] text-[hsl(var(--text-tertiary))]">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full" style={{ background: "#EF4444" }} /> Pause suggested
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full" style={{ background: "#F59E0B" }} /> Review suggested
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full" style={{ background: "#F59E0B" }} /> Monitor
-            </span>
-          </div>
-        </div>
+  const paletteCommands = [
+    { id: 'pause-tab', label: `Pause all in ${shortTabLabel(currentSheet)}`, run: () => { if (confirm('Pause every row in this tab?')) confirmPauseAll(); } },
+    { id: 'apply-ai', label: 'Apply AI suggestions for current tab', run: () => applyAISuggestions() },
+    { id: 'show-undecided', label: 'Show only undecided', run: () => setFocusFilter('all') },
+    { id: 'mark-keep', label: 'Mark all as Keep', run: () => decisionOptions.includes('Keep') && setAllInSheet('Keep') },
+    { id: 'export-csv', label: 'Export decisions as CSV', run: () => onDownloadLegacy() },
+  ];
+  const filteredCommands = paletteCommands.filter(c => c.label.toLowerCase().includes(paletteQuery.toLowerCase()));
 
-        <div className="flex items-center gap-2 relative" ref={moreRef}>
+  return (
+    <>
+    <div className="space-y-3">
+      {/* Top command bar — generate + more options (no duplicate summary) */}
+      <div className="flex items-center justify-end gap-2 relative" ref={moreRef}>
           <TooltipProvider delayDuration={120}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -227,9 +272,8 @@ export const ReviewAllMode = ({
                       allDone && !generateDone ? "ready-pulse" : ""
                     }`}
                     style={{
-                      background: !anyDecided ? "#E5E7EB" : "#4F6EF7",
+                      background: !anyDecided ? "#E5E7EB" : "#0D9488",
                       color: !anyDecided ? "#9CA3AF" : "#FFFFFF",
-                      boxShadow: allDone && !generateDone ? "0 0 0 0 rgba(37,99,235,0.5)" : undefined,
                     }}
                   >
                     {isGenerating ? (
@@ -239,7 +283,7 @@ export const ReviewAllMode = ({
                     ) : allDone ? (
                       <>Generate Amazon file <ArrowRight className="w-3.5 h-3.5" /></>
                     ) : anyDecided ? (
-                      <>Generate file ({decisionsMade}/{totalRows})</>
+                      <>Generate file ({decisionsMade}/{totalRows}) <ArrowRight className="w-3.5 h-3.5" /></>
                     ) : (
                       <>Generate Amazon file</>
                     )}
@@ -295,7 +339,6 @@ export const ReviewAllMode = ({
             </div>
           )}
         </div>
-      </div>
 
       {/* ─── Tab bar ─── */}
       <div className="flex items-end gap-2 overflow-x-auto pb-1">
@@ -318,7 +361,7 @@ export const ReviewAllMode = ({
                 </span>
                 <span
                   className="ml-auto inline-flex items-center justify-center min-w-[20px] h-[18px] px-1.5 rounded-full text-[10.5px] font-mono-nums font-semibold text-white"
-                  style={{ background: isActive ? "#4F6EF7" : "#9CA3AF" }}
+                  style={{ background: isActive ? "#0D9488" : "#9CA3AF" }}
                 >
                   {count}
                 </span>
@@ -334,7 +377,27 @@ export const ReviewAllMode = ({
         })}
       </div>
 
-      {/* ─── Bulk action bar ─── */}
+      {/* ─── Focus filter pills ─── */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {([
+          { id: 'all', label: 'All', icon: '', count: focusMeta.all },
+          { id: 'pause', label: 'Pause candidates', icon: '🔴', count: focusMeta.pause },
+          { id: 'review', label: 'Needs review', icon: '🟡', count: focusMeta.review },
+          { id: 'decided', label: 'Decided', icon: '✓', count: focusMeta.decided },
+          { id: 'highspend', label: 'High spend', icon: '💰', count: focusMeta.highspend },
+        ] as const).map(f => (
+          <button
+            key={f.id}
+            onClick={() => setFocusFilter(f.id as FocusFilter)}
+            className={`focus-pill ${focusFilter === f.id ? 'is-active' : ''}`}
+          >
+            {f.icon && <span aria-hidden>{f.icon}</span>}
+            {f.label}
+            <span className="count">· {f.count}</span>
+          </button>
+        ))}
+      </div>
+
       <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
         <div className="flex items-center justify-between gap-2 px-4 py-2.5 bg-[#F9FAFB] border-b border-border flex-wrap">
           {pauseConfirm ? (
@@ -364,7 +427,7 @@ export const ReviewAllMode = ({
                 <button
                   onClick={applyAISuggestions}
                   className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12.5px] font-semibold text-white btn-press"
-                  style={{ background: "#4F6EF7" }}
+                  style={{ background: "#0D9488" }}
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   Apply all AI suggestions
@@ -378,15 +441,7 @@ export const ReviewAllMode = ({
                     Select all → Cut Bid
                   </button>
                 )}
-                {decisionOptions.includes("Pause") && (
-                  <button
-                    onClick={() => setPauseConfirm(true)}
-                    className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12.5px] font-medium border border-border bg-card text-foreground hover:bg-secondary btn-press"
-                  >
-                    <span className="w-2 h-2 rounded-full" style={{ background: "#EF4444" }} />
-                    Select all → Pause
-                  </button>
-                )}
+                {/* "Select all → Pause" removed (too dangerous as one-click). Available in command palette (/). */}
                 {decisionOptions.includes("Keep") && (
                   <button
                     onClick={() => setAllInSheet("Keep")}
@@ -410,14 +465,14 @@ export const ReviewAllMode = ({
           )}
         </div>
 
-        {/* ─── Contextual callout for Search Terms ─── */}
+        {/* ─── Contextual amber callout for Search Terms ─── */}
         {isSearchTermSheet && (
           <div
             className="px-4 py-2.5 border-b flex items-start gap-2"
-            style={{ background: 'rgba(99, 102, 241, 0.08)', borderBottomColor: 'rgba(99, 102, 241, 0.25)' }}
+            style={{ background: '#FFFBEB', borderBottomColor: '#FDE68A', borderLeft: '3px solid #F59E0B' }}
           >
-            <Info className="w-4 h-4 mt-px flex-shrink-0" style={{ color: '#6366F1' }} />
-            <p className="text-[12.5px]" style={{ color: '#4338CA' }}>
+            <Info className="w-4 h-4 mt-px flex-shrink-0" style={{ color: '#F59E0B' }} />
+            <p className="text-[12.5px]" style={{ color: '#92400E' }}>
               <strong>Pause</strong> on search terms auto-converts to <strong>Negate (Exact)</strong> when generating the Amazon file.
             </p>
           </div>
@@ -536,7 +591,7 @@ export const ReviewAllMode = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedIndices.map((rowIdx) => {
+              {sortedIndices.filter(passesFilter).map((rowIdx) => {
                 const row = currentRows[rowIdx];
                 const key = `${currentSheet}-ROWINDEX-${rowIdx}`;
                 const decision = decisions[key];
@@ -547,15 +602,15 @@ export const ReviewAllMode = ({
                 const acosNum = parseAcosNum(row.acos);
                 const hasAcos = acosNum >= 0 && row.acos && row.acos !== "0" && row.acos !== "0%";
                 const decisionPill = DECISION_PILL(decision);
-                // Sticky-right Decision cell needs a solid bg matching the row stripe.
                 const isEven = rowIdx % 2 === 1;
                 const decisionCellBg = isEven ? '#F9FAFB' : '#FFFFFF';
+                const heatColor = spendBandColor(row.spend || 0, !!decision);
 
                 return (
                   <TableRow
                     key={rowIdx}
                     className={`${indicatorClass} transition-opacity`}
-                    style={{ opacity: decision ? 0.9 : 1 }}
+                    style={{ opacity: decision ? 0.88 : 1, boxShadow: `inset 3px 0 0 ${heatColor}` }}
                   >
                     <TableCell className="font-medium" style={{ width: 220 }}>
                       <TooltipProvider delayDuration={300}>
@@ -659,5 +714,45 @@ export const ReviewAllMode = ({
         </div>
       </div>
     </div>
+
+      {/* "/" hint */}
+      <div className="fixed bottom-3 left-3 text-[11px] z-20" style={{ color: '#9CA3AF' }}>
+        Press <kbd className="px-1.5 py-0.5 rounded font-mono-nums" style={{ background: '#F3F4F6', color: '#374151' }}>/</kbd> for commands
+      </div>
+
+      {/* Command palette */}
+      {paletteOpen && (
+        <div className="fixed inset-0 z-[120] flex items-start justify-center pt-[20vh] px-4" style={{ background: 'rgba(0,0,0,0.4)' }} onClick={() => setPaletteOpen(false)}>
+          <div
+            className="w-full max-w-[480px] rounded-xl overflow-hidden"
+            style={{ background: '#1F2937', border: '1px solid #374151', boxShadow: '0 25px 60px rgba(0,0,0,0.5)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              autoFocus
+              value={paletteQuery}
+              onChange={(e) => setPaletteQuery(e.target.value)}
+              placeholder="Type a command or filter..."
+              className="w-full bg-transparent text-white px-4 py-3 text-[14px] outline-none border-b"
+              style={{ borderColor: '#374151' }}
+            />
+            <div className="max-h-[320px] overflow-y-auto py-1">
+              {filteredCommands.length === 0 ? (
+                <div className="px-4 py-3 text-[13px]" style={{ color: '#9CA3AF' }}>No matching commands</div>
+              ) : filteredCommands.map(c => (
+                <button
+                  key={c.id}
+                  onClick={() => { c.run(); setPaletteOpen(false); setPaletteQuery(''); }}
+                  className="w-full text-left px-4 py-2 text-[13px] hover:bg-white/5"
+                  style={{ color: '#F3F4F6' }}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };

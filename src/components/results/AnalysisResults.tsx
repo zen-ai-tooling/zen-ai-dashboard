@@ -144,7 +144,7 @@ export const AnalysisResults = ({
   useEffect(() => { setSelectedRowIdx(null); setPanelComplete(false); }, [currentSheet]);
 
   // Build the side-panel button spec — uses unified color system.
-  // PAUSE #EF4444 · CUT BID #F59E0B · KEEP #10B981 · NEGATIVE #6366F1
+  // PAUSE #EF4444 · CUT BID #F59E0B · KEEP #059669 · NEGATIVE #6366F1
   const panelButtonSpecs: DecisionButtonSpec[] = useMemo(() => {
     return decisionOptions.map((opt) => {
       if (opt === 'Pause') {
@@ -154,7 +154,7 @@ export const AnalysisResults = ({
         return { value: 'Cut Bid 50%', label: 'Cut Bid 50%', bg: 'rgba(245, 158, 11, 0.10)', color: '#B45309', border: 'rgba(245, 158, 11, 0.25)', hoverBg: 'rgba(245, 158, 11, 0.18)' };
       }
       if (opt === 'Keep') {
-        return { value: 'Keep', label: 'Keep', bg: 'rgba(16, 185, 129, 0.10)', color: '#047857', border: 'rgba(16, 185, 129, 0.25)', hoverBg: 'rgba(16, 185, 129, 0.18)' };
+        return { value: 'Keep', label: 'Keep', bg: 'rgba(5, 150, 105, 0.10)', color: '#047857', border: 'rgba(5, 150, 105, 0.25)', hoverBg: 'rgba(5, 150, 105, 0.18)' };
       }
       // Negate (Exact) / Negate (Phrase) → INFO/NEGATIVE violet
       return { value: opt, label: opt, bg: 'rgba(99, 102, 241, 0.10)', color: '#4338CA', border: 'rgba(99, 102, 241, 0.25)', hoverBg: 'rgba(99, 102, 241, 0.18)' };
@@ -359,7 +359,7 @@ export const AnalysisResults = ({
       { label: 'Paused', count: counts['Pause'] ?? 0, color: '#EF4444' },
       { label: 'Cut Bid 50%', count: counts['Cut Bid 50%'] ?? 0, color: '#F59E0B' },
       { label: 'Negative', count: (counts['Negate (Exact)'] ?? 0) + (counts['Negate (Phrase)'] ?? 0), color: '#6366F1' },
-      { label: 'Keep', count: counts['Keep'] ?? 0, color: '#10B981' },
+      { label: 'Keep', count: counts['Keep'] ?? 0, color: '#059669' },
       { label: 'No decision', count: Math.max(0, allRows.length - decisionsMade), color: '#E5E7EB' },
     ];
     return items;
@@ -384,7 +384,7 @@ export const AnalysisResults = ({
         onDownload={() => lastDownloadRef.current?.()}
         onStartNew={handleStartNew}
         onViewFullResults={() => setShowFullResults(true)}
-        accentColor="#10B981"
+        accentColor="#059669"
         addressedSpend={addressedSpend}
         undecidedSpend={undecidedSpend}
       />
@@ -411,7 +411,7 @@ export const AnalysisResults = ({
         <button
           onClick={() => setShowFullResults(false)}
           className="text-[12.5px] hover:underline btn-press inline-flex items-center gap-1"
-          style={{ color: '#4F6EF7' }}
+          style={{ color: '#0D9488' }}
         >
           ← Back to summary
         </button>
@@ -433,7 +433,7 @@ export const AnalysisResults = ({
                 ? 'text-white shadow-sm'
                 : 'text-[hsl(var(--text-secondary))] hover:text-foreground'
             }`}
-            style={viewMode === 'triage' ? { background: '#4F6EF7' } : undefined}
+            style={viewMode === 'triage' ? { background: '#0D9488' } : undefined}
           >
             <Zap className="w-3.5 h-3.5" /> Triage
           </button>
@@ -446,7 +446,7 @@ export const AnalysisResults = ({
                 ? 'text-white shadow-sm'
                 : 'text-[hsl(var(--text-secondary))] hover:text-foreground'
             }`}
-            style={viewMode === 'review' ? { background: '#4F6EF7' } : undefined}
+            style={viewMode === 'review' ? { background: '#0D9488' } : undefined}
           >
             <ListIcon className="w-3.5 h-3.5" /> Review All
           </button>
@@ -474,7 +474,7 @@ export const AnalysisResults = ({
             </span>
             <span className="text-[12.5px] tabular-nums inline-flex items-center gap-1">
               <span aria-hidden>💰</span>
-              <span className="font-semibold" style={{ color: '#10B981' }}>
+              <span className="font-semibold" style={{ color: '#059669' }}>
                 ${Math.round(addressedSavings).toLocaleString()}
               </span>
               <span className="text-[#9CA3AF]">addressed</span>
@@ -509,14 +509,21 @@ export const AnalysisResults = ({
 
         const decisionSpecsBySheet = (sheet: string): TriageDecisionSpec[] => {
           const opts = getDecisionOptions(sheet);
-          return opts.map((opt) => {
+          const isSearchTerm = /search term/i.test(sheet);
+          const map = (opt: string): TriageDecisionSpec => {
             if (opt === 'Pause') return { value: 'Pause', label: 'PAUSE', bg: '#EF4444', color: '#FFFFFF', shortcut: 'P', countsAsSavings: true };
             if (opt === 'Cut Bid 50%') return { value: 'Cut Bid 50%', label: 'CUT BID', bg: '#F59E0B', color: '#FFFFFF', shortcut: 'C', countsAsSavings: true };
-            if (opt === 'Keep') return { value: 'Keep', label: 'KEEP', bg: '#10B981', color: '#FFFFFF', shortcut: 'K', countsAsSavings: false };
-            // Negate variants → INFO/NEGATIVE violet
-            if (opt.startsWith('Negat')) return { value: opt, label: opt.includes('Phrase') ? 'NEG (PHRASE)' : 'NEGATIVE', bg: '#6366F1', color: '#FFFFFF', shortcut: opt.includes('Phrase') ? 'N' : 'N', countsAsSavings: true };
+            if (opt === 'Keep') return { value: 'Keep', label: 'KEEP', bg: '#059669', color: '#FFFFFF', shortcut: 'K', countsAsSavings: false };
+            if (opt === 'Negate (Phrase)') return { value: opt, label: 'NEG PHRASE', bg: '#8B5CF6', color: '#FFFFFF', shortcut: 'M', countsAsSavings: true };
+            if (opt.startsWith('Negat')) return { value: opt, label: 'NEGATIVE', bg: '#6366F1', color: '#FFFFFF', shortcut: 'N', countsAsSavings: true };
             return { value: opt, label: opt.toUpperCase(), bg: '#9CA3AF', color: '#FFFFFF', shortcut: opt[0].toUpperCase(), countsAsSavings: false };
-          });
+          };
+          const specs = opts.map(map);
+          if (isSearchTerm) {
+            const order = ['Negate (Exact)', 'Negate (Phrase)', 'Keep', 'Pause'];
+            return [...specs].sort((a, b) => order.indexOf(a.value) - order.indexOf(b.value));
+          }
+          return specs;
         };
 
         return (
