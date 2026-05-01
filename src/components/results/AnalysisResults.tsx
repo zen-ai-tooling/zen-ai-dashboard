@@ -393,8 +393,8 @@ export const AnalysisResults = ({
 
   return (
     <div className="space-y-5">
-      {/* Lifetime mode notice */}
-      {mode === 'lifetime' && (
+      {/* Lifetime mode notice — hidden during Triage */}
+      {mode === 'lifetime' && viewMode !== 'triage' && (
         <div className="rounded-lg border border-[hsl(var(--amber-border))] bg-[hsl(var(--amber-light))] px-4 py-3 flex items-start gap-2.5">
           <AlertTriangle className="w-4 h-4 text-[hsl(var(--amber))] flex-shrink-0 mt-px" strokeWidth={1.8} />
           <div>
@@ -453,7 +453,8 @@ export const AnalysisResults = ({
         </div>
       </div>
 
-      {/* Single command bar — stats · stepper · decisions · addressed */}
+      {/* Single command bar — hidden during Triage */}
+      {viewMode !== 'triage' && (
       <CompactStatsBar
         accent={mode === 'lifetime' ? 'purple' : 'red'}
         stats={[
@@ -504,6 +505,7 @@ export const AnalysisResults = ({
           </>
         }
       />
+      )}
 
       {/* TRIAGE MODE ─────────────────────────────────────── */}
       {viewMode === 'triage' && sheetNames.length > 0 && (() => {
@@ -559,6 +561,7 @@ export const AnalysisResults = ({
             onSwitchToReview={() => setViewMode('review')}
             totalSpend={totalSpend}
             sheetsCount={sheetsCount}
+            addressedSavings={addressedSavings}
             shortSheetLabel={shortTabLabel}
           />
         );

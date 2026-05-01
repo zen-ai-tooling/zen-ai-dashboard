@@ -915,21 +915,17 @@
   to   { opacity: 1; transform: translateX(0); }
 }
 
-/* ───── Triage Mode full-bleed ───── */
-body.triage-active [data-sidebar="sidebar"],
-body.triage-active aside.app-sidebar {
-  transform: translateX(-100%);
-  transition: transform 200ms ease-in-out;
+/* ───── Triage Mode — dark content area, sidebar untouched ───── */
+body.triage-active main {
+  background: #0F1117 !important;
+  padding: 0 !important;
 }
-body.triage-active .app-topbar { display: none; }
-body.triage-active main { padding: 0 !important; }
 
-.triage-fullbleed {
-  position: fixed;
-  inset: 0;
+.triage-content {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 52px);
   background: #0F1117;
-  z-index: 100;
-  overflow: hidden;
   animation: triage-fade-in 200ms ease-out;
 }
 @keyframes triage-fade-in {
