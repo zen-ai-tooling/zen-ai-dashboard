@@ -246,11 +246,11 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             key={current.key + (direction === 'right' ? '-r' : '-l')}
             className="bg-white text-[#111827]"
             style={{
-              width: '90vw',
+              width: '85%',
               maxWidth: 640,
               borderRadius: 16,
               padding: 32,
-              boxShadow: '0 25px 60px rgba(0,0,0,0.4)',
+              boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
               animation: direction === 'right'
                 ? 'triage-in-right 220ms ease-out'
                 : 'triage-in-left 220ms ease-out',
