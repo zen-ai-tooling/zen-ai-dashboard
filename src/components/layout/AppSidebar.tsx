@@ -103,7 +103,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
               x="149"
               y="212"
               font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
-              font-size="30"
+              font-size="26"
               font-weight="500"
               letter-spacing="0.2"
               fill="#9CA3AF"
@@ -225,7 +225,9 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             {activeClient.initials}
           </div>
           <div className="text-left min-w-0 flex-1">
-            <div className="text-[13px] font-semibold text-white truncate leading-tight" title={activeClient.name}>{activeClient.name}</div>
+            <div className="text-[13px] font-semibold text-white truncate leading-tight" title={activeClient.name}>
+              {activeClient.name}
+            </div>
             <div className="text-[11px] text-[#9CA3AF] mt-0.5 uppercase" style={{ letterSpacing: "0.08em" }}>
               Active workspace
             </div>
