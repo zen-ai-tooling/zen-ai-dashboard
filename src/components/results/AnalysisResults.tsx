@@ -13,6 +13,8 @@ import { suggestB1Row } from "@/lib/ui/bleeder1Suggestion";
 import { TriageMode, type TriageItem, type TriageDecisionSpec } from "@/components/results/TriageMode";
 import { ReviewAllMode } from "@/components/results/ReviewAllMode";
 import { Zap, List as ListIcon } from "lucide-react";
+import { processDecisions } from '@/lib/decisionProcessor';
+import * as XLSX from 'xlsx';
 
 interface TopSpender {
   term: string;
