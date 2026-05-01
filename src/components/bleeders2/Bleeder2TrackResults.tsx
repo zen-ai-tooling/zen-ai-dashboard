@@ -139,6 +139,38 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
     return { high: q(0.75), low: q(0.25) };
   }, [result.bleeders]);
 
+  // Filter pill counts (mirror Bleeders 1.0 buckets)
+  const focusMeta = useMemo(() => {
+    let pause = 0, review = 0, decided = 0, highspend = 0;
+    result.bleeders.forEach((b, idx) => {
+      const sug = suggestions[idx];
+      if (sug?.decision === 'Pause') pause++;
+      else if (sug && sug.decision !== 'Keep') review++;
+      if (decisions[idx]) decided++;
+      if ((b.spend || 0) >= urgencyBands.high && (b.spend || 0) > 0) highspend++;
+    });
+    return { all: result.bleeders.length, pause, review, decided, highspend };
+  }, [result.bleeders, suggestions, decisions, urgencyBands.high]);
+
+  const matchesFocus = (idx: number): boolean => {
+    if (focusFilter === 'all') return true;
+    const b = result.bleeders[idx];
+    const sug = suggestions[idx];
+    if (focusFilter === 'pause') return sug?.decision === 'Pause';
+    if (focusFilter === 'review') return !!sug && sug.decision !== 'Keep' && sug.decision !== 'Pause';
+    if (focusFilter === 'decided') return !!decisions[idx];
+    if (focusFilter === 'highspend') return (b.spend || 0) >= urgencyBands.high && (b.spend || 0) > 0;
+    return true;
+  };
+
+  const filteredSortedIndices = useMemo(
+    () => sortedIndices.filter(matchesFocus),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sortedIndices, focusFilter, decisions, suggestions, urgencyBands.high]
+  );
+
+  const isSearchTermSheet = result.trackType === 'SP';
+
   const handleSetAllPause = () => {
     const all: Record<number, string> = {};
     result.bleeders.forEach((_, idx) => { all[idx] = 'Pause'; });
