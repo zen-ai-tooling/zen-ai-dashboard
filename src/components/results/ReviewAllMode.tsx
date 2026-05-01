@@ -298,8 +298,11 @@ export const ReviewAllMode = ({
         })}
       </div>
 
-      {/* ─── Focus filter pills ─── */}
+      {/* ─── Focus filter pills with tab-scoped label ─── */}
       <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-[11px] font-medium" style={{ color: '#9CA3AF' }}>
+          {shortTabLabel(currentSheet)}:
+        </span>
         {([
           { id: 'all', label: 'All', icon: '', count: focusMeta.all },
           { id: 'pause', label: 'Pause candidates', icon: '🔴', count: focusMeta.pause },
