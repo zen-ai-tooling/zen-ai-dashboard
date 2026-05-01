@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CheckCircle2, SkipForward, Undo2, Info, Keyboard, X, Sparkles, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, SkipForward, Undo2, Info, Keyboard, X, Sparkles, AlertTriangle, ArrowRight } from 'lucide-react';
 import { suggestB1Row } from '@/lib/ui/bleeder1Suggestion';
 
 /**
@@ -620,5 +620,5 @@ const PipelineStep: React.FC<{ state: 'done' | 'active' | 'pending'; label: stri
 };
 
 const Arrow: React.FC = () => (
-  <span style={{ color: 'rgba(255,255,255,0.30)' }}>→</span>
+  <ArrowRight style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.30)' }} strokeWidth={2} />
 );
