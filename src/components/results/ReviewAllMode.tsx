@@ -590,7 +590,7 @@ export const ReviewAllMode = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedIndices.map((rowIdx) => {
+              {sortedIndices.filter(passesFilter).map((rowIdx) => {
                 const row = currentRows[rowIdx];
                 const key = `${currentSheet}-ROWINDEX-${rowIdx}`;
                 const decision = decisions[key];
@@ -601,15 +601,15 @@ export const ReviewAllMode = ({
                 const acosNum = parseAcosNum(row.acos);
                 const hasAcos = acosNum >= 0 && row.acos && row.acos !== "0" && row.acos !== "0%";
                 const decisionPill = DECISION_PILL(decision);
-                // Sticky-right Decision cell needs a solid bg matching the row stripe.
                 const isEven = rowIdx % 2 === 1;
                 const decisionCellBg = isEven ? '#F9FAFB' : '#FFFFFF';
+                const heatColor = spendBandColor(row.spend || 0, !!decision);
 
                 return (
                   <TableRow
                     key={rowIdx}
                     className={`${indicatorClass} transition-opacity`}
-                    style={{ opacity: decision ? 0.9 : 1 }}
+                    style={{ opacity: decision ? 0.88 : 1, boxShadow: `inset 3px 0 0 ${heatColor}` }}
                   >
                     <TableCell className="font-medium" style={{ width: 220 }}>
                       <TooltipProvider delayDuration={300}>
