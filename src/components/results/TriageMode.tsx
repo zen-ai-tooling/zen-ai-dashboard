@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CheckCircle2, SkipForward, Undo2, Info, Keyboard, X, Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, SkipForward, Undo2, Info, Sparkles, ArrowRight } from 'lucide-react';
 import { suggestB1Row } from '@/lib/ui/bleeder1Suggestion';
 
 /**
@@ -84,7 +84,6 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   const [history, setHistory] = React.useState<string[]>([]);
   const [cursor, setCursor] = React.useState(0);
   const [direction, setDirection] = React.useState<'left' | 'right'>('right');
-  const [showLegend, setShowLegend] = React.useState(true);
   const [showThreshold, setShowThreshold] = React.useState(false);
 
   // Toggle the body class so the global sidebar slides out and the topbar hides.
