@@ -233,7 +233,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             </div>
             <div className="text-[12.5px] font-mono-nums inline-flex items-center gap-1.5">
               <span aria-hidden>💰</span>
-              <span className="font-semibold tabular-nums" style={{ color: '#10B981' }}>
+              <span className="font-semibold tabular-nums" style={{ color: '#059669' }}>
                 ${savingsAnimated.toLocaleString()}
               </span>
               <span style={{ color: 'rgba(255,255,255,0.55)' }}>addressed</span>
@@ -245,7 +245,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
         <div className="h-1 w-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
           <div
             className="h-full transition-all duration-500 ease-out"
-            style={{ width: `${progressPct}%`, background: '#4F6EF7' }}
+            style={{ width: `${progressPct}%`, background: '#0D9488' }}
           />
         </div>
       </div>
@@ -268,15 +268,15 @@ export const TriageMode: React.FC<TriageModeProps> = ({
           >
             <div
               className="mx-auto w-14 h-14 rounded-full flex items-center justify-center animate-scale-in"
-              style={{ background: 'rgba(16, 185, 129, 0.12)' }}
+              style={{ background: 'rgba(5, 150, 105, 0.12)' }}
             >
-              <CheckCircle2 className="w-8 h-8" style={{ color: '#10B981' }} strokeWidth={2.4} />
+              <CheckCircle2 className="w-8 h-8" style={{ color: '#059669' }} strokeWidth={2.4} />
             </div>
             <h2 className="mt-5 text-[24px] font-semibold" style={{ color: '#111827' }}>
               All {total} bleeders addressed
             </h2>
             <p className="mt-2 text-[14px]" style={{ color: '#6B7280' }}>
-              <span className="font-semibold" style={{ color: '#10B981' }}>
+              <span className="font-semibold" style={{ color: '#059669' }}>
                 ${Math.round(savingsTarget).toLocaleString()}
               </span>{' '}
               protected from at-risk spend.
@@ -293,7 +293,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
               <button
                 onClick={onGenerate}
                 className="px-5 h-10 rounded-lg text-[13px] font-semibold text-white btn-press inline-flex items-center gap-1.5"
-                style={{ background: '#4F6EF7' }}
+                style={{ background: '#0D9488' }}
               >
                 Generate Amazon file
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -327,7 +327,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                 {decisions[current.key] && (
                   <span
                     className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded-md"
-                    style={{ background: 'rgba(16, 185, 129, 0.12)', color: '#047857' }}
+                    style={{ background: 'rgba(5, 150, 105, 0.12)', color: '#047857' }}
                   >
                     <CheckCircle2 className="w-3 h-3" />
                     Decided · {decisions[current.key]}
@@ -393,7 +393,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                 accent={
                   current.acosNum < 0 ? '#9CA3AF'
                   : current.acosNum >= 100 ? '#EF4444'
-                  : '#10B981'
+                  : '#059669'
                 }
               />
             </div>
@@ -613,8 +613,8 @@ const Metric: React.FC<{ label: string; value: string; accent?: string }> = ({ l
 
 const PipelineStep: React.FC<{ state: 'done' | 'active' | 'pending'; label: string }> = ({ state, label }) => {
   const dot =
-    state === 'done' ? '#10B981'
-    : state === 'active' ? '#4F6EF7'
+    state === 'done' ? '#059669'
+    : state === 'active' ? '#0D9488'
     : 'rgba(255,255,255,0.30)';
   const text =
     state === 'active' ? '#FFFFFF'

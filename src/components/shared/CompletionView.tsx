@@ -41,7 +41,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
   onDownload,
   onStartNew,
   onViewFullResults,
-  accentColor = '#10B981',
+  accentColor = '#059669',
   impactHeadline,
   impactSubtitle,
   totalRows,
@@ -90,7 +90,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
             <div
               className="relative w-[72px] h-[72px] rounded-full flex items-center justify-center mx-auto"
               style={{
-                background: '#10B981',
+                background: '#059669',
                 animation: 'cv-hero-pop 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both',
               }}
             >
@@ -138,7 +138,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
                 onClick={onStartNew}
                 className="rounded-[10px] btn-press inline-flex items-center gap-1.5"
                 style={{
-                  background: '#4F6EF7',
+                  background: '#0D9488',
                   color: '#fff',
                   padding: '12px 24px',
                   fontSize: 14,
@@ -286,7 +286,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
             {allDecided ? (
               <p
                 className="mt-4 inline-flex items-center gap-1.5"
-                style={{ fontSize: 13, color: '#10B981', fontWeight: 600 }}
+                style={{ fontSize: 13, color: '#059669', fontWeight: 600 }}
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Every bleeder has been addressed
@@ -305,8 +305,8 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
         <div
           className="mt-4 flex items-start gap-3"
           style={{
-            background: 'rgba(79, 110, 247, 0.06)',
-            borderLeft: '3px solid #4F6EF7',
+            background: 'rgba(13, 148, 136, 0.06)',
+            borderLeft: '3px solid #0D9488',
             borderRadius: 8,
             padding: '16px 20px',
             animation: 'cv-slide-up 200ms ease-out 1000ms both',
@@ -314,9 +314,9 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
         >
           <div
             className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ background: 'rgba(79, 110, 247, 0.10)' }}
+            style={{ background: 'rgba(13, 148, 136, 0.10)' }}
           >
-            <Info className="w-4 h-4" style={{ color: '#4F6EF7' }} />
+            <Info className="w-4 h-4" style={{ color: '#0D9488' }} />
           </div>
           <div className="min-w-0 flex-1">
             <h4
@@ -345,7 +345,7 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
             <button
               onClick={onViewFullResults}
               className="hover:underline btn-press inline-flex items-center gap-1.5"
-              style={{ fontSize: 13, fontWeight: 500, color: '#4F6EF7' }}
+              style={{ fontSize: 13, fontWeight: 500, color: '#0D9488' }}
             >
               View full results
               <ArrowRight className="w-3.5 h-3.5" />

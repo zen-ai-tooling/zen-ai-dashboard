@@ -59,7 +59,7 @@ const DECISION_PILL = (decision: string): { bg: string; color: string; label: st
   if (!decision) return null;
   if (decision === "Pause") return { bg: "#EF4444", color: "#FFFFFF", label: "Pause" };
   if (decision.startsWith("Cut")) return { bg: "#F59E0B", color: "#FFFFFF", label: "Cut Bid" };
-  if (decision === "Keep") return { bg: "#10B981", color: "#FFFFFF", label: "Keep" };
+  if (decision === "Keep") return { bg: "#059669", color: "#FFFFFF", label: "Keep" };
   if (decision.startsWith("Negat")) return { bg: "#6366F1", color: "#FFFFFF", label: decision.includes("Phrase") ? "Negative (P)" : "Negative" };
   return { bg: "#9CA3AF", color: "#FFFFFF", label: decision };
 };
@@ -195,8 +195,8 @@ export const ReviewAllMode = ({
           <div
             className="inline-flex items-center gap-2 h-8 px-3 rounded-full font-mono-nums text-[12.5px] font-semibold"
             style={{
-              background: allDone ? "rgba(16, 185, 129, 0.12)" : "rgba(79, 110, 247, 0.08)",
-              color: allDone ? "#047857" : "#4F6EF7",
+              background: allDone ? "rgba(5, 150, 105, 0.12)" : "rgba(13, 148, 136, 0.08)",
+              color: allDone ? "#047857" : "#0D9488",
             }}
           >
             {allDone && <CheckCircle2 className="w-3.5 h-3.5" />}
@@ -227,7 +227,7 @@ export const ReviewAllMode = ({
                       allDone && !generateDone ? "ready-pulse" : ""
                     }`}
                     style={{
-                      background: !anyDecided ? "#E5E7EB" : "#4F6EF7",
+                      background: !anyDecided ? "#E5E7EB" : "#0D9488",
                       color: !anyDecided ? "#9CA3AF" : "#FFFFFF",
                       boxShadow: allDone && !generateDone ? "0 0 0 0 rgba(37,99,235,0.5)" : undefined,
                     }}
@@ -318,7 +318,7 @@ export const ReviewAllMode = ({
                 </span>
                 <span
                   className="ml-auto inline-flex items-center justify-center min-w-[20px] h-[18px] px-1.5 rounded-full text-[10.5px] font-mono-nums font-semibold text-white"
-                  style={{ background: isActive ? "#4F6EF7" : "#9CA3AF" }}
+                  style={{ background: isActive ? "#0D9488" : "#9CA3AF" }}
                 >
                   {count}
                 </span>
@@ -364,7 +364,7 @@ export const ReviewAllMode = ({
                 <button
                   onClick={applyAISuggestions}
                   className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12.5px] font-semibold text-white btn-press"
-                  style={{ background: "#4F6EF7" }}
+                  style={{ background: "#0D9488" }}
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   Apply all AI suggestions
