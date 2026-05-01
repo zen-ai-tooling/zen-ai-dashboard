@@ -941,11 +941,14 @@ body.triage-active .app-topbar button:hover {
   background: rgba(255,255,255,0.06) !important;
 }
 
-.triage-content {
-  position: relative;
-  width: 100%;
-  min-height: calc(100vh - 52px);
+.triage-container {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 1fr;
+  height: calc(100vh - 52px);
   background: #0F1117;
+  position: relative;
+  overflow: hidden;
   animation: triage-fade-in 200ms ease-out;
 }
 @keyframes triage-fade-in {
