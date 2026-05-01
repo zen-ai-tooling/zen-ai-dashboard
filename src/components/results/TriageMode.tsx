@@ -529,59 +529,59 @@ export const TriageMode: React.FC<TriageModeProps> = ({
         )}
       </div>
 
-      {/* 8. Floating Generate file pill — bottom-center */}
+      {/* 8. Floating Generate file pill — bottom-center of CONTENT area (not viewport) */}
       {!allDone && (
         <button
           onClick={onGenerate}
           disabled={decisionsMade === 0}
-          className="fixed inline-flex items-center gap-1.5 hover:opacity-90 btn-press disabled:opacity-50 disabled:cursor-not-allowed"
+          className="absolute inline-flex items-center gap-1.5 hover:opacity-90 btn-press disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
             left: '50%',
             transform: 'translateX(-50%)',
-            bottom: 24,
+            bottom: 16,
             background: '#0D9488',
             color: '#FFFFFF',
             borderRadius: 24,
-            padding: '10px 24px',
-            fontSize: 13,
+            padding: '8px 20px',
+            fontSize: 12,
             fontWeight: 600,
             boxShadow: '0 4px 16px rgba(13,148,136,0.4)',
-            zIndex: 50,
+            zIndex: 40,
           }}
         >
           Generate file ({decisionsMade}/{total}) <ArrowRight className="w-3.5 h-3.5" />
         </button>
       )}
 
-      {/* 9. Shortcuts panel — fixed bottom-right */}
+      {/* 9. Shortcuts panel — absolute bottom-right of content area */}
       {showLegend ? (
         <div
-          className="fixed"
+          className="absolute"
           style={{
-            right: 24,
-            bottom: 24,
-            width: 192,
+            right: 16,
+            bottom: 16,
+            width: 176,
             background: '#1F2937',
             border: '1px solid #374151',
             borderRadius: 10,
-            padding: '14px 16px',
-            zIndex: 50,
+            padding: '10px 12px',
+            zIndex: 45,
           }}
         >
-          <div className="flex items-center justify-between" style={{ marginBottom: 10 }}>
-            <span className="inline-flex items-center gap-1.5" style={{ color: '#FFFFFF', fontSize: 12, fontWeight: 600 }}>
+          <div className="flex items-center justify-between" style={{ marginBottom: 8 }}>
+            <span className="inline-flex items-center gap-1.5" style={{ color: '#FFFFFF', fontSize: 11, fontWeight: 600 }}>
               ⌨ Shortcuts
             </span>
             <button
               onClick={() => setShowLegend(false)}
               className="hover:opacity-70"
               aria-label="Hide shortcuts"
-              style={{ color: '#9CA3AF', fontSize: 14, lineHeight: 1 }}
+              style={{ color: '#9CA3AF', fontSize: 13, lineHeight: 1 }}
             >
               ×
             </button>
           </div>
-          <div className="flex flex-col" style={{ gap: 8, fontSize: 12 }}>
+          <div className="flex flex-col" style={{ gap: 6, fontSize: 11 }}>
             {currentSpecs.map(s => (
               <ShortcutRow key={s.value} label={s.label} k={s.shortcut.toUpperCase()} />
             ))}
@@ -594,11 +594,11 @@ export const TriageMode: React.FC<TriageModeProps> = ({
       ) : (
         <button
           onClick={() => setShowLegend(true)}
-          className="fixed inline-flex items-center gap-1.5 rounded-full px-3 h-8 text-[11.5px] hover:opacity-90"
+          className="absolute inline-flex items-center gap-1.5 rounded-full px-3 h-7 text-[11px] hover:opacity-90"
           style={{
-            right: 24, bottom: 24,
+            right: 16, bottom: 16,
             background: '#1F2937', border: '1px solid #374151', color: '#FFFFFF',
-            zIndex: 50,
+            zIndex: 45,
           }}
         >
           ⌨ Shortcuts
