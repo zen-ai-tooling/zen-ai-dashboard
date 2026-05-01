@@ -40,24 +40,22 @@ export const PipelineHeader: React.FC<PipelineHeaderProps> = ({
   return (
     <div
       style={{
-        background: '#F0F2F5',
+        background: '#FFFFFF',
         border: '1px solid #E5E7EB',
         borderRadius: 12,
-        padding: '18px 22px',
+        padding: '20px 24px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
       }}
     >
       <div className="flex items-start justify-between gap-6 flex-wrap">
         <div className="min-w-0">
-          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: '#9CA3AF' }}>
-            Active Workflow
-          </p>
-          <h2 className="mt-1" style={{ fontSize: 20, fontWeight: 700, color: '#111827', letterSpacing: '-0.3px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 600, color: '#111827', letterSpacing: '-0.01em' }}>
             {workflowName}
             {workflowVariant && (
-              <span style={{ color: '#374151', fontWeight: 500 }}> ({workflowVariant})</span>
+              <span style={{ color: '#6B7280', fontWeight: 500 }}> · {workflowVariant}</span>
             )}
           </h2>
-          <p className="mt-1" style={{ fontSize: 12, color: '#374151', maxWidth: 600 }}>
+          <p className="mt-1.5" style={{ fontSize: 14, color: '#374151', lineHeight: 1.5, maxWidth: 600 }}>
             {description}
           </p>
         </div>
@@ -80,7 +78,7 @@ export const PipelineHeader: React.FC<PipelineHeaderProps> = ({
                       color: isActive || isDone ? '#FFFFFF' : '#9CA3AF',
                       fontSize: 12,
                       fontWeight: 700,
-                      boxShadow: isActive ? '0 0 0 4px rgba(37, 99, 235, 0.12)' : 'none',
+                      boxShadow: isActive ? '0 0 0 4px rgba(79, 110, 247, 0.12)' : 'none',
                       transition: 'all 200ms ease',
                     }}
                   >
@@ -306,36 +304,24 @@ interface WorkspaceCardProps {
   sidebar?: React.ReactNode;
 }
 
-export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({ sectionLabel, children, sidebar }) => {
+export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({ sectionLabel: _sectionLabel, children, sidebar }) => {
   return (
     <div
       style={{
         background: '#FFFFFF',
         border: '1px solid #E5E7EB',
         borderRadius: 12,
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
         overflow: 'hidden',
       }}
     >
-      <div
-        style={{
-          padding: '14px 22px',
-          borderBottom: '1px solid #F3F4F6',
-          background: '#F9FAFB',
-        }}
-      >
-        <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: '#9CA3AF' }}>
-          {sectionLabel}
-        </p>
-      </div>
-
       {sidebar ? (
         <div className="grid" style={{ gridTemplateColumns: 'minmax(0, 1fr) 280px' }}>
-          <div style={{ padding: 22, borderRight: '1px solid #F3F4F6' }}>{children}</div>
+          <div style={{ padding: 24, borderRight: '1px solid #F3F4F6' }}>{children}</div>
           {sidebar}
         </div>
       ) : (
-        <div style={{ padding: 22 }}>{children}</div>
+        <div style={{ padding: 24 }}>{children}</div>
       )}
     </div>
   );

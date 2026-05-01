@@ -293,7 +293,9 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
               </p>
             ) : noCount > 0 ? (
               <p className="mt-4" style={{ fontSize: 13, color: '#9CA3AF' }}>
-                {noCount === 1 ? '1 row was left at its current state' : `${noCount} rows were left at their current state`}
+                {noCount === 1
+                  ? '1 bleeder skipped — not included in your file'
+                  : `${noCount} bleeders skipped — not included in your file`}
               </p>
             ) : null}
           </div>
@@ -326,8 +328,14 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
             <p style={{ fontSize: 14, color: '#111827', lineHeight: 1.45 }}>
               Your Amazon bulk file is ready to upload back into Campaign Manager.
             </p>
-            <p className="mt-1.5 font-mono-nums" style={{ fontSize: 12, color: '#374151' }}>
-              Amazon Ads → Campaign Manager → Bulk Operations → Upload
+            <p className="mt-1.5 inline-flex items-center gap-1 flex-wrap" style={{ fontSize: 13, color: '#374151' }}>
+              <span>Amazon Ads</span>
+              <span style={{ color: '#D1D5DB' }}>›</span>
+              <span>Campaign Manager</span>
+              <span style={{ color: '#D1D5DB' }}>›</span>
+              <span>Bulk Operations</span>
+              <span style={{ color: '#D1D5DB' }}>›</span>
+              <span>Upload</span>
             </p>
           </div>
         </div>
@@ -336,10 +344,12 @@ export const CompletionView: React.FC<CompletionViewProps> = ({
           <div className="text-center mt-6" style={{ animation: 'cv-fade-in 150ms ease-out 1100ms both' }}>
             <button
               onClick={onViewFullResults}
-              className="hover:underline btn-press"
+              className="hover:underline btn-press inline-flex items-center gap-1.5"
               style={{ fontSize: 13, fontWeight: 500, color: '#4F6EF7' }}
             >
-              View full results → Review all {total} bleeders and decisions
+              View full results
+              <ArrowRight className="w-3.5 h-3.5" />
+              <span style={{ color: '#9CA3AF' }}>Review all {total} bleeders and decisions</span>
             </button>
           </div>
         )}

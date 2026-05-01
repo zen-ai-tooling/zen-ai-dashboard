@@ -18,6 +18,8 @@ interface Props {
   stats: CompactStat[];
   steps: StepDef[];
   accent?: Accent;
+  /** Optional right-side trailing slot — e.g. "23/48 decisions · 💰 $1,026 addressed" */
+  trailing?: React.ReactNode;
 }
 
 const ACCENT_BORDER: Record<Accent, string> = {
@@ -26,65 +28,65 @@ const ACCENT_BORDER: Record<Accent, string> = {
   purple: 'border-t-[2px] border-t-[hsl(265_70%_60%)]',
 };
 
-const ACCENT_BG: Record<Accent, string> = {
-  red: 'rgba(239, 68, 68, 0.02)',
-  amber: 'rgba(245, 158, 11, 0.025)',
-  purple: 'rgba(139, 92, 246, 0.025)',
-};
-
-export const CompactStatsBar: React.FC<Props> = ({ stats, steps, accent = 'red' }) => {
+/**
+ * Single horizontal command bar:
+ * [stats] | [pipeline stepper] | [trailing]
+ * Vertical dividers between sections, all on one row.
+ */
+export const CompactStatsBar: React.FC<Props> = ({ stats, steps, accent = 'red', trailing }) => {
   return (
     <div
-      className={`rounded-xl border border-border shadow-card overflow-hidden ${ACCENT_BORDER[accent]}`}
-      style={{ background: ACCENT_BG[accent] }}
+      className={`rounded-xl border border-border bg-card overflow-hidden ${ACCENT_BORDER[accent]}`}
+      style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
     >
-      {/* Inline stats row */}
-      <div className="flex items-center gap-4 px-5 py-3 flex-wrap">
-        {stats.map((s, i) => (
-          <React.Fragment key={i}>
-            {i > 0 && <span className="h-4 w-px bg-border" aria-hidden />}
-            <div className="flex items-baseline gap-1.5">
-              <span
-                className={`text-[20px] font-semibold font-mono-nums leading-none ${
-                  s.danger ? 'text-destructive' : 'text-foreground'
-                }`}
-              >
-                {s.value}
-              </span>
-              <span className="text-[12px] text-[#9CA3AF]">{s.label}</span>
-            </div>
-          </React.Fragment>
-        ))}
-      </div>
+      <div className="flex items-center gap-5 px-5 h-14 flex-wrap md:flex-nowrap">
+        {/* Stats group */}
+        <div className="flex items-center gap-4 flex-shrink-0">
+          {stats.map((s, i) => (
+            <React.Fragment key={i}>
+              {i > 0 && <span className="text-[#D1D5DB]">·</span>}
+              <div className="flex items-baseline gap-1.5">
+                <span
+                  className={`text-[16px] font-semibold tabular-nums leading-none ${
+                    s.danger ? 'text-destructive' : 'text-foreground'
+                  }`}
+                >
+                  {s.value}
+                </span>
+                <span className="text-[12px] text-[#9CA3AF]">{s.label}</span>
+              </div>
+            </React.Fragment>
+          ))}
+        </div>
 
-      {/* Divider */}
-      <div className="border-t border-[#E5E7EB]" />
+        {/* Divider */}
+        <span className="hidden md:block h-6 w-px bg-[#E5E7EB]" aria-hidden />
 
-      {/* Steps */}
-      <div className="px-5 py-3 bg-card/60">
-        <div className="flex items-center">
+        {/* Pipeline stepper */}
+        <div className="flex items-center flex-1 min-w-0">
           {steps.map((step, i) => {
             const isLast = i === steps.length - 1;
-            const dot = step.status === 'complete' ? (
-              <div className="w-4 h-4 rounded-full bg-success flex items-center justify-center flex-shrink-0">
-                <CheckCircle2 className="w-2.5 h-2.5 text-white" />
-              </div>
-            ) : step.status === 'active' ? (
-              <div className="w-4 h-4 rounded-full bg-primary flex-shrink-0 step-pulse" />
-            ) : (
-              <div className="w-4 h-4 rounded-full border-2 border-border bg-card flex-shrink-0" />
-            );
+            const dot =
+              step.status === 'complete' ? (
+                <div className="w-3.5 h-3.5 rounded-full bg-success flex items-center justify-center flex-shrink-0">
+                  <CheckCircle2 className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                </div>
+              ) : step.status === 'active' ? (
+                <div className="w-3.5 h-3.5 rounded-full bg-primary flex-shrink-0 step-pulse" />
+              ) : (
+                <div className="w-3.5 h-3.5 rounded-full border-2 border-border bg-card flex-shrink-0" />
+              );
             return (
               <React.Fragment key={i}>
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   {dot}
                   <span
-                    className={`text-[11px] font-medium whitespace-nowrap ${
+                    className={`text-[11.5px] font-medium whitespace-nowrap ${
                       step.status === 'complete'
-                        ? 'text-success'
+                        ? 'text-[#9CA3AF]'
                         : step.status === 'active'
-                        ? 'text-primary'
-                        : 'text-[hsl(var(--text-tertiary))]'
+                        ? 'text-[#111827]'
+                        : 'text-[#9CA3AF]'
                     }`}
                   >
                     {step.label}
@@ -92,7 +94,7 @@ export const CompactStatsBar: React.FC<Props> = ({ stats, steps, accent = 'red' 
                 </div>
                 {!isLast && (
                   <div
-                    className={`flex-1 h-px mx-3 ${
+                    className={`flex-1 h-px mx-3 min-w-[16px] ${
                       step.status === 'complete' ? 'bg-success' : 'bg-border'
                     }`}
                   />
@@ -101,6 +103,13 @@ export const CompactStatsBar: React.FC<Props> = ({ stats, steps, accent = 'red' 
             );
           })}
         </div>
+
+        {trailing && (
+          <>
+            <span className="hidden md:block h-6 w-px bg-[#E5E7EB]" aria-hidden />
+            <div className="flex items-center gap-3 flex-shrink-0">{trailing}</div>
+          </>
+        )}
       </div>
     </div>
   );

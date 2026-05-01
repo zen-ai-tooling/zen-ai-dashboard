@@ -589,7 +589,12 @@ export const ReviewAllMode = ({
                     <TableCell className="text-[hsl(var(--text-tertiary))] text-[12px]" style={{ width: 70 }}>{row.match_type || "—"}</TableCell>
                     <TableCell className="text-right font-mono-nums text-[12.5px]" style={{ width: 70 }}>{row.clicks}</TableCell>
                     <TableCell className="text-right font-mono-nums text-[12.5px] font-medium" style={{ width: 90 }}>${row.spend.toFixed(2)}</TableCell>
-                    <TableCell className="text-right font-mono-nums text-[12.5px] text-[hsl(var(--text-secondary))]" style={{ width: 80 }}>${row.sales.toFixed(2)}</TableCell>
+                    <TableCell
+                      className="text-right tabular-nums text-[12.5px]"
+                      style={{ width: 80, color: (row.sales || 0) <= 0 ? '#EF4444' : 'hsl(var(--text-secondary))' }}
+                    >
+                      ${row.sales.toFixed(2)}
+                    </TableCell>
                     <TableCell className="text-right" style={{ width: 80 }}>
                       {hasAcos ? (
                         <span

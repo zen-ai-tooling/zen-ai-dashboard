@@ -222,6 +222,18 @@ export const AnalysisResults = ({
     return { addressedSpend: addressed, undecidedSpend: undecided };
   }, [rowsBySheet, decisions]);
 
+  // Savings counter — at-risk spend on rows decided to anything other than Keep
+  const addressedSavings = useMemo(() => {
+    let s = 0;
+    Object.entries(rowsBySheet).forEach(([sheet, rows]) => {
+      rows.forEach((row, idx) => {
+        const dec = decisions[`${sheet}-ROWINDEX-${idx}`];
+        if (dec && dec !== 'Keep') s += row.spend || 0;
+      });
+    });
+    return s;
+  }, [rowsBySheet, decisions]);
+
   const handleDownload = () => {
     if (formattedWorkbook) {
       formattedWorkbook.xlsx.writeBuffer().then((buffer: ArrayBuffer) => {
@@ -372,7 +384,7 @@ export const AnalysisResults = ({
         onDownload={() => lastDownloadRef.current?.()}
         onStartNew={handleStartNew}
         onViewFullResults={() => setShowFullResults(true)}
-        accentColor="#FF3B30"
+        accentColor="#10B981"
         addressedSpend={addressedSpend}
         undecidedSpend={undecidedSpend}
       />
@@ -398,7 +410,8 @@ export const AnalysisResults = ({
       {generateDone && showFullResults && (
         <button
           onClick={() => setShowFullResults(false)}
-          className="text-[12.5px] text-[#0071E3] hover:underline btn-press"
+          className="text-[12.5px] hover:underline btn-press inline-flex items-center gap-1"
+          style={{ color: '#4F6EF7' }}
         >
           ← Back to summary
         </button>
@@ -440,7 +453,7 @@ export const AnalysisResults = ({
         </div>
       </div>
 
-      {/* Compact stats + workflow steps — single unified container */}
+      {/* Single command bar — stats · stepper · decisions · addressed */}
       <CompactStatsBar
         accent={mode === 'lifetime' ? 'purple' : 'red'}
         stats={[
@@ -453,6 +466,21 @@ export const AnalysisResults = ({
           { label: 'Make decisions', status: generateDone ? 'complete' : 'active' },
           { label: 'Generate Amazon file', status: generateDone ? 'complete' : 'pending' },
         ]}
+        trailing={
+          <>
+            <span className="text-[12.5px] tabular-nums">
+              <span className="font-semibold text-[#111827]">{decisionsMade}/{allRows.length}</span>
+              <span className="ml-1 text-[#9CA3AF]">decisions</span>
+            </span>
+            <span className="text-[12.5px] tabular-nums inline-flex items-center gap-1">
+              <span aria-hidden>💰</span>
+              <span className="font-semibold" style={{ color: '#10B981' }}>
+                ${Math.round(addressedSavings).toLocaleString()}
+              </span>
+              <span className="text-[#9CA3AF]">addressed</span>
+            </span>
+          </>
+        }
       />
 
       {/* TRIAGE MODE ─────────────────────────────────────── */}

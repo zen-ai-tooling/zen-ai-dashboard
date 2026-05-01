@@ -9,7 +9,7 @@
  */
 
 import * as React from 'react';
-import { Info, Loader2 } from 'lucide-react';
+import { Info, Loader2, ArrowRight } from 'lucide-react';
 import {
   PipelineHeader,
   WorkspaceCard,
@@ -192,13 +192,14 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
         <button
           onClick={handleAnalyze}
           disabled={!ready}
-          className="rounded-[10px] btn-press disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+          className="rounded-lg btn-press disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
           style={{
             background: '#4F6EF7',
             color: '#FFFFFF',
-            padding: '12px 24px',
+            height: 36,
+            padding: '0 16px',
             fontSize: 14,
-            fontWeight: 600,
+            fontWeight: 500,
             minWidth: 168,
             justifyContent: 'center',
           }}
@@ -209,7 +210,10 @@ export const LifetimeUploader: React.FC<LifetimeUploaderProps> = ({
               Analyzing…
             </>
           ) : (
-            <>Analyze Files →</>
+            <>
+              Analyze Files
+              <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.2} />
+            </>
           )}
         </button>
       </div>
