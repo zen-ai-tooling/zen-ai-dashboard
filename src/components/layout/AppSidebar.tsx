@@ -70,49 +70,49 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         className="px-6 pt-6 pb-6 text-left btn-press"
       >
         <div>
-          <svg width="175" viewBox="18 82 409 136" xmlns="http://www.w3.org/2000/svg">
-            <g transform="translate(72,160)">
-              <circle cx="0" cy="0" r="52" fill="#9333ea" />
+          <svg width="175" viewBox="18 78 420 148" xmlns="http://www.w3.org/2000/svg">
+            <g transform="translate(76,162)">
+              <circle cx="0" cy="0" r="58" fill="#9333ea" />
               <path
-                d="M0,-52 C10,-42 18,-18 16,10 C14,36 6,50 0,52 C6,50 22,36 32,14 C42,2 40,-26 28,-42 C20,-52 10,-56 0,-52 Z"
+                d="M0,-58 C12,-46 20,-20 18,12 C16,40 6,56 0,58 C6,54 24,38 36,14 C46,0 44,-28 30,-46 C20,-58 10,-62 0,-58 Z"
                 fill="#3b0764"
               />
               <path
-                d="M0,-52 C3,-28 -3,0 0,52"
+                d="M0,-58 C3,-30 -3,2 0,58"
                 stroke-width="1.2"
                 stroke-linecap="round"
                 fill="none"
                 stroke="rgba(255,255,255,0.1)"
               />
-              <ellipse cx="-14" cy="-16" rx="10" ry="14" transform="rotate(-15 -14 -16)" fill="rgba(255,255,255,0.1)" />
+              <ellipse cx="-16" cy="-18" rx="11" ry="15" transform="rotate(-15 -16 -18)" fill="rgba(255,255,255,0.1)" />
               <path
-                d="M0,-52 C-1,-60 1,-68 0,-74"
+                d="M0,-58 C-1,-66 1,-74 0,-80"
                 stroke-width="3"
                 stroke-linecap="round"
                 fill="none"
                 stroke="#ffffff"
               />
-              <path d="M0,-66 C10,-78 28,-80 30,-72 C20,-62 4,-62 0,-66 Z" fill="#a78bfa" />
+              <path d="M0,-72 C10,-84 28,-86 30,-78 C20,-68 4,-68 0,-72 Z" fill="#a78bfa" />
             </g>
             <text
-              x="140"
+              x="148"
               y="172"
               font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
-              font-size="72"
+              font-size="108"
               font-weight="700"
-              letter-spacing="-3.5"
-              fill="#c084fc"
+              letter-spacing="-5"
+              fill="#ffffff"
             >
               adprune
             </text>
             <text
-              x="141"
-              y="202"
+              x="149"
+              y="208"
               font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
-              font-size="25"
+              font-size="18"
               font-weight="400"
               letter-spacing="0.2"
-              fill="#666"
+              fill="#6a6a8a"
             >
               Amazon Ads Optimization
             </text>
