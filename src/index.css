@@ -301,74 +301,70 @@
   /* Number transition (for live computed thresholds) */
   .num-transition { transition: color 200ms ease, transform 200ms ease; }
 
-  /* ─── Premium type scale (unified neutrals) ─── */
-  .type-eyebrow {
-    font-size: 12px;
-    font-weight: 600;
+  /* ─── Unified type scale (DS audit) ───
+     h1 28/700 #111827 −0.02em · h2 22/600 · h3 16/600
+     body 14/400 #374151 lh1.5 · muted 12/400 #9CA3AF
+     label 11/500 #9CA3AF +0.08em UPPERCASE
+     Monospace ONLY for filenames — never headings/metrics/labels. */
+  .type-eyebrow,
+  .type-section-eyebrow,
+  .type-table-head,
+  .type-stat-label {
+    font-size: 11px;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     color: #9CA3AF;
+    font-family: inherit;
   }
   .type-page-title {
-    font-size: 32px;
-    font-weight: 600;
+    font-size: 28px;
+    font-weight: 700;
     line-height: 1.15;
     letter-spacing: -0.02em;
     color: #111827;
+    font-family: inherit;
   }
   .type-page-sub {
-    font-size: 15px;
+    font-size: 14px;
+    font-weight: 400;
     line-height: 1.5;
     color: #374151;
   }
   .type-section-title {
-    font-size: 24px;
-    font-weight: 600;
-    letter-spacing: -0.015em;
-    color: #111827;
-  }
-  .type-section-eyebrow {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #9CA3AF;
-  }
-  .type-card-title {
-    font-size: 17px;
+    font-size: 22px;
     font-weight: 600;
     letter-spacing: -0.01em;
     color: #111827;
   }
+  .type-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    color: #111827;
+  }
   .type-card-desc {
     font-size: 14px;
+    font-weight: 400;
     line-height: 1.5;
     color: #374151;
-  }
-  .type-table-head {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: #9CA3AF;
   }
   .type-table-body {
     font-size: 13px;
     color: #111827;
   }
   .type-stat-num {
-    font-size: 36px;
-    font-weight: 600;
-    letter-spacing: -0.025em;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     color: #111827;
     line-height: 1;
+    font-family: inherit;
+    font-variant-numeric: tabular-nums;
   }
-  .type-stat-label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: #9CA3AF;
+  /* Standardized page content padding (48 top, 40 sides) */
+  .page-shell {
+    padding: 48px 40px 56px;
   }
   /* Surface card — used everywhere instead of gray-on-gray */
   .surface-card {
