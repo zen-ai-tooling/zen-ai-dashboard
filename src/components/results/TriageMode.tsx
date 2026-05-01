@@ -195,8 +195,8 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   };
 
   return (
-    <div className="triage-fullbleed text-white">
-      {/* Top edge: 3px progress bar */}
+    <div className="triage-fullbleed">
+      {/* 3px teal progress bar flush to top of viewport */}
       <div className="absolute top-0 left-0 right-0" style={{ height: 3, background: 'rgba(255,255,255,0.06)' }}>
         <div
           className="h-full transition-all duration-500 ease-out"
@@ -204,50 +204,19 @@ export const TriageMode: React.FC<TriageModeProps> = ({
         />
       </div>
 
-      {/* Floating header (48px) */}
-      <div
-        className="absolute left-0 right-0 flex items-center px-6"
-        style={{ top: 3, height: 48 }}
+      {/* Top-left exit link */}
+      <button
+        onClick={onSwitchToReview}
+        className="absolute hover:text-white transition-colors"
+        style={{ top: 16, left: 20, color: '#9CA3AF', fontSize: 13 }}
       >
-        {/* Left: Exit */}
-        <button
-          onClick={onSwitchToReview}
-          className="inline-flex items-center gap-1.5 text-[13px] hover:text-white transition-colors"
-          style={{ color: '#9CA3AF' }}
-        >
-          <ArrowLeft className="w-3.5 h-3.5" /> Exit triage
-        </button>
+        ← Exit triage
+      </button>
 
-        {/* Center: pipeline stepper */}
-        <div className="hidden md:flex items-center gap-2 text-[11.5px] flex-1 justify-center" style={{ color: 'rgba(255,255,255,0.45)' }}>
-          <PipelineStep state="done" label="File analyzed" />
-          <Arrow />
-          <PipelineStep state={allDone ? 'done' : 'active'} label="Make decisions" />
-          <Arrow />
-          <PipelineStep state={allDone ? 'active' : 'pending'} label="Generate file" />
-        </div>
-
-        {/* Right: counters */}
-        <div className="flex items-center gap-4 ml-auto whitespace-nowrap">
-          <div className="text-[12.5px] tabular-nums">
-            <span className="font-semibold" style={{ color: '#FFFFFF' }}>{decisionsMade} / {total}</span>
-            <span className="ml-1" style={{ color: 'rgba(255,255,255,0.55)' }}>decisions</span>
-          </div>
-          <span style={{ color: 'rgba(255,255,255,0.18)' }}>|</span>
-          <div className="text-[12.5px] tabular-nums inline-flex items-center gap-1.5">
-            <span aria-hidden>💰</span>
-            <span className="font-semibold" style={{ color: '#0D9488' }}>
-              ${savingsAnimated.toLocaleString()}
-            </span>
-            <span style={{ color: 'rgba(255,255,255,0.55)' }}>addressed</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Centered card area */}
+      {/* Centered card area — fills viewport below the 3px progress bar */}
       <div
         className="absolute left-0 right-0 flex items-center justify-center px-4"
-        style={{ top: 51, bottom: 0 }}
+        style={{ top: 3, bottom: 0 }}
       >
         {allDone ? (
           <CompletionCard
