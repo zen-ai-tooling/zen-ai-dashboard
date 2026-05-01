@@ -376,7 +376,27 @@ export const ReviewAllMode = ({
         })}
       </div>
 
-      {/* ─── Bulk action bar ─── */}
+      {/* ─── Focus filter pills ─── */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {([
+          { id: 'all', label: 'All', icon: '', count: focusMeta.all },
+          { id: 'pause', label: 'Pause candidates', icon: '🔴', count: focusMeta.pause },
+          { id: 'review', label: 'Needs review', icon: '🟡', count: focusMeta.review },
+          { id: 'decided', label: 'Decided', icon: '✓', count: focusMeta.decided },
+          { id: 'highspend', label: 'High spend', icon: '💰', count: focusMeta.highspend },
+        ] as const).map(f => (
+          <button
+            key={f.id}
+            onClick={() => setFocusFilter(f.id as FocusFilter)}
+            className={`focus-pill ${focusFilter === f.id ? 'is-active' : ''}`}
+          >
+            {f.icon && <span aria-hidden>{f.icon}</span>}
+            {f.label}
+            <span className="count">· {f.count}</span>
+          </button>
+        ))}
+      </div>
+
       <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
         <div className="flex items-center justify-between gap-2 px-4 py-2.5 bg-[#F9FAFB] border-b border-border flex-wrap">
           {pauseConfirm ? (
