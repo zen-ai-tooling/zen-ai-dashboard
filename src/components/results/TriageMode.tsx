@@ -186,9 +186,9 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   const suggestionFor = (it: TriageItem) => {
     const sug = suggestB1Row({ clicks: it.clicks, spend: it.spend, sales: it.sales, orders: it.orders });
     const map: Record<string, { label: string; accent: string; bg: string }> = {
-      pause:   { label: 'PAUSE',   accent: '#EF4444', bg: 'rgba(239, 68, 68, 0.08)' },
-      review:  { label: 'REVIEW',  accent: '#F59E0B', bg: 'rgba(245, 158, 11, 0.08)' },
-      monitor: { label: 'MONITOR', accent: '#6B7280', bg: 'rgba(107, 114, 128, 0.08)' },
+      pause:   { label: 'PAUSE',   accent: '#EF4444', bg: 'rgba(239, 68, 68, 0.06)' },
+      review:  { label: 'REVIEW',  accent: '#F59E0B', bg: 'rgba(245, 158, 11, 0.06)' },
+      monitor: { label: 'MONITOR', accent: '#6B7280', bg: 'rgba(107, 114, 128, 0.06)' },
       keep:    { label: '',        accent: '',        bg: '' },
     };
     const banner = map[sug.kind] ?? map.keep;
