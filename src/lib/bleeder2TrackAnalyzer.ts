@@ -25,6 +25,7 @@ export interface Bleeder2TrackRow {
   // additions for operator workbook mapping
   source?: "SB" | "SD" | "SP";
   cpc?: number;
+  bid?: number; // Current keyword/target bid from bulk file
   ctr?: number; // percent
   roas?: number; // ratio
   salesWindow?: "7D" | "14D" | "GEN";
@@ -556,6 +557,7 @@ export const analyzeSBSDTrack = async (
     const impressionsCol = findColumnWithAliases(headers, ALIASES.impressions);
     const ctrCol = findColumnWithAliases(headers, ALIASES.ctr);
     const cpcCol = findColumnWithAliases(headers, ALIASES.cpc);
+    const bidCol = findColumnWithAliases(headers, ALIASES.bid);
 
     const ordersCol = pickOrdersCol(headers);
     const salesCol = (() => {
@@ -645,6 +647,7 @@ export const analyzeSBSDTrack = async (
       const clicks = clicksCol !== -1 ? safeParseFloat(row[clicksCol]) : 0;
       const impressions = impressionsCol !== -1 ? safeParseFloat(row[impressionsCol]) : 0;
       const cpc = cpcCol !== -1 ? safeParseFloat(row[cpcCol]) : clicks > 0 ? spend / clicks : 0;
+      const bid = bidCol !== -1 ? safeParseFloat(row[bidCol]) : 0;
       const ctr = ctrCol !== -1 ? safeParseFloat(row[ctrCol]) : impressions > 0 ? (clicks / impressions) * 100 : 0;
       let acos = acosCol !== -1 ? safeParseFloat(row[acosCol]) : calculateACoS(spend, sales);
 
@@ -720,6 +723,7 @@ export const analyzeSBSDTrack = async (
         clicks,
         impressions,
         cpc,
+        bid: bid > 0 ? bid : undefined,
         ctr,
         roas: sales > 0 ? sales / spend : 0,
         source,
@@ -936,6 +940,7 @@ export const analyzeSPKeywordsTrack = async (
     const impressionsCol = findColumnWithAliases(headers, ALIASES.impressions);
     const ctrCol = findColumnWithAliases(headers, ALIASES.ctr);
     const cpcCol = findColumnWithAliases(headers, ALIASES.cpc);
+    const bidCol = findColumnWithAliases(headers, ALIASES.bid);
     const spendCol = findColumnWithAliases(headers, ALIASES.spend);
 
     const ordersCol = pickOrdersCol(headers);
@@ -1138,6 +1143,7 @@ export const analyzeSPKeywordsTrack = async (
       const clicks = clicksCol !== -1 ? safeParseFloat(row[clicksCol]) : 0;
       const impressions = impressionsCol !== -1 ? safeParseFloat(row[impressionsCol]) : 0;
       const cpc = cpcCol !== -1 ? safeParseFloat(row[cpcCol]) : clicks > 0 ? spend / clicks : 0;
+      const bid = bidCol !== -1 ? safeParseFloat(row[bidCol]) : 0;
       const ctr = ctrCol !== -1 ? safeParseFloat(row[ctrCol]) : impressions > 0 ? (clicks / impressions) * 100 : 0;
 
       bleeders.push({
@@ -1152,6 +1158,7 @@ export const analyzeSPKeywordsTrack = async (
         clicks,
         impressions,
         cpc,
+        bid: bid > 0 ? bid : undefined,
         ctr,
         roas: sales > 0 ? sales / spend : 0,
         source: "SP",
