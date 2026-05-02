@@ -162,7 +162,7 @@ export const ReviewAllMode = ({
       const key = `${currentSheet}-ROWINDEX-${idx}`;
       if (sug.kind === "pause") {
         next[key] = isSearchTermSheet ? "Negate (Exact)" : (decisionOptions.includes("Pause") ? "Pause" : decisionOptions[0]);
-      } else if (sug.kind === "cut_bid") {
+      } else if ((sug.kind as string) === "cut_bid") {
         if (decisionOptions.includes("Cut Bid 50%")) next[key] = "Cut Bid 50%";
       } else if (sug.kind === "monitor") {
         // leave undecided — monitor = watch
