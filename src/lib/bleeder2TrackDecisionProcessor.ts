@@ -242,7 +242,7 @@ export const processTrackDecisionFile = async (
     } else if (trackType === "SP_KEYWORDS") {
       // Priority order for entity/targeting text extraction:
       // 1. Product Targeting Expression / Targeting Expression (most specific)
-      // 2. Keyword Text 
+      // 2. Keyword Text
       // 3. Generic fallbacks
       productTargetingCol = findColumn(headers, [
         "Product Targeting Expression",
@@ -262,7 +262,7 @@ export const processTrackDecisionFile = async (
       spendCol = findColumn(headers, ["Spend", "Cost"]);
       entityCol = findColumn(headers, ["Entity", "Campaign", "Targeting"]);
       sourceCol = findColumn(headers, ["Source"]);
-      
+
       // ⭐ CRITICAL FIX: Force decisionCol = 4 (Column E) for ACOS100 track.
       // The Decision column is ALWAYS at index 4 in the ACOS100 decision file format.
       // Do NOT rely on findColumn as it incorrectly returns the Entity column (index 3).
@@ -319,18 +319,6 @@ export const processTrackDecisionFile = async (
       if (normalizedDecision !== decisionRaw.toLowerCase()) {
         typosCorrected++;
       }
-
-      // --- START DEBUG BLOCK ---
-      if (trackType === "ACOS100") {
-        console.log(`DEBUG ACOS: Row ${r} (Excel Row ${r + headerRowIndex + 1}):`);
-        console.log(`  Decision Column Index (decisionCol): ${decisionCol}`);
-        console.log(`  HEADERS: ${headers.join("|")}`);
-        console.log(`  ROW ARRAY LENGTH: ${row.length}`);
-        console.log(`  RAW VALUE AT DECISION COL [${decisionCol}]: "${row[decisionCol]}"`); // Shows what value is at the calculated index
-        console.log(`  ROW CONTENT: ${row.map((c) => (typeof c === "string" ? `"${c}"` : c)).join(", ")}`); // Logs the whole array
-        console.log(`  Final normalizedDecision: "${normalizedDecision}"`);
-      }
-      // --- END DEBUG BLOCK ---
 
       // --- REPLACEMENT for the Channel Inference Block (around line 265) ---
       const campaignName = String(row[campaignCol] ?? "").trim(); // This variable is already defined earlier
@@ -403,28 +391,33 @@ export const processTrackDecisionFile = async (
           }
         } else {
           // --- 🔥 REFINED TEXT EXTRACTION FOR SBSD / SP_KEYWORDS 🔥 ---
-          // Priority Order: 
+          // Priority Order:
           // 1. Product Targeting Expression column (most accurate for targeting rows)
           // 2. Keyword Text column (for keyword rows)
           // 3. Entity column fallback
           // 4. Row scanning for asin=/category= (last resort)
-          
+
           let text = "";
-          
+
           // Priority 1: Product Targeting Expression column
-          if (productTargeting && productTargeting.length > 0 && 
-              productTargeting.toLowerCase() !== "product targeting") {
+          if (
+            productTargeting &&
+            productTargeting.length > 0 &&
+            productTargeting.toLowerCase() !== "product targeting"
+          ) {
             text = productTargeting;
           }
           // Priority 2: Keyword Text column
-          else if (keywordTextRaw && keywordTextRaw.length > 0 && 
-                   keywordTextRaw.toLowerCase() !== "keyword") {
+          else if (keywordTextRaw && keywordTextRaw.length > 0 && keywordTextRaw.toLowerCase() !== "keyword") {
             text = keywordTextRaw;
           }
           // Priority 3: Entity column (if not generic)
-          else if (entity && entity.length > 0 && 
-                   entity.toLowerCase() !== "product targeting" && 
-                   entity.toLowerCase() !== "keyword") {
+          else if (
+            entity &&
+            entity.length > 0 &&
+            entity.toLowerCase() !== "product targeting" &&
+            entity.toLowerCase() !== "keyword"
+          ) {
             text = entity;
           }
           // Priority 4: Row scanning fallback for asin=/category= values
@@ -480,21 +473,22 @@ export const processTrackDecisionFile = async (
       } else if (normalizedDecision === "negative") {
         // REFINED TEXT EXTRACTION - Same priority as pause
         let textToNegate = "";
-        
+
         // Priority 1: Product Targeting Expression column
-        if (productTargeting && productTargeting.length > 0 && 
-            productTargeting.toLowerCase() !== "product targeting") {
+        if (productTargeting && productTargeting.length > 0 && productTargeting.toLowerCase() !== "product targeting") {
           textToNegate = productTargeting;
         }
         // Priority 2: Keyword Text column
-        else if (keywordTextRaw && keywordTextRaw.length > 0 && 
-                 keywordTextRaw.toLowerCase() !== "keyword") {
+        else if (keywordTextRaw && keywordTextRaw.length > 0 && keywordTextRaw.toLowerCase() !== "keyword") {
           textToNegate = keywordTextRaw;
         }
         // Priority 3: Entity column (if not generic)
-        else if (entity && entity.length > 0 && 
-                 entity.toLowerCase() !== "product targeting" && 
-                 entity.toLowerCase() !== "keyword") {
+        else if (
+          entity &&
+          entity.length > 0 &&
+          entity.toLowerCase() !== "product targeting" &&
+          entity.toLowerCase() !== "keyword"
+        ) {
           textToNegate = entity;
         }
         // Priority 4: Customer Search Term fallback (for SP track)
@@ -531,7 +525,7 @@ export const processTrackDecisionFile = async (
         const isPATNegative = isASIN(textToNegate);
 
         // Define the compliant canonical input
-        const targetRecordType = isPATNegative 
+        const targetRecordType = isPATNegative
           ? recordTypes.negativeKeyword(channel) // Will resolve to NegativeProductTargeting for ASIN-based
           : recordTypes.negativeKeyword(channel);
 
@@ -581,21 +575,26 @@ export const processTrackDecisionFile = async (
         } else {
           // REFINED TEXT EXTRACTION - Same priority as pause/negative
           let text = "";
-          
+
           // Priority 1: Product Targeting Expression column
-          if (productTargeting && productTargeting.length > 0 && 
-              productTargeting.toLowerCase() !== "product targeting") {
+          if (
+            productTargeting &&
+            productTargeting.length > 0 &&
+            productTargeting.toLowerCase() !== "product targeting"
+          ) {
             text = productTargeting;
           }
           // Priority 2: Keyword Text column
-          else if (keywordTextRaw && keywordTextRaw.length > 0 && 
-                   keywordTextRaw.toLowerCase() !== "keyword") {
+          else if (keywordTextRaw && keywordTextRaw.length > 0 && keywordTextRaw.toLowerCase() !== "keyword") {
             text = keywordTextRaw;
           }
           // Priority 3: Entity column (if not generic)
-          else if (entity && entity.length > 0 && 
-                   entity.toLowerCase() !== "product targeting" && 
-                   entity.toLowerCase() !== "keyword") {
+          else if (
+            entity &&
+            entity.length > 0 &&
+            entity.toLowerCase() !== "product targeting" &&
+            entity.toLowerCase() !== "keyword"
+          ) {
             text = entity;
           }
           // Priority 4: Row scanning fallback
@@ -656,15 +655,15 @@ export const processTrackDecisionFile = async (
   } else {
     // Group rows by Product type (SP, SB, SD)
     const groupedRows = groupRowsByProduct(builtRows);
-    
+
     // Create a separate tab for each product type that has rows
     const productTypes: AmazonProduct[] = ["Sponsored Products", "Sponsored Brands", "Sponsored Display"];
     let tabsCreated = 0;
-    
+
     for (const product of productTypes) {
       const productRows = groupedRows[product];
       if (productRows.length === 0) continue;
-      
+
       // Use Amazon-required exact tab names
       const tabName = AMAZON_TAB_NAMES[product];
       const sheet = outputWorkbook.addWorksheet(tabName);
@@ -672,7 +671,7 @@ export const processTrackDecisionFile = async (
       productRows.forEach((row) => sheet.addRow(bulkRowToArray(row)));
       tabsCreated++;
     }
-    
+
     if (tabsCreated === 0) {
       validation.warnings.push("Decisions processed but no Amazon Bulk rows constructed.");
       outputWorkbook.addWorksheet("No Bulk Actions");
