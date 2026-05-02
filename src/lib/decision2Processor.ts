@@ -70,8 +70,6 @@ const BULK_HEADERS = [
 // 🛠️ MAIN PROCESSOR V3
 // ---------------------------------------------------------------------------
 export const processDecision2File = async (file: File): Promise<any> => {
-  console.log("*** V3 PROCESSOR ACTIVE ***"); // Check console for this!
-
   const buffer = await file.arrayBuffer();
   const workbook = XLSX.read(buffer, { type: "array" });
 
@@ -261,7 +259,7 @@ export const processDecision2File = async (file: File): Promise<any> => {
 
   // 5. Build Output (Multi-Tab by Product Type)
   type AmazonProduct = "Sponsored Products" | "Sponsored Brands" | "Sponsored Display";
-  
+
   const rowsByProduct: Record<AmazonProduct, any[][]> = {
     "Sponsored Products": [],
     "Sponsored Brands": [],
@@ -308,19 +306,19 @@ export const processDecision2File = async (file: File): Promise<any> => {
 
   const outputWorkbook = XLSX.utils.book_new();
   let tabsCreated = 0;
-  
+
   // Create a separate tab for each product type that has rows
   const productTypes: AmazonProduct[] = ["Sponsored Products", "Sponsored Brands", "Sponsored Display"];
   for (const product of productTypes) {
     const productRows = rowsByProduct[product];
     if (productRows.length === 0) continue;
-    
+
     // Use Amazon-required exact tab names (case-sensitive)
     const sheet = XLSX.utils.aoa_to_sheet([BULK_HEADERS, ...productRows]);
     XLSX.utils.book_append_sheet(outputWorkbook, sheet, product);
     tabsCreated++;
   }
-  
+
   if (tabsCreated === 0) {
     validation.warnings.push("No actionable rows generated.");
   }
