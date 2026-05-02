@@ -300,10 +300,10 @@ const Index = () => {
     }
   };
 
-  const handleBleeder2DecisionUpload = async (file: File, track: Bleeder2Track) => {
+  const handleBleeder2DecisionUpload = async (file: File, track: Bleeder2Track, cutBidPct?: number) => {
     try {
       const { processTrackDecisionFile } = await import("@/lib/bleeder2TrackDecisionProcessor");
-      const result = await processTrackDecisionFile(file, track);
+      const result = await processTrackDecisionFile(file, track, cutBidPct ?? 25);
       if (result.validation.errors.length > 0) {
         toast({ title: "Processing failed", description: result.validation.errors[0], variant: "destructive" });
         return;
@@ -973,7 +973,7 @@ const Index = () => {
               <Bleeder2TrackResults
                 result={bleeder2TrackState[bleeder2ActiveTrack].result!}
                 onDownload={() => handleDownloadDecisionSheet(bleeder2ActiveTrack!)}
-                onUploadDecision={(_, file) => handleBleeder2DecisionUpload(file, bleeder2ActiveTrack!)}
+                onUploadDecision={(_, file, pct) => handleBleeder2DecisionUpload(file, bleeder2ActiveTrack!, pct)}
                 onAdjustThresholds={() => setBleeder2Stage("thresholds")}
                 onUploadNewFile={(track) => handleResetTrack(track)}
                 decisionFile={bleeder2TrackState[bleeder2ActiveTrack].decisionFile}
