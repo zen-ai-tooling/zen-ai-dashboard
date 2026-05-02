@@ -172,6 +172,7 @@ const ALIASES = {
   impressions: ["Impressions", "Viewable Impressions"],
   ctr: ["Click-Thru Rate (CTR)", "CTR", "Click-through Rate", "Click Through Rate"],
   cpc: ["Cost Per Click (CPC)", "CPC"],
+  bid: ["Bid", "Max Bid", "Keyword Bid", "Default Bid", "Max CPC"],
   customerSearchTerm: ["Customer Search Term", "Search Term"],
   ranking: ["Ranking Campaign", "Ranking", "Is Ranking"],
   // Amazon ID columns
