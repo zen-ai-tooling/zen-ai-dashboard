@@ -1616,6 +1616,8 @@ export const analyzeACoS100Track = async (
     })();
 
     const clicksCol = findColumnWithAliases(headers, ALIASES.clicks);
+    const cpcCol = findColumnWithAliases(headers, ALIASES.cpc);
+    const bidCol = findColumnWithAliases(headers, ALIASES.bid);
     // ------------------------------------------------
     const rankingCol = findColumnWithAliases(headers, ALIASES.ranking);
     const entityTypeCol = findColumnWithAliases(headers, ALIASES.entityType);
@@ -1667,6 +1669,8 @@ export const analyzeACoS100Track = async (
       const orders = ordersCol !== -1 ? safeParseFloat(row[ordersCol]) : 0;
 
       const clicks = clicksCol !== -1 ? safeParseFloat(row[clicksCol]) : 0;
+      const cpc = cpcCol !== -1 ? safeParseFloat(row[cpcCol]) : clicks > 0 ? spend / clicks : 0;
+      const bid = bidCol !== -1 ? safeParseFloat(row[bidCol]) : 0;
       let acos = acosCol !== -1 ? safeParseFloat(row[acosCol]) : calculateACoS(spend, sales);
 
       if (acos > 0 && acos < 100) {
@@ -1710,6 +1714,8 @@ export const analyzeACoS100Track = async (
           acos,
           sales,
           clicks,
+          cpc,
+          bid: bid > 0 ? bid : undefined,
           isRankCampaign,
           trackType: "ACOS100",
           campaignId: campaignId || undefined,
