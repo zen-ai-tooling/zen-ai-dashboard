@@ -253,7 +253,9 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
             isProductTargeting ? '' : (bleeder.entity ?? ''),
             isProductTargeting ? (bleeder.entity ?? '') : '',
             bleeder.matchType ?? '',
-            decision === 'Cut Bid' ? (bleeder.spend ?? 0) : 0,
+            decision === 'Cut Bid'
+              ? (bleeder.bid ?? bleeder.cpc ?? 0)
+              : 0,
             decision,
             (bleeder as any).source ?? '',
             bleeder.campaignId ?? '',
