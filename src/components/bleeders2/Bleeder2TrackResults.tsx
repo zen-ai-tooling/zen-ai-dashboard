@@ -20,7 +20,7 @@ import { RowDetailPanel, type DecisionButtonSpec, type RowDetail } from "@/compo
 interface Bleeder2TrackResultsProps {
   result: Bleeder2TrackResult;
   onDownload: () => void;
-  onUploadDecision: (trackType: Bleeder2TrackType, file: File) => void;
+  onUploadDecision: (trackType: Bleeder2TrackType, file: File, cutBidPct?: number) => void;
   onAdjustThresholds: () => void;
   onUploadNewFile: (trackType: Bleeder2TrackType) => void;
   decisionFile?: File | null;
@@ -273,7 +273,16 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         'inline_decisions.xlsx',
         { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
       );
-      onUploadDecision(result.trackType, file);
+      const cutBidPctValues = Object.keys(decisions)
+        .filter(k => decisions[Number(k)] === 'Cut Bid')
+        .map(k => cutBidPcts[Number(k)] ?? 25);
+      const dominantCutPct = cutBidPctValues.length > 0
+        ? Math.round(
+            cutBidPctValues.reduce((a, b) => a + b, 0) /
+            cutBidPctValues.length
+          )
+        : 25;
+      onUploadDecision(result.trackType, file, dominantCutPct);
       setGenerateDone(true);
     } catch (err) {
       console.error('[Generate] Failed:', err);
@@ -343,14 +352,14 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         breakdown={[
           { label: 'Paused', count: breakdownCounts['Pause'] ?? 0, color: '#EF4444' },
           { label: 'Cut Bid', count: breakdownCounts['Cut Bid'] ?? 0, color: '#F59E0B' },
-          { label: 'Negative', count: breakdownCounts['Negative'] ?? 0, color: '#4F6EF7' },
-          { label: 'Keep', count: breakdownCounts['Keep'] ?? 0, color: '#10B981' },
+          { label: 'Negative', count: breakdownCounts['Negative'] ?? 0, color: '#6366F1' },
+          { label: 'Keep', count: breakdownCounts['Keep'] ?? 0, color: '#059669' },
           { label: 'No decision', count: Math.max(0, result.bleeders.length - decisionsMade), color: '#D1D5DB' },
         ]}
         onDownload={onDownloadAmazon}
         onStartNew={onStartNew}
         onViewFullResults={() => setShowFullResults(true)}
-        accentColor="#F59E0B"
+        accentColor="#0D9488"
         addressedSpend={addressedSpend}
         undecidedSpend={undecidedSpend}
       />
