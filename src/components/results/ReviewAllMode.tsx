@@ -162,7 +162,7 @@ export const ReviewAllMode = ({
       const key = `${currentSheet}-ROWINDEX-${idx}`;
       if (sug.kind === "pause") {
         next[key] = isSearchTermSheet ? "Negate (Exact)" : (decisionOptions.includes("Pause") ? "Pause" : decisionOptions[0]);
-      } else if (sug.kind === "review") {
+      } else if (sug.kind === "cut_bid") {
         if (decisionOptions.includes("Cut Bid 50%")) next[key] = "Cut Bid 50%";
       } else if (sug.kind === "monitor") {
         // leave undecided — monitor = watch
@@ -354,7 +354,7 @@ export const ReviewAllMode = ({
                   style={{ background: "#0D9488" }}
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  Apply all AI suggestions
+                  Apply recommendations
                 </button>
                 {decisionOptions.includes("Cut Bid 50%") && (
                   <button
