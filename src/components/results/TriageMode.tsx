@@ -494,6 +494,53 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                   );
                 })()}
 
+                {(() => {
+                  if (currentDecision) return null;
+                  const match = queue.find(
+                    (it) =>
+                      it.key !== current.key &&
+                      it.campaign === current.campaign &&
+                      decisions[it.key] &&
+                      (it.entity.toLowerCase().includes(current.entity.toLowerCase().slice(0, 6)) ||
+                        current.entity.toLowerCase().includes(it.entity.toLowerCase().slice(0, 6))),
+                  );
+                  if (!match) return null;
+                  const matchDecision = decisions[match.key];
+                  const matchSpec = decisionSpecsBySheet(match.sheet).find((s) => s.value === matchDecision);
+                  if (!matchSpec) return null;
+                  return (
+                    <div
+                      className="flex items-center gap-2 rounded-md mt-2"
+                      style={{
+                        padding: "6px 10px",
+                        background: "rgba(99,102,241,0.05)",
+                        border: "1px solid rgba(99,102,241,0.15)",
+                      }}
+                    >
+                      <span style={{ fontSize: 11, color: "#6B7280", flexShrink: 0 }}>Similar keyword:</span>
+                      <button
+                        onClick={() => handleDecide(matchDecision)}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold hover:opacity-80 transition-opacity"
+                        style={{ background: matchSpec.bg, color: "#FFFFFF" }}
+                      >
+                        Apply {matchSpec.label}
+                      </button>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          color: "#374151",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          maxWidth: 160,
+                        }}
+                      >
+                        {match.entity}
+                      </span>
+                    </div>
+                  );
+                })()}
+
                 {/* b. Entity name — ASINs render muted with prefix label */}
                 {(() => {
                   const isAsin = /^B[A-Z0-9]{9}$/.test(current.entity || "");
