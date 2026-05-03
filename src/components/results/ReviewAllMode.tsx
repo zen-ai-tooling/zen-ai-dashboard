@@ -629,7 +629,7 @@ export const ReviewAllMode = ({
                       </tr>
                     );
                   }
-                  const rowIdx = item.rowIdx;
+                  const rowIdx = (item as { _isCampaignHeader: false; rowIdx: number }).rowIdx;
                 const row = currentRows[rowIdx];
                 const key = `${currentSheet}-ROWINDEX-${rowIdx}`;
                 const decision = decisions[key];
