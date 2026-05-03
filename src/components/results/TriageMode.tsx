@@ -610,7 +610,8 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                 Skip for now (S) <SkipForward className="w-3.5 h-3.5" />
               </button>
             </div>
-          </div>
+            );
+          })()
         ) : (
           <div className="bg-white text-center" style={{ borderRadius: 16, padding: 40, maxWidth: 640, width: "85%" }}>
             <h2 className="text-[20px] font-semibold" style={{ color: "#111827" }}>
