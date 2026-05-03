@@ -367,7 +367,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                   borderRadius: 16,
                   padding: 22,
                   background: _tint,
-                  borderLeft: currentDecision ? `4px solid ${_bg || "#0D9488"}` : undefined,
+                  borderLeft: currentDecision && _bg ? `4px solid ${_bg}` : undefined,
                   boxShadow: "0 25px 60px rgba(0,0,0,0.5)",
                   animation:
                     phase === "exiting"
