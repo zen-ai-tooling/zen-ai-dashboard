@@ -1182,6 +1182,7 @@ const Index = () => {
               bleeder2ActiveTrack &&
               !bleeder2TrackState[bleeder2ActiveTrack].isValidating && (
                 <div className="pt-4 space-y-4">
+                  <OnboardingBanner moduleName="bleeders2" />
                   <TrackUploader
                     track={bleeder2ActiveTrack}
                     onUpload={(track, file) => handleBleeder2TrackUpload(file, track)}
