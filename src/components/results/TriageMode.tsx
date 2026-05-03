@@ -610,6 +610,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                 Skip for now (S) <SkipForward className="w-3.5 h-3.5" />
               </button>
             </div>
+          </div>
             );
           })()
         ) : (
