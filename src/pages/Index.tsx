@@ -28,6 +28,7 @@ import { parseCommand } from "@/lib/commandParser";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { HomeScreen } from "@/components/layout/HomeScreen";
+import { OnboardingBanner } from "@/components/shared/OnboardingBanner";
 import { SessionLogView } from "@/components/history/SessionLogView";
 import { AnalyzingView } from "@/components/shared/AnalyzingView";
 import * as XLSX from "xlsx";
