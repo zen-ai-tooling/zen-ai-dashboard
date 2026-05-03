@@ -570,7 +570,16 @@ export const processTrackDecisionFile = async (
               cutBidPercent: pct,
             });
           } else {
-            missingBidCount++;
+            canonicalInputs.push({
+              recordType,
+              action: "pause",
+              campaignName,
+              campaignId,
+              currentBid: bid,
+              cutBidPercent: pct,
+            });
+            validation.warnings.push(`Row ${r}: No bid found for Cut Bid — converted to Pause.`);
+            summary.pausedCount++;
           }
         } else {
           // REFINED TEXT EXTRACTION - Same priority as pause/negative
@@ -632,7 +641,24 @@ export const processTrackDecisionFile = async (
               targetingId,
             } as any);
           } else {
-            missingBidCount++;
+            canonicalInputs.push({
+              recordType,
+              action: "pause",
+              campaignName,
+              campaignId,
+              adGroupName,
+              adGroupId,
+              keywordText: isPAT ? undefined : text,
+              targetingText: isPAT ? text : undefined,
+              matchType,
+              currentBid: bid,
+              cutBidPercent: pct,
+              keywordId,
+              productTargetingId,
+              targetingId,
+            } as any);
+            validation.warnings.push(`Row ${r}: No bid found for Cut Bid — converted to Pause.`);
+            summary.pausedCount++;
           }
         }
         summary.bidsCutCount++;
