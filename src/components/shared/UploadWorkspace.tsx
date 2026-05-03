@@ -235,6 +235,9 @@ export const SmartDropzone: React.FC<SmartDropzoneProps> = ({
           </span>
         ))}
       </div>
+      <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>
+        Works with files up to 50MB · Typical processing time under 30s
+      </p>
     </div>
   );
 };
@@ -268,8 +271,8 @@ export const AssetInventory: React.FC<AssetInventoryProps> = ({
               key={sheet.name}
               className="flex items-center gap-2"
               style={{
-                background: detected ? 'rgba(16, 185, 129, 0.08)' : '#FAFAFA',
-                border: `1px solid ${detected ? 'rgba(16, 185, 129, 0.25)' : 'rgba(0,0,0,0.05)'}`,
+                background: detected ? 'rgba(13,148,136,0.06)' : 'transparent',
+                border: detected ? '1px solid #0D9488' : '1px dashed #D1D5DB',
                 borderRadius: 8,
                 padding: '8px 10px',
                 transition: 'all 200ms ease',
@@ -278,16 +281,13 @@ export const AssetInventory: React.FC<AssetInventoryProps> = ({
               <span
                 className="flex-shrink-0 inline-flex items-center justify-center"
                 style={{
-                  width: 16,
-                  height: 16,
+                  width: 10,
+                  height: 10,
                   borderRadius: 999,
-                  background: detected ? '#10B981' : 'transparent',
-                  border: detected ? 'none' : '1.5px solid #D1D5DB',
+                  background: detected ? '#0D9488' : '#9CA3AF',
                 }}
-              >
-                {detected && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
-              </span>
-              <span style={{ fontSize: 12, fontWeight: 500, color: detected ? '#111827' : '#374151' }}>
+              />
+              <span style={{ fontSize: 12, fontWeight: 500, color: detected ? '#0D9488' : '#9CA3AF' }}>
                 {sheet.name}
               </span>
             </div>
