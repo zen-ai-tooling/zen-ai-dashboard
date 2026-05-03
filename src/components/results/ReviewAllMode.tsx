@@ -885,6 +885,24 @@ export const ReviewAllMode = ({
                             placeholder="Decide…"
                           />
                         )}
+                        {decision?.startsWith('Cut Bid') && (
+                          <div className="flex items-center gap-0.5 mt-1">
+                            <input
+                              type="number"
+                              min={1}
+                              max={99}
+                              className="h-7 w-14 text-[12px] rounded border border-border px-1.5 font-mono"
+                              value={cutBidPcts[key] ?? 50}
+                              onChange={(e) => {
+                                const pct = parseInt(e.target.value) || 50;
+                                setCutBidPcts(prev => ({ ...prev, [key]: pct }));
+                                setDecision(key, `Cut Bid ${pct}%`);
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <span className="text-[11px]" style={{ color: '#9CA3AF' }}>%</span>
+                          </div>
+                        )}
                       </TableCell>
                     </TableRow>
                   );
