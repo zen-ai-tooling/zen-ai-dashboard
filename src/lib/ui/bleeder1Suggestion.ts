@@ -1,7 +1,4 @@
-// UI-only helper — does NOT affect business logic.
-// Suggestion pills shown on Bleeders 1.0 results table to guide reviewers.
-
-export type B1SuggestionKind = 'pause' | 'review' | 'monitor' | 'keep';
+export type B1SuggestionKind = "pause" | "cut_bid" | "monitor" | "keep";
 
 export interface B1Suggestion {
   kind: B1SuggestionKind;
@@ -9,8 +6,8 @@ export interface B1Suggestion {
   bg: string;
   color: string;
   border: string;
-  /** One-line rationale shown in the row detail side panel. */
   rationale: string;
+  defaultDecision: string;
 }
 
 interface B1SuggestionInput {
@@ -18,53 +15,113 @@ interface B1SuggestionInput {
   spend: number;
   sales: number;
   orders?: number;
+  acos?: number;
 }
 
 export function suggestB1Row(row: B1SuggestionInput): B1Suggestion {
   const clicks = row.clicks ?? 0;
+  const spend = row.spend ?? 0;
   const sales = row.sales ?? 0;
   const orders = row.orders ?? 0;
-  const isZeroSale = sales <= 0 && orders <= 0;
+  const hasConversions = sales > 0 || orders > 0;
+  const acosNum = row.acos != null ? row.acos : sales > 0 ? (spend / sales) * 100 : 0;
 
-  if (isZeroSale && clicks >= 15) {
+  if (hasConversions) {
+    if (acosNum >= 100 && spend >= 20) {
+      return {
+        kind: "pause",
+        label: "Pause",
+        bg: "rgba(239, 68, 68, 0.08)",
+        color: "#B91C1C",
+        border: "rgba(239, 68, 68, 0.22)",
+        rationale: `${acosNum.toFixed(0)}% ACoS on $${spend.toFixed(2)} spend — losing money`,
+        defaultDecision: "Pause",
+      };
+    }
+    if (acosNum >= 80 && spend >= 15) {
+      return {
+        kind: "cut_bid",
+        label: "Cut Bid",
+        bg: "rgba(245, 158, 11, 0.08)",
+        color: "#B45309",
+        border: "rgba(245, 158, 11, 0.22)",
+        rationale: `${acosNum.toFixed(0)}% ACoS — reduce bid to improve efficiency`,
+        defaultDecision: "Cut Bid 50%",
+      };
+    }
     return {
-      kind: 'pause',
-      label: 'Pause',
-      bg: 'rgba(239, 68, 68, 0.10)',
-      color: '#B91C1C',
-      border: 'rgba(239, 68, 68, 0.25)',
-      rationale: `${clicks} clicks with zero conversions — strong pause candidate`,
+      kind: "keep",
+      label: "Keep",
+      bg: "rgba(5, 150, 105, 0.08)",
+      color: "#047857",
+      border: "rgba(5, 150, 105, 0.20)",
+      rationale: "Has conversions — keep and monitor performance",
+      defaultDecision: "Keep",
     };
   }
 
-  if (isZeroSale && clicks >= 13) {
+  if (spend >= 30 && clicks >= 20) {
     return {
-      kind: 'review',
-      label: 'Review',
-      bg: 'rgba(245, 158, 11, 0.10)',
-      color: '#B45309',
-      border: 'rgba(245, 158, 11, 0.25)',
-      rationale: `${clicks} clicks with no conversions — review before deciding`,
+      kind: "pause",
+      label: "Pause",
+      bg: "rgba(239, 68, 68, 0.08)",
+      color: "#B91C1C",
+      border: "rgba(239, 68, 68, 0.22)",
+      rationale: `${clicks} clicks, $${spend.toFixed(2)} spend, zero conversions — strong pause candidate`,
+      defaultDecision: "Pause",
     };
   }
-
-  if (isZeroSale && clicks >= 10) {
+  if (clicks >= 30) {
     return {
-      kind: 'monitor',
-      label: 'Monitor',
-      bg: 'rgba(134, 134, 139, 0.10)',
-      color: '#374151',
-      border: 'rgba(134, 134, 139, 0.25)',
-      rationale: `${clicks} clicks — consider monitoring before taking action`,
+      kind: "pause",
+      label: "Pause",
+      bg: "rgba(239, 68, 68, 0.08)",
+      color: "#B91C1C",
+      border: "rgba(239, 68, 68, 0.22)",
+      rationale: `${clicks} clicks with zero conversions — pause recommended`,
+      defaultDecision: "Pause",
     };
   }
-
+  if (spend >= 15 && clicks >= 13) {
+    return {
+      kind: "cut_bid",
+      label: "Cut Bid",
+      bg: "rgba(245, 158, 11, 0.08)",
+      color: "#B45309",
+      border: "rgba(245, 158, 11, 0.22)",
+      rationale: `${clicks} clicks, $${spend.toFixed(2)} spend — reduce bid before pausing`,
+      defaultDecision: "Cut Bid 50%",
+    };
+  }
+  if (spend >= 25 && clicks >= 8) {
+    return {
+      kind: "cut_bid",
+      label: "Cut Bid",
+      bg: "rgba(245, 158, 11, 0.08)",
+      color: "#B45309",
+      border: "rgba(245, 158, 11, 0.22)",
+      rationale: `$${spend.toFixed(2)} spend with zero sales — cut bid to reduce cost`,
+      defaultDecision: "Cut Bid 50%",
+    };
+  }
+  if (clicks >= 10 || spend >= 8) {
+    return {
+      kind: "monitor",
+      label: "Monitor",
+      bg: "rgba(107, 114, 128, 0.07)",
+      color: "#374151",
+      border: "rgba(107, 114, 128, 0.20)",
+      rationale: `${clicks} clicks — not enough data yet, monitor before acting`,
+      defaultDecision: "Keep",
+    };
+  }
   return {
-    kind: 'keep',
-    label: 'Keep?',
-    bg: 'rgba(16, 185, 129, 0.10)',
-    color: '#047857',
-    border: 'rgba(16, 185, 129, 0.25)',
-    rationale: 'Performance is borderline — keep and monitor for now',
+    kind: "keep",
+    label: "Keep",
+    bg: "rgba(5, 150, 105, 0.06)",
+    color: "#047857",
+    border: "rgba(5, 150, 105, 0.18)",
+    rationale: "Low spend and clicks — keep and let data accumulate",
+    defaultDecision: "Keep",
   };
 }
