@@ -211,18 +211,23 @@ export const ReviewAllMode = ({
         acos: parseAcosNum(r.acos),
       });
       const key = `${currentSheet}-ROWINDEX-${idx}`;
-      if (sug.kind === "pause") {
-        next[key] = isSearchTermSheet
-          ? "Negate (Exact)"
-          : decisionOptions.includes("Pause")
-            ? "Pause"
-            : decisionOptions[0];
-      } else if ((sug.kind as string) === "cut_bid") {
-        if (decisionOptions.includes("Cut Bid 50%")) next[key] = "Cut Bid 50%";
-      } else if (sug.kind === "monitor") {
-        // leave undecided — monitor = watch
-      } else if (sug.kind === "keep") {
-        if (decisionOptions.includes("Keep")) next[key] = "Keep";
+      // For search term sheets: pause/cut_bid/monitor all map to Negate (Exact)
+      // since that's the only valid action to take on a search term
+      if (isSearchTermSheet) {
+        if (sug.kind === "pause" || sug.kind === "cut_bid" || sug.kind === "monitor") {
+          if (decisionOptions.includes("Negate (Exact)")) next[key] = "Negate (Exact)";
+        } else if (sug.kind === "keep") {
+          if (decisionOptions.includes("Keep")) next[key] = "Keep";
+        }
+      } else {
+        if (sug.kind === "pause") {
+          if (decisionOptions.includes("Pause")) next[key] = "Pause";
+        } else if (sug.kind === "cut_bid") {
+          if (decisionOptions.includes("Cut Bid 50%")) next[key] = "Cut Bid 50%";
+        } else if (sug.kind === "keep") {
+          if (decisionOptions.includes("Keep")) next[key] = "Keep";
+        }
+        // monitor: leave undecided
       }
     });
     setDecisions(next);
@@ -264,8 +269,11 @@ export const ReviewAllMode = ({
         orders: r.orders ?? 0,
         acos: parseAcosNum(r.acos),
       });
-      if (sug.kind === "pause") pause++;
-      if ((sug.kind as string) === "review" || sug.kind === "monitor") review++;
+      const displayKind = (isSearchTermSheet &&
+        (sug.kind === "cut_bid" || sug.kind === "monitor" || sug.kind === "pause"))
+        ? "pause" : sug.kind;
+      if (displayKind === "pause") pause++;
+      else if (displayKind === "cut_bid" || displayKind === "monitor") review++;
       if (decisions[`${currentSheet}-ROWINDEX-${idx}`]) decided++;
       if ((r.spend || 0) >= q75 && q75 > 0) highspend++;
     });
@@ -749,7 +757,10 @@ export const ReviewAllMode = ({
                     orders: row.orders ?? 0,
                     acos: parseAcosNum(row.acos),
                   });
-                  const sugStyle = SUGGESTION_PILL_CLASS[sug.kind];
+                  const displayKind = (isSearchTermSheet &&
+                    (sug.kind === "cut_bid" || sug.kind === "monitor" || sug.kind === "pause"))
+                    ? "pause" : sug.kind;
+                  const sugStyle = SUGGESTION_PILL_CLASS[displayKind] ?? SUGGESTION_PILL_CLASS.keep;
                   const acosNum = parseAcosNum(row.acos);
                   const hasAcos = acosNum >= 0 && row.acos && row.acos !== "0" && row.acos !== "0%";
                   const decisionPill = DECISION_PILL(decision);
