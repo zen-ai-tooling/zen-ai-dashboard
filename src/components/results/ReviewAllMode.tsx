@@ -757,7 +757,10 @@ export const ReviewAllMode = ({
                     orders: row.orders ?? 0,
                     acos: parseAcosNum(row.acos),
                   });
-                  const sugStyle = SUGGESTION_PILL_CLASS[sug.kind];
+                  const displayKind = (isSearchTermSheet &&
+                    (sug.kind === "cut_bid" || sug.kind === "monitor" || sug.kind === "pause"))
+                    ? "pause" : sug.kind;
+                  const sugStyle = SUGGESTION_PILL_CLASS[displayKind] ?? SUGGESTION_PILL_CLASS.keep;
                   const acosNum = parseAcosNum(row.acos);
                   const hasAcos = acosNum >= 0 && row.acos && row.acos !== "0" && row.acos !== "0%";
                   const decisionPill = DECISION_PILL(decision);
