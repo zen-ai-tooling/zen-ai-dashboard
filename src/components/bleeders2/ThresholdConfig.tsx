@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -22,7 +22,11 @@ interface ThresholdConfigProps {
 }
 
 export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
-  thresholds, onChange, onContinue, onBack, clientName
+  thresholds,
+  onChange,
+  onContinue,
+  onBack,
+  clientName,
 }) => {
   const { toast } = useToast();
   const [local, setLocal] = useState(thresholds);
@@ -51,7 +55,11 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
     setTimeout(() => setShowSaved(false), 2000);
     const targetNum = parsePercentOrUndefined(targetACOSRaw);
     if (targetNum === undefined) {
-      toast({ title: "Target ACoS Required", description: "Please enter a Target ACoS (e.g., 35)", variant: "destructive" });
+      toast({
+        title: "Target ACoS Required",
+        description: "Please enter a Target ACoS (e.g., 35)",
+        variant: "destructive",
+      });
       setShowSaved(false);
       return;
     }
@@ -66,10 +74,10 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
         {/* Workflow stepper */}
         <WorkflowStepBreadcrumb
           steps={[
-            { label: 'Select Track', status: 'complete' },
-            { label: 'Configure Thresholds', status: 'active' },
-            { label: 'Upload File', status: 'pending' },
-            { label: 'Results', status: 'pending' },
+            { label: "Select Track", status: "complete" },
+            { label: "Configure Thresholds", status: "active" },
+            { label: "Upload File", status: "pending" },
+            { label: "Results", status: "pending" },
           ]}
         />
 
@@ -83,7 +91,7 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
           <div className="rounded-xl border border-border bg-card p-6 space-y-5 shadow-card flex flex-col h-full">
             <div className="space-y-1.5">
               <Label htmlFor="targetACOS" className="text-[12px] font-medium text-foreground">
-                Target ACoS / Break-even ACoS (%)
+                Break-even ACoS (%)
               </Label>
               <Input
                 id="targetACOS"
@@ -97,13 +105,19 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
                 onChange={(e) => setTargetACOSRaw(e.target.value.replace(/[^\d.]/g, ""))}
                 onBlur={() => {
                   const n = parsePercentOrUndefined(targetACOSRaw);
-                  if (n === undefined && targetACOSRaw.trim() !== "") { setTargetACOSRaw("35"); handleUpdate('targetACOS', 35); }
-                  else if (n !== undefined) { const c = Math.max(0, Math.min(300, n)); setTargetACOSRaw(String(c)); handleUpdate('targetACOS', c); }
+                  if (n === undefined && targetACOSRaw.trim() !== "") {
+                    setTargetACOSRaw("35");
+                    handleUpdate("targetACOS", 35);
+                  } else if (n !== undefined) {
+                    const c = Math.max(0, Math.min(300, n));
+                    setTargetACOSRaw(String(c));
+                    handleUpdate("targetACOS", c);
+                  }
                 }}
                 className="w-full h-10 rounded-lg border-border"
               />
               <p className="text-[12px] text-[hsl(var(--text-tertiary))]">
-                Your break-even ACoS (e.g., 35% means your profit margin is 35%)
+                Your profit margin as a percentage. If you keep 35¢ of every $1 sold, enter 35.
               </p>
             </div>
 
@@ -123,18 +137,20 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
                 onBlur={() => {
                   if (fewerThanOrdersRaw === "") setFewerThanOrdersRaw("5");
                   const n = parseInt(fewerThanOrdersRaw || "5", 10);
-                  handleUpdate('fewerThanOrders', isNaN(n) ? 5 : n);
+                  handleUpdate("fewerThanOrders", isNaN(n) ? 5 : n);
                 }}
                 className="w-full h-10 rounded-lg border-border"
               />
-              <p className="text-[12px] text-[hsl(var(--text-tertiary))]">Flag items with orders ≤ {local.fewerThanOrders}</p>
+              <p className="text-[12px] text-[hsl(var(--text-tertiary))]">
+                Flag items with orders ≤ {local.fewerThanOrders}
+              </p>
             </div>
 
             <div className="flex items-center space-x-2 pt-1">
               <Checkbox
                 id="excludeRanking"
                 checked={local.excludeRanking}
-                onCheckedChange={(checked) => handleUpdate('excludeRanking', checked as boolean)}
+                onCheckedChange={(checked) => handleUpdate("excludeRanking", checked as boolean)}
               />
               <Label htmlFor="excludeRanking" className="text-[13px] font-normal cursor-pointer">
                 Exclude campaigns with "rank" in name
@@ -202,7 +218,9 @@ export const ThresholdConfig: React.FC<ThresholdConfigProps> = ({
               <ArrowLeft className="w-3.5 h-3.5" />
               Back to track selection
             </button>
-          ) : <span />}
+          ) : (
+            <span />
+          )}
 
           <div className="flex flex-col items-end gap-1.5">
             <button onClick={handleContinue} className="btn-primary-action btn-press">
