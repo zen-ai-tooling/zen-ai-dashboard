@@ -322,15 +322,30 @@ export const TriageMode: React.FC<TriageModeProps> = ({
         ) : allDone ? (
           <CompletionCard total={total} savings={savingsTarget} onGenerate={onGenerate} onReview={onSwitchToReview} />
         ) : current ? (
+          (() => {
+            const _spec = currentSpecs.find((s) => s.value === currentDecision);
+            const _bg = _spec?.bg ?? "";
+            const _tint = currentDecision
+              ? _bg.includes("EF4444")
+                ? "rgba(239,68,68,0.03)"
+                : _bg.includes("F59E0B")
+                  ? "rgba(245,158,11,0.03)"
+                  : _bg.includes("059669")
+                    ? "rgba(5,150,105,0.03)"
+                    : "#FFFFFF"
+              : "#FFFFFF";
+            return (
           <div
             key={current.key + ":" + (phase === "exiting" ? "out" : "in") + ":" + direction}
-            className="bg-white text-[#111827] overflow-y-auto"
+            className="text-[#111827] overflow-y-auto"
             style={{
               width: "85%",
               maxWidth: 640,
               maxHeight: "calc(100vh - 52px - 48px - 64px)",
               borderRadius: 16,
               padding: 22,
+              background: _tint,
+              borderLeft: currentDecision ? `4px solid ${_bg || "#0D9488"}` : undefined,
               boxShadow: "0 25px 60px rgba(0,0,0,0.5)",
               animation:
                 phase === "exiting"
