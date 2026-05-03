@@ -65,6 +65,7 @@ interface ReviewAllModeProps {
 
 const SUGGESTION_PILL_CLASS = {
   pause: { bg: "rgba(239, 68, 68, 0.10)", color: "#B91C1C", label: "Pause" },
+  cut_bid: { bg: "rgba(245, 158, 11, 0.10)", color: "#B45309", label: "Cut Bid" },
   review: { bg: "rgba(245, 158, 11, 0.10)", color: "#B45309", label: "Review" },
   monitor: { bg: "rgba(245, 158, 11, 0.06)", color: "#92400E", label: "Monitor" },
   keep: { bg: "#F3F4F6", color: "#374151", label: "None" },
@@ -207,6 +208,7 @@ export const ReviewAllMode = ({
         spend: r.spend ?? 0,
         sales: r.sales ?? 0,
         orders: r.orders ?? 0,
+        acos: parseAcosNum(r.acos),
       });
       const key = `${currentSheet}-ROWINDEX-${idx}`;
       if (sug.kind === "pause") {
@@ -260,6 +262,7 @@ export const ReviewAllMode = ({
         spend: r.spend ?? 0,
         sales: r.sales ?? 0,
         orders: r.orders ?? 0,
+        acos: parseAcosNum(r.acos),
       });
       if (sug.kind === "pause") pause++;
       if ((sug.kind as string) === "review" || sug.kind === "monitor") review++;
@@ -744,8 +747,9 @@ export const ReviewAllMode = ({
                     spend: row.spend ?? 0,
                     sales: row.sales ?? 0,
                     orders: row.orders ?? 0,
+                    acos: parseAcosNum(row.acos),
                   });
-                  const sugStyle = SUGGESTION_PILL_CLASS[sug.kind as keyof typeof SUGGESTION_PILL_CLASS] ?? SUGGESTION_PILL_CLASS.keep;
+                  const sugStyle = SUGGESTION_PILL_CLASS[sug.kind];
                   const acosNum = parseAcosNum(row.acos);
                   const hasAcos = acosNum >= 0 && row.acos && row.acos !== "0" && row.acos !== "0%";
                   const decisionPill = DECISION_PILL(decision);

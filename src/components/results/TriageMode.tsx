@@ -350,7 +350,11 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                   ? "rgba(245,158,11,0.03)"
                   : _bg.includes("059669")
                     ? "rgba(5,150,105,0.03)"
-                    : "#FFFFFF"
+                    : _bg.includes("6366F1")
+                      ? "rgba(99,102,241,0.03)"
+                      : _bg.includes("8B5CF6")
+                        ? "rgba(139,92,246,0.03)"
+                        : "rgba(0,0,0,0.02)"
               : "#FFFFFF";
             return (
               <div
