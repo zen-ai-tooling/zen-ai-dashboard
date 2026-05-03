@@ -269,8 +269,11 @@ export const ReviewAllMode = ({
         orders: r.orders ?? 0,
         acos: parseAcosNum(r.acos),
       });
-      if (sug.kind === "pause") pause++;
-      if ((sug.kind as string) === "review" || sug.kind === "monitor") review++;
+      const displayKind = (isSearchTermSheet &&
+        (sug.kind === "cut_bid" || sug.kind === "monitor" || sug.kind === "pause"))
+        ? "pause" : sug.kind;
+      if (displayKind === "pause") pause++;
+      else if (displayKind === "cut_bid" || displayKind === "monitor") review++;
       if (decisions[`${currentSheet}-ROWINDEX-${idx}`]) decided++;
       if ((r.spend || 0) >= q75 && q75 > 0) highspend++;
     });
