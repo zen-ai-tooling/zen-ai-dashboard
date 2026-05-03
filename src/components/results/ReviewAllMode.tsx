@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/u
 import { SortHeader, useSortable } from "@/components/shared/SortHeader";
 import { suggestB1Row } from "@/lib/ui/bleeder1Suggestion";
 import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
+import { useHistory } from "@/context/HistoryContext";
 
 interface NormalizedRow {
   sheet: string;

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { CheckCircle2, SkipForward, Undo2, Info, Sparkles, ArrowRight } from "lucide-react";
 import { suggestB1Row } from "@/lib/ui/bleeder1Suggestion";
+import { useHistory } from "@/context/HistoryContext";
 
 /**
  * Triage Mode — full-bleed, immersive one-card-at-a-time decision interface.
@@ -270,6 +271,17 @@ export const TriageMode: React.FC<TriageModeProps> = ({
 
   const counterValue = addressedSavings ?? savingsTarget;
 
+  const { entries } = useHistory();
+  const repeatEntities = React.useMemo(() => {
+    const counts: Record<string, number> = {};
+    entries.forEach((e) => {
+      ((e as any).bleeders ?? []).forEach((b: string) => {
+        counts[b] = (counts[b] ?? 0) + 1;
+      });
+    });
+    return new Set(Object.keys(counts).filter((k) => counts[k] >= 2));
+  }, [entries]);
+
   return (
     <div className="triage-container">
       {/* Progress bar — absolute, on top of grid, above row 1 */}
@@ -533,6 +545,23 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                     </h2>
                   );
                 })()}
+
+                {repeatEntities.has(current.entity) && (
+                  <div
+                    className="inline-flex items-center gap-1.5 rounded-md"
+                    style={{
+                      marginTop: 8,
+                      padding: "4px 8px",
+                      background: "rgba(245, 158, 11, 0.10)",
+                      border: "1px solid rgba(245, 158, 11, 0.30)",
+                      color: "#92400E",
+                      fontSize: 11,
+                      fontWeight: 600,
+                    }}
+                  >
+                    ⚠ Repeat bleeder — seen in previous sessions
+                  </div>
+                )}
 
                 {/* c. Metadata row — campaign (≤35 chars) · match pill */}
                 <div
