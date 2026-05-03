@@ -321,6 +321,23 @@ export const ReviewAllMode = ({
             <span className="count">· {f.count}</span>
           </button>
         ))}
+        <button
+          onClick={() => setGroupByCampaign(g => !g)}
+          className="inline-flex items-center gap-1.5 px-3 h-7 rounded-full text-[11px] font-medium transition-colors ml-1"
+          style={{
+            background: groupByCampaign ? '#0D9488' : 'transparent',
+            color: groupByCampaign ? '#FFFFFF' : '#6B7280',
+            border: groupByCampaign ? '1px solid #0D9488' : '1px solid #E5E7EB',
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <rect x="0" y="0" width="5" height="5" rx="1" fill="currentColor" opacity="0.7"/>
+            <rect x="7" y="0" width="5" height="5" rx="1" fill="currentColor" opacity="0.7"/>
+            <rect x="0" y="7" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"/>
+            <rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"/>
+          </svg>
+          Group by campaign
+        </button>
       </div>
 
       <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
