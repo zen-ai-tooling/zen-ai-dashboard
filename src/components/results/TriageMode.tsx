@@ -442,43 +442,37 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                 {(() => {
                   // Find most recent decision in same campaign
                   const samecamp = queue
-                    .filter(
-                      (it) =>
-                        it.campaign === current.campaign &&
-                        it.key !== current.key &&
-                        decisions[it.key]
-                    )
+                    .filter((it) => it.campaign === current.campaign && it.key !== current.key && decisions[it.key])
                     .slice(-1)[0];
                   if (!samecamp) return null;
-                  const priorSpec = decisionSpecsBySheet(samecamp.sheet)
-                    .find((s) => s.value === decisions[samecamp.key]);
+                  const priorSpec = decisionSpecsBySheet(samecamp.sheet).find(
+                    (s) => s.value === decisions[samecamp.key],
+                  );
                   if (!priorSpec) return null;
                   return (
                     <div
                       className="flex items-center gap-2 rounded-md"
                       style={{
                         marginTop: 10,
-                        padding: '6px 10px',
-                        background: 'rgba(13, 148, 136, 0.06)',
-                        border: '1px solid rgba(13, 148, 136, 0.15)',
+                        padding: "6px 10px",
+                        background: "rgba(13, 148, 136, 0.06)",
+                        border: "1px solid rgba(13, 148, 136, 0.15)",
                       }}
                     >
-                      <span style={{ fontSize: 11, color: '#6B7280' }}>
-                        Same campaign:
-                      </span>
+                      <span style={{ fontSize: 11, color: "#6B7280" }}>Same campaign:</span>
                       <span
                         className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold"
-                        style={{ background: priorSpec.bg, color: '#FFFFFF' }}
+                        style={{ background: priorSpec.bg, color: "#FFFFFF" }}
                       >
                         {priorSpec.label}
                       </span>
                       <span
                         style={{
                           fontSize: 11,
-                          color: '#374151',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
+                          color: "#374151",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
                           maxWidth: 200,
                         }}
                       >
@@ -788,6 +782,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
               ))}
               <ShortcutRow label="SKIP" k="S" />
               <ShortcutRow label="UNDO" k="Z" />
+              <ShortcutRow label="SAME AS PREV" k="." />
               <ShortcutRow label="PREV" k="←" />
               <ShortcutRow label="NEXT" k="→" />
             </div>
