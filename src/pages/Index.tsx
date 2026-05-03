@@ -28,6 +28,7 @@ import { parseCommand } from "@/lib/commandParser";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { HomeScreen } from "@/components/layout/HomeScreen";
+import { OnboardingBanner } from "@/components/shared/OnboardingBanner";
 import { SessionLogView } from "@/components/history/SessionLogView";
 import { AnalyzingView } from "@/components/shared/AnalyzingView";
 import * as XLSX from "xlsx";
@@ -934,6 +935,7 @@ const Index = () => {
               !decisionResults &&
               !validatorResults && (
                 <div className="max-w-[760px] mx-auto pt-4">
+                  <OnboardingBanner moduleName="bleeders1" />
                   <UploadCard onFileUpload={handleFileUpload} isVisible={true} />
                 </div>
               )}
@@ -1180,6 +1182,7 @@ const Index = () => {
               bleeder2ActiveTrack &&
               !bleeder2TrackState[bleeder2ActiveTrack].isValidating && (
                 <div className="pt-4 space-y-4">
+                  <OnboardingBanner moduleName="bleeders2" />
                   <TrackUploader
                     track={bleeder2ActiveTrack}
                     onUpload={(track, file) => handleBleeder2TrackUpload(file, track)}
@@ -1236,6 +1239,7 @@ const Index = () => {
             {/* LIFETIME BLEEDERS */}
             {activeModule === "lifetime_bleeders" && lifetimeStage === "upload" && (
               <div className="pt-4">
+                <OnboardingBanner moduleName="lifetime" />
                 <LifetimeUploader onAnalyze={handleLifetimeAnalysis} isProcessing={lifetimeProcessing} />
               </div>
             )}
