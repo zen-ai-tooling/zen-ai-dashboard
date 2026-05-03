@@ -347,7 +347,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
           { label: 'Average ACoS', value: `${avgAcos.toFixed(1)}%` },
           { label: 'Decisions made', value: `${decisionsMade}/${result.bleeders.length}` },
           { label: 'Avg spend per bleeder', value: `$${(result.totalSpend / Math.max(result.bleeders.length, 1)).toFixed(2)}` },
-          ...(acosThresholdLabel ? [{ label: 'Threshold used', value: acosThresholdLabel }] : []),
+          ...(acosThresholdLabel ? [{ label: 'ACoS threshold', value: acosThresholdLabel.replace(/\((SB\/SD)\)/, '$1').replace(/\((SP)\)/, '$1').replace(' / ', ' · ') }] : []),
         ]}
         breakdown={[
           { label: 'Paused', count: breakdownCounts['Pause'] ?? 0, color: '#EF4444' },
@@ -574,20 +574,18 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
             <span className="font-mono-nums">{result.bleeders.length}</span> bleeders
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <button onClick={() => {
-              const allSuggested: Record<number, string> = {};
-              suggestions.forEach((s, idx) => { allSuggested[idx] = s.decision; });
-              setDecisions(allSuggested);
-            }} className="bulk-btn btn-press">
-              <Sparkles className="w-3 h-3" style={{ color: '#4F6EF7' }} />
-              Apply all AI suggestions
+            <button
+              onClick={() => {
+                const allSuggested: Record<number, string> = {};
+                suggestions.forEach((s, idx) => { allSuggested[idx] = s.decision; });
+                setDecisions(allSuggested);
+              }}
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12.5px] font-semibold text-white btn-press"
+              style={{ background: "#0D9488" }}
+            >
+              <Sparkles className="w-3 h-3" />
+              Apply recommendations
             </button>
-            {getDecisionOptions().includes('Pause') && (
-              <button onClick={handleSetAllPause} className="bulk-btn btn-press">
-                <span className="decision-dot" style={{ background: '#EF4444' }} />
-                Select all → Pause
-              </button>
-            )}
             {getDecisionOptions().includes('Cut Bid') && (
               <button onClick={handleSetAllCutBid} className="bulk-btn btn-press">
                 <span className="decision-dot" style={{ background: '#F59E0B' }} />
@@ -727,9 +725,6 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                     </TableCell>
                     <TableCell onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-1.5">
-                        {decision && (
-                          <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#10B981' }} />
-                        )}
                         <DecisionSelect
                           value={decision}
                           onChange={(val) => setDecisionWithFlash(idx, val)}
