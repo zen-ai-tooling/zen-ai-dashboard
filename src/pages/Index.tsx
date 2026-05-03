@@ -1239,6 +1239,7 @@ const Index = () => {
             {/* LIFETIME BLEEDERS */}
             {activeModule === "lifetime_bleeders" && lifetimeStage === "upload" && (
               <div className="pt-4">
+                <OnboardingBanner moduleName="lifetime" />
                 <LifetimeUploader onAnalyze={handleLifetimeAnalysis} isProcessing={lifetimeProcessing} />
               </div>
             )}
