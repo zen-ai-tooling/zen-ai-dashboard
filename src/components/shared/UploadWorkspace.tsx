@@ -235,6 +235,9 @@ export const SmartDropzone: React.FC<SmartDropzoneProps> = ({
           </span>
         ))}
       </div>
+      <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>
+        Works with files up to 50MB · Typical processing time under 30s
+      </p>
     </div>
   );
 };
