@@ -181,6 +181,7 @@ export const ReviewAllMode = ({
   type OptionalCol = "ad_group";
   const [optionalCols, setOptionalCols] = useState<Set<OptionalCol>>(new Set());
   const [colPickerOpen, setColPickerOpen] = useState(false);
+  const [cutBidPcts, setCutBidPcts] = useState<Record<string, number>>({});
   const colPickerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
@@ -672,17 +673,12 @@ export const ReviewAllMode = ({
                           </TooltipTrigger>
                           <TooltipContent side="bottom" className="max-w-[280px] text-[12px] leading-relaxed">
                             <div className="space-y-1.5">
-                              <div>
-                                <strong>Pause</strong>: Zero sales, high spend over threshold period
-                              </div>
-                              <div>
-                                <strong>Monitor</strong>: Low sales relative to spend, watch closely
-                              </div>
-                              <div>
-                                <strong>Cut Bid</strong>: High ACoS or moderate spend — reduce bid before pausing
-                              </div>
-                              <div>
-                                <strong>None</strong>: Within acceptable performance range
+                              <div><strong>Pause</strong>: ACoS ≥ 100% or 30+ clicks with zero conversions</div>
+                              <div><strong>Cut Bid</strong>: ACoS 80–99% or moderate spend, no conversions</div>
+                              <div><strong>Monitor</strong>: Some activity, not enough signal yet</div>
+                              <div><strong>None</strong>: Acceptable performance</div>
+                              <div style={{ marginTop: 4, color: '#9CA3AF' }}>
+                                On search term sheets, suggestions automatically show Negative.
                               </div>
                             </div>
                           </TooltipContent>
@@ -888,6 +884,24 @@ export const ReviewAllMode = ({
                             width="100%"
                             placeholder="Decide…"
                           />
+                        )}
+                        {decision?.startsWith('Cut Bid') && (
+                          <div className="flex items-center gap-0.5 mt-1">
+                            <input
+                              type="number"
+                              min={1}
+                              max={99}
+                              className="h-7 w-14 text-[12px] rounded border border-border px-1.5 font-mono"
+                              value={cutBidPcts[key] ?? 50}
+                              onChange={(e) => {
+                                const pct = parseInt(e.target.value) || 50;
+                                setCutBidPcts(prev => ({ ...prev, [key]: pct }));
+                                setDecision(key, `Cut Bid ${pct}%`);
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <span className="text-[11px]" style={{ color: '#9CA3AF' }}>%</span>
+                          </div>
                         )}
                       </TableCell>
                     </TableRow>
