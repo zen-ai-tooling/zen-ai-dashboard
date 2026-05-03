@@ -187,6 +187,7 @@ export const ReviewAllMode = ({
   // ── Focus filter (above table) ──
   type FocusFilter = 'all' | 'pause' | 'review' | 'decided' | 'highspend';
   const [focusFilter, setFocusFilter] = useState<FocusFilter>('all');
+  const [groupByCampaign, setGroupByCampaign] = useState(false);
 
   // Compute filter counts + spend quartiles for current sheet
   const focusMeta = useMemo(() => {
