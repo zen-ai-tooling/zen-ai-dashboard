@@ -396,6 +396,42 @@ export const TriageMode: React.FC<TriageModeProps> = ({
               />
             </div>
 
+            {/* mini-map progress strip — clickable dots per item */}
+            <div className="flex items-center gap-1.5 flex-wrap" style={{ marginTop: 10 }}>
+              {queue.slice(0, 20).map((item, i) => {
+                const dec = decisions[item.key];
+                const ispec = decisionSpecsBySheet(item.sheet).find((s) => s.value === dec);
+                const isCurrent = i === cursor;
+                const isSkip = skipped.has(item.key);
+                const dotColor = dec ? (ispec?.bg ?? "#0D9488") : isSkip ? "#F59E0B" : "#E5E7EB";
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => {
+                      const dir = i > cursor ? "right" : "left";
+                      sequence(dir, () => setCursor(i));
+                    }}
+                    style={{
+                      width: isCurrent ? 9 : 7,
+                      height: isCurrent ? 9 : 7,
+                      borderRadius: 999,
+                      background: isCurrent ? "#FFFFFF" : dotColor,
+                      boxShadow: isCurrent ? "0 0 0 2px rgba(255,255,255,0.4)" : undefined,
+                      flexShrink: 0,
+                      transition: "all 150ms ease",
+                      border: "none",
+                      padding: 0,
+                      cursor: "pointer",
+                    }}
+                    aria-label={`Go to item ${i + 1}`}
+                  />
+                );
+              })}
+              {queue.length > 20 && (
+                <span style={{ color: "#9CA3AF", fontSize: 11 }}>+{queue.length - 20}</span>
+              )}
+            </div>
+
             {/* b. Entity name — ASINs render muted with prefix label */}
             {(() => {
               const isAsin = /^B[A-Z0-9]{9}$/.test(current.entity || "");
