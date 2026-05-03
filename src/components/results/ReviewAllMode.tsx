@@ -746,7 +746,8 @@ export const ReviewAllMode = ({
                     </TableCell>
                   </TableRow>
                 );
-              })}
+              });
+              })()}
             </TableBody>
           </Table>
         </div>
