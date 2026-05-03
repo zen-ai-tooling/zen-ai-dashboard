@@ -561,8 +561,8 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                       fontWeight: 700,
                       letterSpacing: "0.05em",
                       textTransform: "uppercase",
-                      boxShadow: isSelected ? "0 0 0 2px #FFFFFF, 0 0 0 4px " + spec.bg + "55" : undefined,
-                      opacity: hasDecision && !isSelected ? 0.8 : 1,
+                      boxShadow: isSelected ? "0 0 0 3px #FFFFFF, 0 0 0 5px " + spec.bg : undefined,
+                      opacity: hasDecision && !isSelected ? 0.4 : 1,
                     }}
                   >
                     {isSelected && <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" strokeWidth={2.6} />}
