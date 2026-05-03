@@ -260,6 +260,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
     });
     const map: Record<string, { label: string; accent: string; bg: string }> = {
       pause: { label: "PAUSE", accent: "#EF4444", bg: "rgba(239, 68, 68, 0.06)" },
+      cut_bid: { label: "CUT BID", accent: "#F59E0B", bg: "rgba(245, 158, 11, 0.06)" },
       monitor: { label: "MONITOR", accent: "#6B7280", bg: "rgba(107, 114, 128, 0.06)" },
       keep: { label: "", accent: "", bg: "" },
     };
@@ -569,8 +570,9 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                           </div>
                           {showThreshold && (
                             <div className="mt-2 text-[11.5px] leading-relaxed" style={{ color: "#6B7280" }}>
-                              Triggered by: clicks ≥ 15 with zero sales → Pause · clicks ≥ 13 → Review · clicks ≥ 10 →
-                              Monitor. ACoS &gt; 100% inflates risk band.
+                              Pause: ACoS ≥ 100% + spend ≥ $20, or 30+ clicks with zero sales. Cut Bid: ACoS ≥ 80% +
+                              spend ≥ $15, or moderate spend with no conversions. Monitor: some activity but not enough
+                              signal yet.
                             </div>
                           )}
                         </div>
