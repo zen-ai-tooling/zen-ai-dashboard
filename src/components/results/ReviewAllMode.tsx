@@ -211,18 +211,23 @@ export const ReviewAllMode = ({
         acos: parseAcosNum(r.acos),
       });
       const key = `${currentSheet}-ROWINDEX-${idx}`;
-      if (sug.kind === "pause") {
-        next[key] = isSearchTermSheet
-          ? "Negate (Exact)"
-          : decisionOptions.includes("Pause")
-            ? "Pause"
-            : decisionOptions[0];
-      } else if ((sug.kind as string) === "cut_bid") {
-        if (decisionOptions.includes("Cut Bid 50%")) next[key] = "Cut Bid 50%";
-      } else if (sug.kind === "monitor") {
-        // leave undecided — monitor = watch
-      } else if (sug.kind === "keep") {
-        if (decisionOptions.includes("Keep")) next[key] = "Keep";
+      // For search term sheets: pause/cut_bid/monitor all map to Negate (Exact)
+      // since that's the only valid action to take on a search term
+      if (isSearchTermSheet) {
+        if (sug.kind === "pause" || sug.kind === "cut_bid" || sug.kind === "monitor") {
+          if (decisionOptions.includes("Negate (Exact)")) next[key] = "Negate (Exact)";
+        } else if (sug.kind === "keep") {
+          if (decisionOptions.includes("Keep")) next[key] = "Keep";
+        }
+      } else {
+        if (sug.kind === "pause") {
+          if (decisionOptions.includes("Pause")) next[key] = "Pause";
+        } else if (sug.kind === "cut_bid") {
+          if (decisionOptions.includes("Cut Bid 50%")) next[key] = "Cut Bid 50%";
+        } else if (sug.kind === "keep") {
+          if (decisionOptions.includes("Keep")) next[key] = "Keep";
+        }
+        // monitor: leave undecided
       }
     });
     setDecisions(next);
