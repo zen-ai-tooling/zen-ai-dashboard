@@ -187,6 +187,7 @@ export const ReviewAllMode = ({
   // ── Focus filter (above table) ──
   type FocusFilter = 'all' | 'pause' | 'review' | 'decided' | 'highspend';
   const [focusFilter, setFocusFilter] = useState<FocusFilter>('all');
+  const [groupByCampaign, setGroupByCampaign] = useState(false);
 
   // Compute filter counts + spend quartiles for current sheet
   const focusMeta = useMemo(() => {
@@ -320,6 +321,23 @@ export const ReviewAllMode = ({
             <span className="count">· {f.count}</span>
           </button>
         ))}
+        <button
+          onClick={() => setGroupByCampaign(g => !g)}
+          className="inline-flex items-center gap-1.5 px-3 h-7 rounded-full text-[11px] font-medium transition-colors ml-1"
+          style={{
+            background: groupByCampaign ? '#0D9488' : 'transparent',
+            color: groupByCampaign ? '#FFFFFF' : '#6B7280',
+            border: groupByCampaign ? '1px solid #0D9488' : '1px solid #E5E7EB',
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <rect x="0" y="0" width="5" height="5" rx="1" fill="currentColor" opacity="0.7"/>
+            <rect x="7" y="0" width="5" height="5" rx="1" fill="currentColor" opacity="0.7"/>
+            <rect x="0" y="7" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"/>
+            <rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"/>
+          </svg>
+          Group by campaign
+        </button>
       </div>
 
       <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
@@ -564,7 +582,54 @@ export const ReviewAllMode = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedIndices.filter(passesFilter).map((rowIdx) => {
+              {(() => {
+                const filteredIdx = sortedIndices.filter(passesFilter);
+                type Item = { _isCampaignHeader: true; campaign: string; totalSpend: number; rowCount: number } | { _isCampaignHeader: false; rowIdx: number };
+                let items: Item[];
+                if (!groupByCampaign) {
+                  items = filteredIdx.map((rowIdx) => ({ _isCampaignHeader: false as const, rowIdx }));
+                } else {
+                  const groups: Record<string, number[]> = {};
+                  filteredIdx.forEach((rowIdx) => {
+                    const camp = currentRows[rowIdx].campaign || 'Unknown';
+                    (groups[camp] ||= []).push(rowIdx);
+                  });
+                  const sorted = Object.entries(groups).sort(([, a], [, b]) => {
+                    const sb = b.reduce((s, i) => s + (currentRows[i].spend ?? 0), 0);
+                    const sa = a.reduce((s, i) => s + (currentRows[i].spend ?? 0), 0);
+                    return sb - sa;
+                  });
+                  items = sorted.flatMap(([campaign, idxs]) => [
+                    { _isCampaignHeader: true as const, campaign, totalSpend: idxs.reduce((s, i) => s + (currentRows[i].spend ?? 0), 0), rowCount: idxs.length },
+                    ...idxs.map((rowIdx) => ({ _isCampaignHeader: false as const, rowIdx })),
+                  ]);
+                }
+                return items.map((item) => {
+                  if (item._isCampaignHeader) {
+                    return (
+                      <tr key={'header-' + item.campaign}>
+                        <td
+                          colSpan={99}
+                          style={{
+                            padding: '6px 12px',
+                            background: '#F9FAFB',
+                            borderBottom: '1px solid #E5E7EB',
+                            borderTop: '1px solid #E5E7EB',
+                          }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: '#374151' }}>
+                              {item.campaign}
+                            </span>
+                            <span className="text-[11px]" style={{ color: '#9CA3AF' }}>
+                              {item.rowCount} bleeder{item.rowCount !== 1 ? 's' : ''} · ${item.totalSpend.toFixed(2)} at risk
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  }
+                  const rowIdx = (item as { _isCampaignHeader: false; rowIdx: number }).rowIdx;
                 const row = currentRows[rowIdx];
                 const key = `${currentSheet}-ROWINDEX-${rowIdx}`;
                 const decision = decisions[key];
@@ -681,7 +746,8 @@ export const ReviewAllMode = ({
                     </TableCell>
                   </TableRow>
                 );
-              })}
+              });
+              })()}
             </TableBody>
           </Table>
         </div>
