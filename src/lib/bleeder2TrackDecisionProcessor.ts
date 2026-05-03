@@ -557,7 +557,7 @@ export const processTrackDecisionFile = async (
               adGroupName,
               adGroupId,
               currentBid: bid,
-              cutBidPercent: 50,
+              cutBidPercent: pct,
             });
           } else if (campaignId && bid > 0) {
             const recordType = recordTypes.campaign(channel);
@@ -567,7 +567,7 @@ export const processTrackDecisionFile = async (
               campaignName,
               campaignId,
               currentBid: bid,
-              cutBidPercent: 50,
+              cutBidPercent: pct,
             });
           } else {
             missingBidCount++;

@@ -106,16 +106,16 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   }, []);
 
   const queue = React.useMemo(() => {
-    const undecided: TriageItem[] = [];
-    const skippedItems: TriageItem[] = [];
-    const decided: TriageItem[] = [];
-    items.forEach((it) => {
-      if (decisions[it.key]) decided.push(it);
-      else if (skipped.has(it.key)) skippedItems.push(it);
-      else undecided.push(it);
+    const campaignSpend: Record<string, number> = {};
+    items.forEach((item) => {
+      campaignSpend[item.campaign] = (campaignSpend[item.campaign] ?? 0) + item.spend;
     });
-    return [...undecided, ...skippedItems, ...decided];
-  }, [items, decisions, skipped]);
+    return [...items].sort((a, b) => {
+      const campDiff = (campaignSpend[b.campaign] ?? 0) - (campaignSpend[a.campaign] ?? 0);
+      if (campDiff !== 0) return campDiff;
+      return b.spend - a.spend;
+    });
+  }, [items]);
 
   React.useEffect(() => {
     if (cursor >= queue.length) setCursor(Math.max(0, queue.length - 1));
