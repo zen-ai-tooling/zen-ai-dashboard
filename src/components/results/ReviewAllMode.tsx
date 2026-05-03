@@ -745,7 +745,7 @@ export const ReviewAllMode = ({
                     sales: row.sales ?? 0,
                     orders: row.orders ?? 0,
                   });
-                  const sugStyle = SUGGESTION_PILL_CLASS[sug.kind];
+                  const sugStyle = SUGGESTION_PILL_CLASS[sug.kind as keyof typeof SUGGESTION_PILL_CLASS] ?? SUGGESTION_PILL_CLASS.keep;
                   const acosNum = parseAcosNum(row.acos);
                   const hasAcos = acosNum >= 0 && row.acos && row.acos !== "0" && row.acos !== "0%";
                   const decisionPill = DECISION_PILL(decision);
