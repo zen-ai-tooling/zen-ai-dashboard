@@ -181,6 +181,7 @@ export const ReviewAllMode = ({
   type OptionalCol = "ad_group";
   const [optionalCols, setOptionalCols] = useState<Set<OptionalCol>>(new Set());
   const [colPickerOpen, setColPickerOpen] = useState(false);
+  const [cutBidPcts, setCutBidPcts] = useState<Record<string, number>>({});
   const colPickerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
