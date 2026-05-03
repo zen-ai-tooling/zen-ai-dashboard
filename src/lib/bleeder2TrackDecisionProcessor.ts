@@ -571,7 +571,7 @@ export const processTrackDecisionFile = async (
             });
           } else {
             canonicalInputs.push({
-              recordType,
+              recordType: recordTypes.campaign(channel),
               action: "pause",
               campaignName,
               campaignId,
