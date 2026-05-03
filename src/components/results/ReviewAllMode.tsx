@@ -582,7 +582,54 @@ export const ReviewAllMode = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedIndices.filter(passesFilter).map((rowIdx) => {
+              {(() => {
+                const filteredIdx = sortedIndices.filter(passesFilter);
+                type Item = { _isCampaignHeader: true; campaign: string; totalSpend: number; rowCount: number } | { _isCampaignHeader: false; rowIdx: number };
+                let items: Item[];
+                if (!groupByCampaign) {
+                  items = filteredIdx.map((rowIdx) => ({ _isCampaignHeader: false as const, rowIdx }));
+                } else {
+                  const groups: Record<string, number[]> = {};
+                  filteredIdx.forEach((rowIdx) => {
+                    const camp = currentRows[rowIdx].campaign || 'Unknown';
+                    (groups[camp] ||= []).push(rowIdx);
+                  });
+                  const sorted = Object.entries(groups).sort(([, a], [, b]) => {
+                    const sb = b.reduce((s, i) => s + (currentRows[i].spend ?? 0), 0);
+                    const sa = a.reduce((s, i) => s + (currentRows[i].spend ?? 0), 0);
+                    return sb - sa;
+                  });
+                  items = sorted.flatMap(([campaign, idxs]) => [
+                    { _isCampaignHeader: true as const, campaign, totalSpend: idxs.reduce((s, i) => s + (currentRows[i].spend ?? 0), 0), rowCount: idxs.length },
+                    ...idxs.map((rowIdx) => ({ _isCampaignHeader: false as const, rowIdx })),
+                  ]);
+                }
+                return items.map((item) => {
+                  if (item._isCampaignHeader) {
+                    return (
+                      <tr key={'header-' + item.campaign}>
+                        <td
+                          colSpan={99}
+                          style={{
+                            padding: '6px 12px',
+                            background: '#F9FAFB',
+                            borderBottom: '1px solid #E5E7EB',
+                            borderTop: '1px solid #E5E7EB',
+                          }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: '#374151' }}>
+                              {item.campaign}
+                            </span>
+                            <span className="text-[11px]" style={{ color: '#9CA3AF' }}>
+                              {item.rowCount} bleeder{item.rowCount !== 1 ? 's' : ''} · ${item.totalSpend.toFixed(2)} at risk
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  }
+                  const rowIdx = item.rowIdx;
                 const row = currentRows[rowIdx];
                 const key = `${currentSheet}-ROWINDEX-${rowIdx}`;
                 const decision = decisions[key];
