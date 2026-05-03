@@ -830,14 +830,16 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             className="absolute"
             style={{
               right: 24,
-              top: "50%",
-              transform: "translateY(-50%)",
+              bottom: 8,
+              transform: "none",
               width: 176,
               background: "#1F2937",
               border: "1px solid #374151",
               borderRadius: 10,
               padding: "10px 12px",
               zIndex: 45,
+              maxHeight: 'calc(100vh - 120px)',
+              overflowY: 'auto',
             }}
           >
             <div className="flex items-center justify-between" style={{ marginBottom: 8 }}>

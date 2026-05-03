@@ -351,7 +351,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectModule }) => {
                         ))}
                     </div>
                     <p className="text-[12px] text-[#9CA3AF] truncate mt-0.5 ml-5">
-                      {e.clientName} · {e.fileName}
+                      {e.clientName} · {
+                        (e.pausedCount || e.negativesCreated || e.bidsCutCount)
+                          ? `${(e.pausedCount ?? 0) + (e.negativesCreated ?? 0) + (e.bidsCutCount ?? 0)} decisions exported`
+                          : e.bleedersFound > 0
+                            ? `${e.bleedersFound} bleeders reviewed`
+                            : 'Session complete'
+                      }
                     </p>
                     {decisionsSummary(e) && (
                       <p className="text-[12px] text-[#374151] truncate mt-0.5 ml-5">{decisionsSummary(e)}</p>
