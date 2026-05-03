@@ -251,10 +251,15 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   }, [current?.key, currentSpecs, queue.length, cursor, history]);
 
   const suggestionFor = (it: TriageItem) => {
-    const sug = suggestB1Row({ clicks: it.clicks, spend: it.spend, sales: it.sales, orders: it.orders });
+    const sug = suggestB1Row({
+      clicks: it.clicks,
+      spend: it.spend,
+      sales: it.sales,
+      orders: it.orders,
+      acos: it.acosNum,
+    });
     const map: Record<string, { label: string; accent: string; bg: string }> = {
       pause: { label: "PAUSE", accent: "#EF4444", bg: "rgba(239, 68, 68, 0.06)" },
-      review: { label: "REVIEW", accent: "#F59E0B", bg: "rgba(245, 158, 11, 0.06)" },
       monitor: { label: "MONITOR", accent: "#6B7280", bg: "rgba(107, 114, 128, 0.06)" },
       keep: { label: "", accent: "", bg: "" },
     };
@@ -335,313 +340,317 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                     : "#FFFFFF"
               : "#FFFFFF";
             return (
-          <div
-            key={current.key + ":" + (phase === "exiting" ? "out" : "in") + ":" + direction}
-            className="text-[#111827] overflow-y-auto"
-            style={{
-              width: "85%",
-              maxWidth: 640,
-              maxHeight: "calc(100vh - 52px - 48px - 64px)",
-              borderRadius: 16,
-              padding: 22,
-              background: _tint,
-              borderLeft: currentDecision ? `4px solid ${_bg || "#0D9488"}` : undefined,
-              boxShadow: "0 25px 60px rgba(0,0,0,0.5)",
-              animation:
-                phase === "exiting"
-                  ? direction === "right"
-                    ? "triage-out-left 120ms ease-in forwards"
-                    : "triage-out-right 120ms ease-in forwards"
-                  : direction === "right"
-                    ? "triage-in-right 150ms ease-out"
-                    : "triage-in-left 150ms ease-out",
-            }}
-          >
-            {/* a. Header row */}
-            <div className="flex items-center justify-between gap-4">
-              <span
-                className="inline-flex items-center text-[10.5px] font-semibold uppercase tracking-[0.10em] px-2 py-1 rounded-md"
-                style={{ background: "#F3F4F6", color: "#6B7280" }}
-              >
-                {shortSheetLabel(current.sheet)}
-              </span>
-              <div className="text-[12px] tabular-nums flex items-center gap-2" style={{ color: "#9CA3AF" }}>
-                <span>
-                  <span className="font-semibold" style={{ color: "#374151" }}>
-                    {cursor + 1}
-                  </span>{" "}
-                  of {queue.length}
-                </span>
-                {currentDecision &&
-                  (() => {
-                    const spec = currentSpecs.find((s) => s.value === currentDecision);
-                    if (!spec) return null;
-                    return (
-                      <span
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold"
-                        style={{ background: spec.bg, color: "#FFFFFF" }}
-                      >
-                        <CheckCircle2 className="w-3 h-3" />
-                        {spec.label}
-                      </span>
-                    );
-                  })()}
-              </div>
-            </div>
-            {/* card progress bar — overall session completion */}
-            <div className="mt-3 w-full overflow-hidden" style={{ height: 4, background: "#F3F4F6", borderRadius: 2 }}>
               <div
-                className="h-full transition-all duration-300"
-                style={{ width: `${progressPct}%`, background: "#0D9488", borderRadius: 2 }}
-              />
-            </div>
-
-            {/* mini-map progress strip — clickable dots per item */}
-            <div className="flex items-center gap-1.5 flex-wrap" style={{ marginTop: 10 }}>
-              {queue.slice(0, 20).map((item, i) => {
-                const dec = decisions[item.key];
-                const ispec = decisionSpecsBySheet(item.sheet).find((s) => s.value === dec);
-                const isCurrent = i === cursor;
-                const isSkip = skipped.has(item.key);
-                const dotColor = dec ? (ispec?.bg ?? "#0D9488") : isSkip ? "#F59E0B" : "#E5E7EB";
-                return (
-                  <button
-                    key={item.key}
-                    onClick={() => {
-                      const dir = i > cursor ? "right" : "left";
-                      sequence(dir, () => setCursor(i));
-                    }}
-                    style={{
-                      width: isCurrent ? 9 : 7,
-                      height: isCurrent ? 9 : 7,
-                      borderRadius: 999,
-                      background: isCurrent ? "#FFFFFF" : dotColor,
-                      boxShadow: isCurrent ? "0 0 0 2px rgba(255,255,255,0.4)" : undefined,
-                      flexShrink: 0,
-                      transition: "all 150ms ease",
-                      border: "none",
-                      padding: 0,
-                      cursor: "pointer",
-                    }}
-                    aria-label={`Go to item ${i + 1}`}
-                  />
-                );
-              })}
-              {queue.length > 20 && (
-                <span style={{ color: "#9CA3AF", fontSize: 11 }}>+{queue.length - 20}</span>
-              )}
-            </div>
-
-            {/* b. Entity name — ASINs render muted with prefix label */}
-            {(() => {
-              const isAsin = /^B[A-Z0-9]{9}$/.test(current.entity || "");
-              if (isAsin) {
-                return (
-                  <div className="flex items-baseline gap-2 break-words" style={{ marginTop: 14 }}>
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 600,
-                        textTransform: "uppercase",
-                        letterSpacing: "0.10em",
-                        color: "#9CA3AF",
-                        padding: "2px 6px",
-                        background: "#F3F4F6",
-                        borderRadius: 4,
-                      }}
-                    >
-                      ASIN
+                key={current.key + ":" + (phase === "exiting" ? "out" : "in") + ":" + direction}
+                className="text-[#111827] overflow-y-auto"
+                style={{
+                  width: "85%",
+                  maxWidth: 640,
+                  maxHeight: "calc(100vh - 52px - 48px - 64px)",
+                  borderRadius: 16,
+                  padding: 22,
+                  background: _tint,
+                  borderLeft: currentDecision ? `4px solid ${_bg || "#0D9488"}` : undefined,
+                  boxShadow: "0 25px 60px rgba(0,0,0,0.5)",
+                  animation:
+                    phase === "exiting"
+                      ? direction === "right"
+                        ? "triage-out-left 120ms ease-in forwards"
+                        : "triage-out-right 120ms ease-in forwards"
+                      : direction === "right"
+                        ? "triage-in-right 150ms ease-out"
+                        : "triage-in-left 150ms ease-out",
+                }}
+              >
+                {/* a. Header row */}
+                <div className="flex items-center justify-between gap-4">
+                  <span
+                    className="inline-flex items-center text-[10.5px] font-semibold uppercase tracking-[0.10em] px-2 py-1 rounded-md"
+                    style={{ background: "#F3F4F6", color: "#6B7280" }}
+                  >
+                    {shortSheetLabel(current.sheet)}
+                  </span>
+                  <div className="text-[12px] tabular-nums flex items-center gap-2" style={{ color: "#9CA3AF" }}>
+                    <span>
+                      <span className="font-semibold" style={{ color: "#374151" }}>
+                        {cursor + 1}
+                      </span>{" "}
+                      of {queue.length}
                     </span>
+                    {currentDecision &&
+                      (() => {
+                        const spec = currentSpecs.find((s) => s.value === currentDecision);
+                        if (!spec) return null;
+                        return (
+                          <span
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold"
+                            style={{ background: spec.bg, color: "#FFFFFF" }}
+                          >
+                            <CheckCircle2 className="w-3 h-3" />
+                            {spec.label}
+                          </span>
+                        );
+                      })()}
+                  </div>
+                </div>
+                {/* card progress bar — overall session completion */}
+                <div
+                  className="mt-3 w-full overflow-hidden"
+                  style={{ height: 4, background: "#F3F4F6", borderRadius: 2 }}
+                >
+                  <div
+                    className="h-full transition-all duration-300"
+                    style={{ width: `${progressPct}%`, background: "#0D9488", borderRadius: 2 }}
+                  />
+                </div>
+
+                {/* mini-map progress strip — clickable dots per item */}
+                <div className="flex items-center gap-1.5 flex-wrap" style={{ marginTop: 10 }}>
+                  {queue.slice(0, 20).map((item, i) => {
+                    const dec = decisions[item.key];
+                    const ispec = decisionSpecsBySheet(item.sheet).find((s) => s.value === dec);
+                    const isCurrent = i === cursor;
+                    const isSkip = skipped.has(item.key);
+                    const dotColor = dec ? (ispec?.bg ?? "#0D9488") : isSkip ? "#F59E0B" : "#E5E7EB";
+                    return (
+                      <button
+                        key={item.key}
+                        onClick={() => {
+                          const dir = i > cursor ? "right" : "left";
+                          sequence(dir, () => setCursor(i));
+                        }}
+                        style={{
+                          width: isCurrent ? 9 : 7,
+                          height: isCurrent ? 9 : 7,
+                          borderRadius: 999,
+                          background: isCurrent ? "#FFFFFF" : dotColor,
+                          boxShadow: isCurrent ? "0 0 0 2px rgba(255,255,255,0.4)" : undefined,
+                          flexShrink: 0,
+                          transition: "all 150ms ease",
+                          border: "none",
+                          padding: 0,
+                          cursor: "pointer",
+                        }}
+                        aria-label={`Go to item ${i + 1}`}
+                      />
+                    );
+                  })}
+                  {queue.length > 20 && <span style={{ color: "#9CA3AF", fontSize: 11 }}>+{queue.length - 20}</span>}
+                </div>
+
+                {/* b. Entity name — ASINs render muted with prefix label */}
+                {(() => {
+                  const isAsin = /^B[A-Z0-9]{9}$/.test(current.entity || "");
+                  if (isAsin) {
+                    return (
+                      <div className="flex items-baseline gap-2 break-words" style={{ marginTop: 14 }}>
+                        <span
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 600,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.10em",
+                            color: "#9CA3AF",
+                            padding: "2px 6px",
+                            background: "#F3F4F6",
+                            borderRadius: 4,
+                          }}
+                        >
+                          ASIN
+                        </span>
+                        <h2
+                          className="break-words tabular-nums"
+                          style={{
+                            fontSize: 24,
+                            fontWeight: 600,
+                            color: "#9CA3AF",
+                            lineHeight: 1.2,
+                            letterSpacing: "-0.01em",
+                          }}
+                        >
+                          {current.entity}
+                        </h2>
+                      </div>
+                    );
+                  }
+                  return (
                     <h2
-                      className="break-words tabular-nums"
+                      className="break-words"
                       style={{
+                        marginTop: 14,
                         fontSize: 24,
-                        fontWeight: 600,
-                        color: "#9CA3AF",
+                        fontWeight: 700,
+                        color: "#111827",
                         lineHeight: 1.2,
-                        letterSpacing: "-0.01em",
+                        letterSpacing: "-0.02em",
                       }}
                     >
                       {current.entity}
                     </h2>
-                  </div>
-                );
-              }
-              return (
-                <h2
-                  className="break-words"
-                  style={{
-                    marginTop: 14,
-                    fontSize: 24,
-                    fontWeight: 700,
-                    color: "#111827",
-                    lineHeight: 1.2,
-                    letterSpacing: "-0.02em",
-                  }}
-                >
-                  {current.entity}
-                </h2>
-              );
-            })()}
+                  );
+                })()}
 
-            {/* c. Metadata row — campaign (≤35 chars) · match pill */}
-            <div className="flex items-center gap-2 flex-wrap" style={{ marginTop: 6, fontSize: 13, color: "#9CA3AF" }}>
-              <span title={current.campaign}>{current.campaign || "—"}</span>
-              {current.matchType && (
-                <>
-                  <span style={{ color: "#D1D5DB" }}>·</span>
-                  <span
-                    className="inline-block text-[11px] font-medium px-2 py-0.5 rounded"
-                    style={{ background: "#FFFFFF", color: "#374151", border: "1px solid #E5E7EB" }}
-                  >
-                    {current.matchType}
-                  </span>
-                </>
-              )}
-            </div>
-
-            {/* d. Metrics row — 4 equal columns */}
-            <div className="grid grid-cols-4 gap-4" style={{ marginTop: 16 }}>
-              <Metric label="Spend" value={`$${current.spend.toFixed(2)}`} accent="#EF4444" />
-              <Metric label="Clicks" value={current.clicks.toLocaleString()} accent="#111827" />
-              <Metric
-                label="Sales"
-                value={current.sales == null ? "—" : `$${current.sales.toFixed(2)}`}
-                accent={current.sales == null ? "#9CA3AF" : current.sales <= 0 ? "#EF4444" : "#059669"}
-              />
-              <Metric
-                label="ACoS"
-                value={current.acosNum >= 0 && current.acos ? current.acos : "—"}
-                accent={current.acosNum < 0 ? "#9CA3AF" : current.acosNum >= 100 ? "#EF4444" : "#059669"}
-              />
-            </div>
-
-            {/* e. Suggestion banner — 4px left border, label + reason on one line */}
-            {(() => {
-              const s = suggestionFor(current);
-              if (!s.label) return null;
-              return (
+                {/* c. Metadata row — campaign (≤35 chars) · match pill */}
                 <div
-                  className="rounded-lg"
-                  style={{
-                    marginTop: 14,
-                    background: s.bg,
-                    borderLeft: `4px solid ${s.accent}`,
-                    borderLeftWidth: "4px",
-                    borderLeftStyle: "solid",
-                    borderLeftColor: s.accent,
-                    padding: "12px 14px",
-                  }}
+                  className="flex items-center gap-2 flex-wrap"
+                  style={{ marginTop: 6, fontSize: 13, color: "#9CA3AF" }}
                 >
-                  <div className="flex items-start gap-3">
-                    <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: s.accent }} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-baseline gap-1.5 flex-wrap">
-                        <span
-                          style={{
-                            fontSize: 13,
-                            fontWeight: 700,
-                            letterSpacing: "0.06em",
-                            textTransform: "uppercase",
-                            color: s.accent,
-                          }}
-                        >
-                          {s.label}
-                        </span>
-                        <span style={{ fontSize: 13, color: "#374151" }}>— {s.rationale}</span>
-                        <button
-                          onClick={() => setShowThreshold((v) => !v)}
-                          className="hover:opacity-70"
-                          aria-label="Threshold logic"
-                          style={{ color: s.accent }}
-                        >
-                          <Info className="w-3 h-3" />
-                        </button>
-                      </div>
-                      {showThreshold && (
-                        <div className="mt-2 text-[11.5px] leading-relaxed" style={{ color: "#6B7280" }}>
-                          Triggered by: clicks ≥ 15 with zero sales → Pause · clicks ≥ 13 → Review · clicks ≥ 10 →
-                          Monitor. ACoS &gt; 100% inflates risk band.
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <span title={current.campaign}>{current.campaign || "—"}</span>
+                  {current.matchType && (
+                    <>
+                      <span style={{ color: "#D1D5DB" }}>·</span>
+                      <span
+                        className="inline-block text-[11px] font-medium px-2 py-0.5 rounded"
+                        style={{ background: "#FFFFFF", color: "#374151", border: "1px solid #E5E7EB" }}
+                      >
+                        {current.matchType}
+                      </span>
+                    </>
+                  )}
                 </div>
-              );
-            })()}
 
-            {/* f. Action buttons — equal-width grid filling card inner width */}
-            <div
-              className="grid"
-              style={{
-                marginTop: 16,
-                gap: 8,
-                width: "100%",
-                gridTemplateColumns: `repeat(${currentSpecs.length}, 1fr)`,
-              }}
-            >
-              {currentSpecs.map((spec) => {
-                const isSelected = currentDecision === spec.value;
-                const hasDecision = !!currentDecision;
-                return (
-                  <button
-                    key={spec.value}
-                    onClick={() => handleDecide(spec.value)}
-                    className="relative btn-press transition-all flex items-center justify-center w-full"
-                    style={{
-                      height: 46,
-                      borderRadius: 10,
-                      background: spec.bg,
-                      color: "#FFFFFF",
-                      fontSize: 13,
-                      fontWeight: 700,
-                      letterSpacing: "0.05em",
-                      textTransform: "uppercase",
-                      boxShadow: isSelected ? "0 0 0 3px #FFFFFF, 0 0 0 5px " + spec.bg : undefined,
-                      opacity: hasDecision && !isSelected ? 0.4 : 1,
-                    }}
-                  >
-                    {isSelected && <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" strokeWidth={2.6} />}
-                    {spec.label}
-                    <span
-                      className="absolute font-mono-nums"
+                {/* d. Metrics row — 4 equal columns */}
+                <div className="grid grid-cols-4 gap-4" style={{ marginTop: 16 }}>
+                  <Metric label="Spend" value={`$${current.spend.toFixed(2)}`} accent="#EF4444" />
+                  <Metric label="Clicks" value={current.clicks.toLocaleString()} accent="#111827" />
+                  <Metric
+                    label="Sales"
+                    value={current.sales == null ? "—" : `$${current.sales.toFixed(2)}`}
+                    accent={current.sales == null ? "#9CA3AF" : current.sales <= 0 ? "#EF4444" : "#059669"}
+                  />
+                  <Metric
+                    label="ACoS"
+                    value={current.acosNum >= 0 && current.acos ? current.acos : "—"}
+                    accent={current.acosNum < 0 ? "#9CA3AF" : current.acosNum >= 100 ? "#EF4444" : "#059669"}
+                  />
+                </div>
+
+                {/* e. Suggestion banner — 4px left border, label + reason on one line */}
+                {(() => {
+                  const s = suggestionFor(current);
+                  if (!s.label) return null;
+                  return (
+                    <div
+                      className="rounded-lg"
                       style={{
-                        right: 6,
-                        bottom: 5,
-                        fontSize: 11,
-                        fontWeight: 600,
-                        padding: "1px 5px",
-                        borderRadius: 3,
-                        background: "rgba(0,0,0,0.15)",
-                        color: "#FFFFFF",
+                        marginTop: 14,
+                        background: s.bg,
+                        borderLeft: `4px solid ${s.accent}`,
+                        borderLeftWidth: "4px",
+                        borderLeftStyle: "solid",
+                        borderLeftColor: s.accent,
+                        padding: "12px 14px",
                       }}
                     >
-                      {spec.shortcut.toUpperCase()}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+                      <div className="flex items-start gap-3">
+                        <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: s.accent }} />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-baseline gap-1.5 flex-wrap">
+                            <span
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 700,
+                                letterSpacing: "0.06em",
+                                textTransform: "uppercase",
+                                color: s.accent,
+                              }}
+                            >
+                              {s.label}
+                            </span>
+                            <span style={{ fontSize: 13, color: "#374151" }}>— {s.rationale}</span>
+                            <button
+                              onClick={() => setShowThreshold((v) => !v)}
+                              className="hover:opacity-70"
+                              aria-label="Threshold logic"
+                              style={{ color: s.accent }}
+                            >
+                              <Info className="w-3 h-3" />
+                            </button>
+                          </div>
+                          {showThreshold && (
+                            <div className="mt-2 text-[11.5px] leading-relaxed" style={{ color: "#6B7280" }}>
+                              Triggered by: clicks ≥ 15 with zero sales → Pause · clicks ≥ 13 → Review · clicks ≥ 10 →
+                              Monitor. ACoS &gt; 100% inflates risk band.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
 
-            {/* g. Secondary actions */}
-            <div className="flex items-center justify-between" style={{ marginTop: 10 }}>
-              <button
-                onClick={handleUndo}
-                disabled={!currentDecision && history.length === 0}
-                className="text-[13px] inline-flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-80"
-                style={{ color: "#9CA3AF" }}
-              >
-                <Undo2 className="w-3.5 h-3.5" /> {currentDecision ? "Change decision (Z)" : "Undo last (Z)"}
-              </button>
-              <button
-                onClick={handleSkip}
-                className="text-[13px] inline-flex items-center gap-1.5 hover:opacity-80"
-                style={{ color: "#9CA3AF" }}
-              >
-                Skip for now (S) <SkipForward className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
+                {/* f. Action buttons — equal-width grid filling card inner width */}
+                <div
+                  className="grid"
+                  style={{
+                    marginTop: 16,
+                    gap: 8,
+                    width: "100%",
+                    gridTemplateColumns: `repeat(${currentSpecs.length}, 1fr)`,
+                  }}
+                >
+                  {currentSpecs.map((spec) => {
+                    const isSelected = currentDecision === spec.value;
+                    const hasDecision = !!currentDecision;
+                    return (
+                      <button
+                        key={spec.value}
+                        onClick={() => handleDecide(spec.value)}
+                        className="relative btn-press transition-all flex items-center justify-center w-full"
+                        style={{
+                          height: 46,
+                          borderRadius: 10,
+                          background: spec.bg,
+                          color: "#FFFFFF",
+                          fontSize: 13,
+                          fontWeight: 700,
+                          letterSpacing: "0.05em",
+                          textTransform: "uppercase",
+                          boxShadow: isSelected ? "0 0 0 3px #FFFFFF, 0 0 0 5px " + spec.bg : undefined,
+                          opacity: hasDecision && !isSelected ? 0.4 : 1,
+                        }}
+                      >
+                        {isSelected && <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" strokeWidth={2.6} />}
+                        {spec.label}
+                        <span
+                          className="absolute font-mono-nums"
+                          style={{
+                            right: 6,
+                            bottom: 5,
+                            fontSize: 11,
+                            fontWeight: 600,
+                            padding: "1px 5px",
+                            borderRadius: 3,
+                            background: "rgba(0,0,0,0.15)",
+                            color: "#FFFFFF",
+                          }}
+                        >
+                          {spec.shortcut.toUpperCase()}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* g. Secondary actions */}
+                <div className="flex items-center justify-between" style={{ marginTop: 10 }}>
+                  <button
+                    onClick={handleUndo}
+                    disabled={!currentDecision && history.length === 0}
+                    className="text-[13px] inline-flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-80"
+                    style={{ color: "#9CA3AF" }}
+                  >
+                    <Undo2 className="w-3.5 h-3.5" /> {currentDecision ? "Change decision (Z)" : "Undo last (Z)"}
+                  </button>
+                  <button
+                    onClick={handleSkip}
+                    className="text-[13px] inline-flex items-center gap-1.5 hover:opacity-80"
+                    style={{ color: "#9CA3AF" }}
+                  >
+                    Skip for now (S) <SkipForward className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
             );
           })()
         ) : (
