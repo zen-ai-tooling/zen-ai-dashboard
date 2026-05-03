@@ -59,6 +59,12 @@ export const normalizeDecision = (value: any): string => {
     "pause campaign": "pause",
     "negative exact": "negative",
     negativeexact: "negative",
+    // Negative Phrase with parentheses (from UI decision buttons)
+    "negate (phrase)": "negative phrase",
+    "negate(phrase)": "negative phrase",
+    // Negative Exact with parentheses
+    "negate (exact)": "negative",
+    "negate(exact)": "negative",
   };
 
   if (corrections[squished]) {
@@ -75,15 +81,29 @@ export const normalizeDecision = (value: any): string => {
     return "pause";
   } // --- NEGATIVE bucket (handles "negative exact", "negative phrase", etc.) ---
 
+  // --- NEGATIVE PHRASE bucket (must come before plain NEGATIVE) ---
+  if (
+    squished.includes("negative phrase") ||
+    squished.includes("negate phrase") ||
+    squished.includes("neg phrase") ||
+    (squished.includes("negate") && squished.includes("phrase")) ||
+    (squished.includes("negative") && squished.includes("phrase"))
+  ) {
+    return "negative phrase";
+  }
+
+  // --- NEGATIVE bucket ---
   if (
     squished === "negative" ||
     squished === "n" ||
     squished.startsWith("negative") ||
+    squished.startsWith("negate") ||
     squished.includes(" negative") ||
     squished.includes("neg ")
   ) {
     return "negative";
-  } // --- CUT BID bucket ---
+  }
+  // --- CUT BID bucket ---
 
   if (
     squished === "cut bid" ||

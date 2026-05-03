@@ -181,7 +181,9 @@ const findHeaderIndex = (rawHeaders: string[], canonical: string): number => {
 };
 
 // Fuzzy match decision values using shared normalizer
-const fuzzyMatchDecision = (value: any): { decision: "pause" | "negative" | "keep"; wasRepaired: boolean } => {
+const fuzzyMatchDecision = (
+  value: any,
+): { decision: "pause" | "negative" | "negative phrase" | "keep"; wasRepaired: boolean } => {
   if (
     value === null ||
     value === undefined ||
@@ -195,11 +197,20 @@ const fuzzyMatchDecision = (value: any): { decision: "pause" | "negative" | "kee
   const original = String(value).trim();
   const lower = original.toLowerCase();
 
-  // 🔒 Fast substring safety net (handles "Pause Keyword", "Negative Exact", etc.)
+  // 🔒 Fast substring safety net — phrase check MUST come before plain negative
   if (lower.includes("pause")) {
     return { decision: "pause", wasRepaired: lower !== "pause" };
   }
-  if (lower.includes("negative")) {
+  if (
+    lower.includes("negative phrase") ||
+    lower.includes("negate phrase") ||
+    lower.includes("neg phrase") ||
+    (lower.includes("negate") && lower.includes("phrase")) ||
+    (lower.includes("negative") && lower.includes("phrase"))
+  ) {
+    return { decision: "negative phrase", wasRepaired: lower !== "negative phrase" };
+  }
+  if (lower.includes("negative") || lower.includes("negate")) {
     return { decision: "negative", wasRepaired: lower !== "negative" };
   }
 
