@@ -595,7 +595,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                 className="text-[13px] inline-flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-80"
                 style={{ color: "#9CA3AF" }}
               >
-                <Undo2 className="w-3.5 h-3.5" /> {currentDecision ? "Clear decision (Z)" : "Undo last (Z)"}
+                <Undo2 className="w-3.5 h-3.5" /> {currentDecision ? "Change decision (Z)" : "Undo last (Z)"}
               </button>
               <button
                 onClick={handleSkip}
