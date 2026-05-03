@@ -673,17 +673,12 @@ export const ReviewAllMode = ({
                           </TooltipTrigger>
                           <TooltipContent side="bottom" className="max-w-[280px] text-[12px] leading-relaxed">
                             <div className="space-y-1.5">
-                              <div>
-                                <strong>Pause</strong>: Zero sales, high spend over threshold period
-                              </div>
-                              <div>
-                                <strong>Monitor</strong>: Low sales relative to spend, watch closely
-                              </div>
-                              <div>
-                                <strong>Cut Bid</strong>: High ACoS or moderate spend — reduce bid before pausing
-                              </div>
-                              <div>
-                                <strong>None</strong>: Within acceptable performance range
+                              <div><strong>Pause</strong>: ACoS ≥ 100% or 30+ clicks with zero conversions</div>
+                              <div><strong>Cut Bid</strong>: ACoS 80–99% or moderate spend, no conversions</div>
+                              <div><strong>Monitor</strong>: Some activity, not enough signal yet</div>
+                              <div><strong>None</strong>: Acceptable performance</div>
+                              <div style={{ marginTop: 4, color: '#9CA3AF' }}>
+                                On search term sheets, suggestions automatically show Negative.
                               </div>
                             </div>
                           </TooltipContent>
