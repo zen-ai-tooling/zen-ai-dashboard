@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/u
 import { SortHeader, useSortable } from "@/components/shared/SortHeader";
 import { suggestB1Row } from "@/lib/ui/bleeder1Suggestion";
 import { DecisionSelect, decisionRowClass } from "@/components/shared/DecisionSelect";
+import { useHistory } from "@/context/HistoryContext";
 
 interface NormalizedRow {
   sheet: string;
@@ -113,6 +114,17 @@ export const ReviewAllMode = ({
       })
       .sort((a, b) => b.spendAtRisk - a.spendAtRisk);
   }, [rowsBySheet, decisions]);
+
+  const { entries } = useHistory();
+  const repeatEntities = useMemo(() => {
+    const counts: Record<string, number> = {};
+    entries.forEach((e) => {
+      ((e as any).bleeders ?? []).forEach((b: string) => {
+        counts[b] = (counts[b] ?? 0) + 1;
+      });
+    });
+    return new Set(Object.keys(counts).filter((k) => counts[k] >= 2));
+  }, [entries]);
 
   const [activeSheet, setActiveSheet] = useState<string>(sheetMeta[0]?.sheet || "");
   useEffect(() => {
@@ -762,7 +774,17 @@ export const ReviewAllMode = ({
                         </TooltipProvider>
                       </TableCell>
                       <TableCell style={{ width: 160 }}>
-                        <span className="block whitespace-normal break-words text-[12.5px]">{entityDisplay}</span>
+                        <span className="inline-flex items-center gap-1.5 whitespace-normal break-words text-[12.5px]">
+                          {repeatEntities.has(entityDisplay) && (
+                            <span
+                              className="inline-block rounded-full flex-shrink-0"
+                              style={{ width: 6, height: 6, background: "#F59E0B" }}
+                              title="Repeat bleeder — seen in previous sessions"
+                              aria-label="Repeat bleeder"
+                            />
+                          )}
+                          {entityDisplay}
+                        </span>
                       </TableCell>
                       {showAdGroup && (
                         <TableCell className="text-[hsl(var(--text-secondary))]" style={{ width: 160 }}>
