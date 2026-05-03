@@ -72,8 +72,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
 
   const hasBleeders = result.bleeders.length > 0;
 
-  const suggestions = useMemo(() => result.bleeders.map(bleeder =>
-    suggestDecision({
+  const suggestions = useMemo(() => result.bleeders.map(bleeder => {
+    const raw = suggestDecision({
       acos: bleeder.acos,
       spend: bleeder.spend,
       orders: bleeder.orders,
@@ -81,12 +81,26 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
       matchType: bleeder.matchType,
       entity: bleeder.entity,
       trackType: result.trackType,
-    })
-  ), [result.bleeders, result.trackType]);
+    });
+    // SP Search Terms: cut_bid/review → Negative
+    if (result.trackType === 'SP' &&
+        (raw.decision === 'Cut Bid' ||
+         raw.shortLabel === 'Review' ||
+         raw.shortLabel === 'Cut bid' ||
+         raw.shortLabel === 'Cut bid?')) {
+      return {
+        ...raw,
+        decision: 'Negative' as any,
+        shortLabel: 'Negative',
+        reason: 'Search term — negate to stop spend',
+      };
+    }
+    return raw;
+  }), [result.bleeders, result.trackType]);
 
   const getDecisionOptions = () => {
     if (result.trackType === 'ACOS100') return ['Pause', 'Cut Bid', 'Keep'];
-    if (result.trackType === 'SP') return ['Negative', 'Pause', 'Keep'];
+    if (result.trackType === 'SP') return ['Negative', 'Keep'];
     return ['Negative', 'Pause', 'Cut Bid', 'Keep'];
   };
 
