@@ -651,7 +651,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                   <SortHeader active={sortKey === 'acos'} dir={sortDir} onClick={() => toggleSort('acos')} align="right">ACoS</SortHeader>
                 </TableHead>
                 <TableHead className="w-[80px]" style={{ letterSpacing: '0.08em' }}>Suggestion</TableHead>
-                <TableHead className="w-[200px]" style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
+                <TableHead className="w-[160px]" style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -738,25 +738,27 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                       </button>
                     </TableCell>
                     <TableCell onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-1.5">
-                        <DecisionSelect
-                          value={decision}
-                          onChange={(val) => setDecisionWithFlash(idx, val)}
-                          options={getDecisionOptions()}
-                          placeholder="Decide..."
-                          width="128px"
-                        />
+                      <div className="flex items-center gap-1 min-w-0">
+                        <div className="flex-shrink-0">
+                          <DecisionSelect
+                            value={decision}
+                            onChange={(val) => setDecisionWithFlash(idx, val)}
+                            options={getDecisionOptions()}
+                            placeholder="Decide..."
+                            width="110px"
+                          />
+                        </div>
                         {decisions[idx] === 'Cut Bid' && (
-                          <div className="flex items-center gap-0.5">
+                          <div className="flex items-center gap-0.5 flex-shrink-0">
                             <Input
                               type="number"
                               min={1}
                               max={99}
-                              className="h-7 w-14 text-[12px] font-mono-nums"
+                              className="h-7 w-12 text-[12px] font-mono-nums"
                               value={cutBidPcts[idx] ?? 25}
                               onChange={(e) => setCutBidPcts(prev => ({ ...prev, [idx]: parseInt(e.target.value) || 25 }))}
                             />
-                            <span className="text-[11px] text-muted-foreground">%</span>
+                            <span className="text-[11px]" style={{ color: '#9CA3AF' }}>%</span>
                           </div>
                         )}
                       </div>
