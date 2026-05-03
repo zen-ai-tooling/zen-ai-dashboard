@@ -377,17 +377,12 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                     const spec = currentSpecs.find((s) => s.value === currentDecision);
                     if (!spec) return null;
                     return (
-                      <span className="inline-flex items-center gap-1.5" style={{ color: spec.bg }}>
-                        <span
-                          style={{
-                            width: 6,
-                            height: 6,
-                            borderRadius: 999,
-                            background: spec.bg,
-                            display: "inline-block",
-                          }}
-                        />
-                        <span style={{ fontWeight: 600 }}>{spec.label}</span>
+                      <span
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold"
+                        style={{ background: spec.bg, color: "#FFFFFF" }}
+                      >
+                        <CheckCircle2 className="w-3 h-3" />
+                        {spec.label}
                       </span>
                     );
                   })()}
