@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { CheckCircle2, SkipForward, Undo2, Info, Sparkles, ArrowRight } from 'lucide-react';
-import { suggestB1Row } from '@/lib/ui/bleeder1Suggestion';
+import * as React from "react";
+import { CheckCircle2, SkipForward, Undo2, Info, Sparkles, ArrowRight } from "lucide-react";
+import { suggestB1Row } from "@/lib/ui/bleeder1Suggestion";
 
 /**
  * Triage Mode — full-bleed, immersive one-card-at-a-time decision interface.
@@ -85,20 +85,24 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   const [skipped, setSkipped] = React.useState<Set<string>>(new Set());
   const [history, setHistory] = React.useState<string[]>([]);
   const [cursor, setCursor] = React.useState(0);
-  const [direction, setDirection] = React.useState<'left' | 'right'>('right');
-  const [phase, setPhase] = React.useState<'idle' | 'exiting'>('idle');
+  const [direction, setDirection] = React.useState<"left" | "right">("right");
+  const [phase, setPhase] = React.useState<"idle" | "exiting">("idle");
   const [showThreshold, setShowThreshold] = React.useState(false);
   const [showLegend, setShowLegend] = React.useState(true);
 
   // Refs that survive re-renders — used by debounced key handler
   const lastKeyAtRef = React.useRef(0);
-  const phaseRef = React.useRef<'idle' | 'exiting'>('idle');
-  React.useEffect(() => { phaseRef.current = phase; }, [phase]);
+  const phaseRef = React.useRef<"idle" | "exiting">("idle");
+  React.useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
 
   // Toggle the body class so the global sidebar slides out and the topbar hides.
   React.useEffect(() => {
-    document.body.classList.add('triage-active');
-    return () => { document.body.classList.remove('triage-active'); };
+    document.body.classList.add("triage-active");
+    return () => {
+      document.body.classList.remove("triage-active");
+    };
   }, []);
 
   const queue = React.useMemo(() => {
@@ -118,10 +122,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   }, [queue.length, cursor]);
 
   const total = items.length;
-  const decisionsMade = React.useMemo(
-    () => items.filter(it => decisions[it.key]).length,
-    [items, decisions]
-  );
+  const decisionsMade = React.useMemo(() => items.filter((it) => decisions[it.key]).length, [items, decisions]);
 
   const allDone = decisionsMade >= total && total > 0;
   const progressPct = total > 0 ? (decisionsMade / total) * 100 : 0;
@@ -132,7 +133,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
       const d = decisions[it.key];
       if (!d) return;
       const specs = decisionSpecsBySheet(it.sheet);
-      const spec = specs.find(x => x.value === d);
+      const spec = specs.find((x) => x.value === d);
       if (spec?.countsAsSavings) s += it.spend || 0;
     });
     return s;
@@ -144,31 +145,31 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   const currentDecision = current ? decisions[current.key] : undefined;
 
   // Sequential exit -> advance -> enter. Keeps only one card visible at a time.
-  const sequence = (dir: 'left' | 'right', advance: () => void) => {
-    if (phaseRef.current === 'exiting') return;
+  const sequence = (dir: "left" | "right", advance: () => void) => {
+    if (phaseRef.current === "exiting") return;
     setDirection(dir);
-    setPhase('exiting');
+    setPhase("exiting");
     window.setTimeout(() => {
       advance();
-      setPhase('idle');
+      setPhase("idle");
     }, 130);
   };
 
   const handleDecide = (val: string) => {
     if (!current) return;
     const wasUndecided = !decisions[current.key];
-    if (wasUndecided) setHistory(h => [...h, current.key]);
+    if (wasUndecided) setHistory((h) => [...h, current.key]);
     onDecide(current.key, val);
-    sequence('right', () => {
-      setCursor(c => Math.min(c + 1, queue.length - 1));
+    sequence("right", () => {
+      setCursor((c) => Math.min(c + 1, queue.length - 1));
     });
   };
 
   const handleSkip = () => {
     if (!current || decisions[current.key]) return;
-    setSkipped(s => new Set(s).add(current.key));
-    sequence('right', () => {
-      setCursor(c => Math.min(c + 1, queue.length - 1));
+    setSkipped((s) => new Set(s).add(current.key));
+    sequence("right", () => {
+      setCursor((c) => Math.min(c + 1, queue.length - 1));
     });
   };
 
@@ -177,24 +178,24 @@ export const TriageMode: React.FC<TriageModeProps> = ({
   const handleUndo = () => {
     if (current && decisions[current.key]) {
       onUndo?.(current.key);
-      setHistory(h => h.filter(k => k !== current.key));
+      setHistory((h) => h.filter((k) => k !== current.key));
       return;
     }
     const last = history[history.length - 1];
     if (!last) return;
     onUndo?.(last);
-    setHistory(h => h.slice(0, -1));
-    const idx = queue.findIndex(q => q.key === last);
+    setHistory((h) => h.slice(0, -1));
+    const idx = queue.findIndex((q) => q.key === last);
     if (idx >= 0) {
-      sequence('left', () => setCursor(idx));
+      sequence("left", () => setCursor(idx));
     }
   };
 
   const handlePrev = () => {
-    sequence('left', () => setCursor(c => Math.max(0, c - 1)));
+    sequence("left", () => setCursor((c) => Math.max(0, c - 1)));
   };
   const handleNext = () => {
-    sequence('right', () => setCursor(c => Math.min(queue.length - 1, c + 1)));
+    sequence("right", () => setCursor((c) => Math.min(queue.length - 1, c + 1)));
   };
 
   React.useEffect(() => {
@@ -208,31 +209,54 @@ export const TriageMode: React.FC<TriageModeProps> = ({
         lastKeyAtRef.current = now;
 
         const k = e.key.toLowerCase();
-        if (e.key === 'ArrowLeft') { e.preventDefault(); handlePrev(); return; }
-        if (e.key === 'ArrowRight') { e.preventDefault(); handleNext(); return; }
-        if (k === 's') { e.preventDefault(); handleSkip(); return; }
-        if (k === 'z') { e.preventDefault(); handleUndo(); return; }
-        if (k === 'escape') { e.preventDefault(); onSwitchToReview(); return; }
-        const spec = currentSpecs.find(s => s.shortcut.toLowerCase() === k);
-        if (spec) { e.preventDefault(); handleDecide(spec.value); }
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          handlePrev();
+          return;
+        }
+        if (e.key === "ArrowRight") {
+          e.preventDefault();
+          handleNext();
+          return;
+        }
+        if (k === "s") {
+          e.preventDefault();
+          handleSkip();
+          return;
+        }
+        if (k === "z") {
+          e.preventDefault();
+          handleUndo();
+          return;
+        }
+        if (k === "escape") {
+          e.preventDefault();
+          onSwitchToReview();
+          return;
+        }
+        const spec = currentSpecs.find((s) => s.shortcut.toLowerCase() === k);
+        if (spec) {
+          e.preventDefault();
+          handleDecide(spec.value);
+        }
       } catch (err) {
         // Never let a key handler crash the component
         // eslint-disable-next-line no-console
-        console.error('[TriageMode] key handler error', err);
+        console.error("[TriageMode] key handler error", err);
       }
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current?.key, currentSpecs, queue.length, cursor, history]);
 
   const suggestionFor = (it: TriageItem) => {
     const sug = suggestB1Row({ clicks: it.clicks, spend: it.spend, sales: it.sales, orders: it.orders });
     const map: Record<string, { label: string; accent: string; bg: string }> = {
-      pause:   { label: 'PAUSE',   accent: '#EF4444', bg: 'rgba(239, 68, 68, 0.06)' },
-      review:  { label: 'REVIEW',  accent: '#F59E0B', bg: 'rgba(245, 158, 11, 0.06)' },
-      monitor: { label: 'MONITOR', accent: '#6B7280', bg: 'rgba(107, 114, 128, 0.06)' },
-      keep:    { label: '',        accent: '',        bg: '' },
+      pause: { label: "PAUSE", accent: "#EF4444", bg: "rgba(239, 68, 68, 0.06)" },
+      review: { label: "REVIEW", accent: "#F59E0B", bg: "rgba(245, 158, 11, 0.06)" },
+      monitor: { label: "MONITOR", accent: "#6B7280", bg: "rgba(107, 114, 128, 0.06)" },
+      keep: { label: "", accent: "", bg: "" },
     };
     const banner = map[sug.kind] ?? map.keep;
     return { ...banner, rationale: sug.rationale, kind: sug.kind };
@@ -245,26 +269,31 @@ export const TriageMode: React.FC<TriageModeProps> = ({
       {/* Progress bar — absolute, on top of grid, above row 1 */}
       <div
         className="absolute"
-        style={{ top: 0, left: 0, width: '100%', height: 3, background: 'rgba(255,255,255,0.06)', zIndex: 10 }}
+        style={{ top: 0, left: 0, width: "100%", height: 3, background: "rgba(255,255,255,0.06)", zIndex: 10 }}
       >
         <div
           className="h-full transition-all duration-500 ease-out"
-          style={{ width: `${progressPct}%`, background: '#0D9488' }}
+          style={{ width: `${progressPct}%`, background: "#0D9488" }}
         />
       </div>
 
       {/* ── Row 1: top bar (48px) ── */}
-      <div className="flex items-center justify-between" style={{ height: 48, paddingLeft: 24, paddingRight: 24, paddingTop: 3 }}>
+      <div
+        className="flex items-center justify-between"
+        style={{ height: 48, paddingLeft: 24, paddingRight: 24, paddingTop: 3 }}
+      >
         <button
           onClick={onSwitchToReview}
           className="hover:text-white transition-colors"
-          style={{ color: '#9CA3AF', fontSize: 13 }}
+          style={{ color: "#9CA3AF", fontSize: 13 }}
         >
           ← Exit triage
         </button>
-        <div className="flex items-center gap-3 tabular-nums" style={{ color: '#FFFFFF', fontSize: 13 }}>
-          <span>{decisionsMade}/{total}</span>
-          <span style={{ width: 1, height: 14, background: 'rgba(255,255,255,0.25)' }} />
+        <div className="flex items-center gap-3 tabular-nums" style={{ color: "#FFFFFF", fontSize: 13 }}>
+          <span>
+            {decisionsMade}/{total}
+          </span>
+          <span style={{ width: 1, height: 14, background: "rgba(255,255,255,0.25)" }} />
           <span className="inline-flex items-center gap-1.5">
             <span aria-hidden>💰</span>
             <span>${Math.round(counterValue).toLocaleString()} addressed</span>
@@ -273,83 +302,93 @@ export const TriageMode: React.FC<TriageModeProps> = ({
       </div>
 
       {/* ── Row 2: centered card zone (1fr) ── */}
-      <div
-        className="flex items-center justify-center px-4 min-h-0"
-        style={{ overflow: 'hidden' }}
-      >
-
-
+      <div className="flex items-center justify-center px-4 min-h-0" style={{ overflow: "hidden" }}>
         {total === 0 ? (
-          <div className="bg-white text-center" style={{ borderRadius: 16, padding: 40, maxWidth: 640, width: '85%' }}>
-            <h2 className="text-[20px] font-semibold" style={{ color: '#111827' }}>No bleeders to review</h2>
-            <p className="mt-2 text-[13px]" style={{ color: '#6B7280' }}>There's nothing to triage right now.</p>
+          <div className="bg-white text-center" style={{ borderRadius: 16, padding: 40, maxWidth: 640, width: "85%" }}>
+            <h2 className="text-[20px] font-semibold" style={{ color: "#111827" }}>
+              No bleeders to review
+            </h2>
+            <p className="mt-2 text-[13px]" style={{ color: "#6B7280" }}>
+              There's nothing to triage right now.
+            </p>
             <button
               onClick={onSwitchToReview}
               className="mt-5 inline-flex items-center justify-center h-10 px-5 rounded-lg text-[13px] font-semibold text-white"
-              style={{ background: '#0D9488' }}
+              style={{ background: "#0D9488" }}
             >
               Exit triage
             </button>
           </div>
         ) : allDone ? (
-          <CompletionCard
-            total={total}
-            savings={savingsTarget}
-            onGenerate={onGenerate}
-            onReview={onSwitchToReview}
-          />
+          <CompletionCard total={total} savings={savingsTarget} onGenerate={onGenerate} onReview={onSwitchToReview} />
         ) : current ? (
           <div
-            key={current.key + ':' + (phase === 'exiting' ? 'out' : 'in') + ':' + direction}
+            key={current.key + ":" + (phase === "exiting" ? "out" : "in") + ":" + direction}
             className="bg-white text-[#111827] overflow-y-auto"
             style={{
-              width: '85%',
+              width: "85%",
               maxWidth: 640,
-              maxHeight: 'calc(100vh - 52px - 48px - 64px)',
+              maxHeight: "calc(100vh - 52px - 48px - 64px)",
               borderRadius: 16,
               padding: 22,
-              boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
-              animation: phase === 'exiting'
-                ? (direction === 'right'
-                    ? 'triage-out-left 120ms ease-in forwards'
-                    : 'triage-out-right 120ms ease-in forwards')
-                : (direction === 'right'
-                    ? 'triage-in-right 150ms ease-out'
-                    : 'triage-in-left 150ms ease-out'),
+              boxShadow: "0 25px 60px rgba(0,0,0,0.5)",
+              animation:
+                phase === "exiting"
+                  ? direction === "right"
+                    ? "triage-out-left 120ms ease-in forwards"
+                    : "triage-out-right 120ms ease-in forwards"
+                  : direction === "right"
+                    ? "triage-in-right 150ms ease-out"
+                    : "triage-in-left 150ms ease-out",
             }}
           >
             {/* a. Header row */}
             <div className="flex items-center justify-between gap-4">
               <span
                 className="inline-flex items-center text-[10.5px] font-semibold uppercase tracking-[0.10em] px-2 py-1 rounded-md"
-                style={{ background: '#F3F4F6', color: '#6B7280' }}
+                style={{ background: "#F3F4F6", color: "#6B7280" }}
               >
                 {shortSheetLabel(current.sheet)}
               </span>
-              <div className="text-[12px] tabular-nums flex items-center gap-2" style={{ color: '#9CA3AF' }}>
+              <div className="text-[12px] tabular-nums flex items-center gap-2" style={{ color: "#9CA3AF" }}>
                 <span>
-                  <span className="font-semibold" style={{ color: '#374151' }}>{cursor + 1}</span> of {queue.length}
+                  <span className="font-semibold" style={{ color: "#374151" }}>
+                    {cursor + 1}
+                  </span>{" "}
+                  of {queue.length}
                 </span>
-                {currentDecision && (() => {
-                  const spec = currentSpecs.find(s => s.value === currentDecision);
-                  if (!spec) return null;
-                  return (
-                    <span className="inline-flex items-center gap-1.5" style={{ color: spec.bg }}>
-                      <span style={{ width: 6, height: 6, borderRadius: 999, background: spec.bg, display: 'inline-block' }} />
-                      <span style={{ fontWeight: 600 }}>{spec.label}</span>
-                    </span>
-                  );
-                })()}
+                {currentDecision &&
+                  (() => {
+                    const spec = currentSpecs.find((s) => s.value === currentDecision);
+                    if (!spec) return null;
+                    return (
+                      <span className="inline-flex items-center gap-1.5" style={{ color: spec.bg }}>
+                        <span
+                          style={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: 999,
+                            background: spec.bg,
+                            display: "inline-block",
+                          }}
+                        />
+                        <span style={{ fontWeight: 600 }}>{spec.label}</span>
+                      </span>
+                    );
+                  })()}
               </div>
             </div>
             {/* card progress bar — overall session completion */}
-            <div className="mt-3 w-full overflow-hidden" style={{ height: 4, background: '#F3F4F6', borderRadius: 2 }}>
-              <div className="h-full transition-all duration-300" style={{ width: `${progressPct}%`, background: '#0D9488', borderRadius: 2 }} />
+            <div className="mt-3 w-full overflow-hidden" style={{ height: 4, background: "#F3F4F6", borderRadius: 2 }}>
+              <div
+                className="h-full transition-all duration-300"
+                style={{ width: `${progressPct}%`, background: "#0D9488", borderRadius: 2 }}
+              />
             </div>
 
             {/* b. Entity name — ASINs render muted with prefix label */}
             {(() => {
-              const isAsin = /^B[A-Z0-9]{9}$/.test(current.entity || '');
+              const isAsin = /^B[A-Z0-9]{9}$/.test(current.entity || "");
               if (isAsin) {
                 return (
                   <div className="flex items-baseline gap-2 break-words" style={{ marginTop: 14 }}>
@@ -357,11 +396,11 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                       style={{
                         fontSize: 10,
                         fontWeight: 600,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.10em',
-                        color: '#9CA3AF',
-                        padding: '2px 6px',
-                        background: '#F3F4F6',
+                        textTransform: "uppercase",
+                        letterSpacing: "0.10em",
+                        color: "#9CA3AF",
+                        padding: "2px 6px",
+                        background: "#F3F4F6",
                         borderRadius: 4,
                       }}
                     >
@@ -369,7 +408,13 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                     </span>
                     <h2
                       className="break-words tabular-nums"
-                      style={{ fontSize: 24, fontWeight: 600, color: '#9CA3AF', lineHeight: 1.2, letterSpacing: '-0.01em' }}
+                      style={{
+                        fontSize: 24,
+                        fontWeight: 600,
+                        color: "#9CA3AF",
+                        lineHeight: 1.2,
+                        letterSpacing: "-0.01em",
+                      }}
                     >
                       {current.entity}
                     </h2>
@@ -379,7 +424,14 @@ export const TriageMode: React.FC<TriageModeProps> = ({
               return (
                 <h2
                   className="break-words"
-                  style={{ marginTop: 14, fontSize: 24, fontWeight: 700, color: '#111827', lineHeight: 1.2, letterSpacing: '-0.02em' }}
+                  style={{
+                    marginTop: 14,
+                    fontSize: 24,
+                    fontWeight: 700,
+                    color: "#111827",
+                    lineHeight: 1.2,
+                    letterSpacing: "-0.02em",
+                  }}
                 >
                   {current.entity}
                 </h2>
@@ -387,18 +439,14 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             })()}
 
             {/* c. Metadata row — campaign (≤35 chars) · match pill */}
-            <div className="flex items-center gap-2 flex-wrap" style={{ marginTop: 6, fontSize: 13, color: '#9CA3AF' }}>
-              <span title={current.campaign}>
-                {current.campaign && current.campaign.length > 35
-                  ? `${current.campaign.slice(0, 35)}…`
-                  : (current.campaign || '—')}
-              </span>
+            <div className="flex items-center gap-2 flex-wrap" style={{ marginTop: 6, fontSize: 13, color: "#9CA3AF" }}>
+              <span title={current.campaign}>{current.campaign || "—"}</span>
               {current.matchType && (
                 <>
-                  <span style={{ color: '#D1D5DB' }}>·</span>
+                  <span style={{ color: "#D1D5DB" }}>·</span>
                   <span
                     className="inline-block text-[11px] font-medium px-2 py-0.5 rounded"
-                    style={{ background: '#FFFFFF', color: '#374151', border: '1px solid #E5E7EB' }}
+                    style={{ background: "#FFFFFF", color: "#374151", border: "1px solid #E5E7EB" }}
                   >
                     {current.matchType}
                   </span>
@@ -412,21 +460,13 @@ export const TriageMode: React.FC<TriageModeProps> = ({
               <Metric label="Clicks" value={current.clicks.toLocaleString()} accent="#111827" />
               <Metric
                 label="Sales"
-                value={current.sales == null ? '—' : `$${current.sales.toFixed(2)}`}
-                accent={
-                  current.sales == null ? '#9CA3AF'
-                  : current.sales <= 0 ? '#EF4444'
-                  : '#059669'
-                }
+                value={current.sales == null ? "—" : `$${current.sales.toFixed(2)}`}
+                accent={current.sales == null ? "#9CA3AF" : current.sales <= 0 ? "#EF4444" : "#059669"}
               />
               <Metric
                 label="ACoS"
-                value={current.acosNum >= 0 && current.acos ? current.acos : '—'}
-                accent={
-                  current.acosNum < 0 ? '#9CA3AF'
-                  : current.acosNum >= 100 ? '#EF4444'
-                  : '#059669'
-                }
+                value={current.acosNum >= 0 && current.acos ? current.acos : "—"}
+                accent={current.acosNum < 0 ? "#9CA3AF" : current.acosNum >= 100 ? "#EF4444" : "#059669"}
               />
             </div>
 
@@ -441,24 +481,30 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                     marginTop: 14,
                     background: s.bg,
                     borderLeft: `4px solid ${s.accent}`,
-                    borderLeftWidth: '4px',
-                    borderLeftStyle: 'solid',
+                    borderLeftWidth: "4px",
+                    borderLeftStyle: "solid",
                     borderLeftColor: s.accent,
-                    padding: '12px 14px',
+                    padding: "12px 14px",
                   }}
                 >
                   <div className="flex items-start gap-3">
                     <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: s.accent }} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline gap-1.5 flex-wrap">
-                        <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: s.accent }}>
+                        <span
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 700,
+                            letterSpacing: "0.06em",
+                            textTransform: "uppercase",
+                            color: s.accent,
+                          }}
+                        >
                           {s.label}
                         </span>
-                        <span style={{ fontSize: 13, color: '#374151' }}>
-                          — {s.rationale}
-                        </span>
+                        <span style={{ fontSize: 13, color: "#374151" }}>— {s.rationale}</span>
                         <button
-                          onClick={() => setShowThreshold(v => !v)}
+                          onClick={() => setShowThreshold((v) => !v)}
                           className="hover:opacity-70"
                           aria-label="Threshold logic"
                           style={{ color: s.accent }}
@@ -467,9 +513,9 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                         </button>
                       </div>
                       {showThreshold && (
-                        <div className="mt-2 text-[11.5px] leading-relaxed" style={{ color: '#6B7280' }}>
-                          Triggered by: clicks ≥ 15 with zero sales → Pause · clicks ≥ 13 → Review ·
-                          clicks ≥ 10 → Monitor. ACoS &gt; 100% inflates risk band.
+                        <div className="mt-2 text-[11.5px] leading-relaxed" style={{ color: "#6B7280" }}>
+                          Triggered by: clicks ≥ 15 with zero sales → Pause · clicks ≥ 13 → Review · clicks ≥ 10 →
+                          Monitor. ACoS &gt; 100% inflates risk band.
                         </div>
                       )}
                     </div>
@@ -484,7 +530,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
               style={{
                 marginTop: 16,
                 gap: 8,
-                width: '100%',
+                width: "100%",
                 gridTemplateColumns: `repeat(${currentSpecs.length}, 1fr)`,
               }}
             >
@@ -500,12 +546,12 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                       height: 46,
                       borderRadius: 10,
                       background: spec.bg,
-                      color: '#FFFFFF',
+                      color: "#FFFFFF",
                       fontSize: 13,
                       fontWeight: 700,
-                      letterSpacing: '0.05em',
-                      textTransform: 'uppercase',
-                      boxShadow: isSelected ? '0 0 0 2px #FFFFFF, 0 0 0 4px ' + spec.bg + '55' : undefined,
+                      letterSpacing: "0.05em",
+                      textTransform: "uppercase",
+                      boxShadow: isSelected ? "0 0 0 2px #FFFFFF, 0 0 0 4px " + spec.bg + "55" : undefined,
                       opacity: hasDecision && !isSelected ? 0.8 : 1,
                     }}
                   >
@@ -518,10 +564,10 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                         bottom: 5,
                         fontSize: 11,
                         fontWeight: 600,
-                        padding: '1px 5px',
+                        padding: "1px 5px",
                         borderRadius: 3,
-                        background: 'rgba(0,0,0,0.15)',
-                        color: '#FFFFFF',
+                        background: "rgba(0,0,0,0.15)",
+                        color: "#FFFFFF",
                       }}
                     >
                       {spec.shortcut.toUpperCase()}
@@ -537,27 +583,31 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                 onClick={handleUndo}
                 disabled={!currentDecision && history.length === 0}
                 className="text-[13px] inline-flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-80"
-                style={{ color: '#9CA3AF' }}
+                style={{ color: "#9CA3AF" }}
               >
-                <Undo2 className="w-3.5 h-3.5" /> {currentDecision ? 'Clear decision (Z)' : 'Undo last (Z)'}
+                <Undo2 className="w-3.5 h-3.5" /> {currentDecision ? "Clear decision (Z)" : "Undo last (Z)"}
               </button>
               <button
                 onClick={handleSkip}
                 className="text-[13px] inline-flex items-center gap-1.5 hover:opacity-80"
-                style={{ color: '#9CA3AF' }}
+                style={{ color: "#9CA3AF" }}
               >
                 Skip for now (S) <SkipForward className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
         ) : (
-          <div className="bg-white text-center" style={{ borderRadius: 16, padding: 40, maxWidth: 640, width: '85%' }}>
-            <h2 className="text-[20px] font-semibold" style={{ color: '#111827' }}>No bleeders to review</h2>
-            <p className="mt-2 text-[13px]" style={{ color: '#6B7280' }}>There's nothing to triage right now.</p>
+          <div className="bg-white text-center" style={{ borderRadius: 16, padding: 40, maxWidth: 640, width: "85%" }}>
+            <h2 className="text-[20px] font-semibold" style={{ color: "#111827" }}>
+              No bleeders to review
+            </h2>
+            <p className="mt-2 text-[13px]" style={{ color: "#6B7280" }}>
+              There's nothing to triage right now.
+            </p>
             <button
               onClick={onSwitchToReview}
               className="mt-5 inline-flex items-center justify-center h-10 px-5 rounded-lg text-[13px] font-semibold text-white"
-              style={{ background: '#0D9488' }}
+              style={{ background: "#0D9488" }}
             >
               Exit triage
             </button>
@@ -566,10 +616,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
       </div>
 
       {/* ── Row 3: bottom bar (64px) — generate centered, shortcuts right ── */}
-      <div
-        className="relative"
-        style={{ height: 64, padding: '0 16px' }}
-      >
+      <div className="relative" style={{ height: 64, padding: "0 16px" }}>
         {/* Generate file pill — centered in row */}
         {!allDone && (
           <button
@@ -577,16 +624,16 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             disabled={decisionsMade === 0}
             className="absolute inline-flex items-center gap-1.5 hover:opacity-90 btn-press disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: '#0D9488',
-              color: '#FFFFFF',
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              background: "#0D9488",
+              color: "#FFFFFF",
               borderRadius: 24,
-              padding: '8px 20px',
+              padding: "8px 20px",
               fontSize: 12,
               fontWeight: 600,
-              boxShadow: '0 4px 16px rgba(13,148,136,0.4)',
+              boxShadow: "0 4px 16px rgba(13,148,136,0.4)",
               zIndex: 40,
             }}
           >
@@ -601,31 +648,34 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             className="absolute"
             style={{
               right: 24,
-              top: '50%',
-              transform: 'translateY(-50%)',
+              top: "50%",
+              transform: "translateY(-50%)",
               width: 176,
-              background: '#1F2937',
-              border: '1px solid #374151',
+              background: "#1F2937",
+              border: "1px solid #374151",
               borderRadius: 10,
-              padding: '10px 12px',
+              padding: "10px 12px",
               zIndex: 45,
             }}
           >
             <div className="flex items-center justify-between" style={{ marginBottom: 8 }}>
-              <span className="inline-flex items-center gap-1.5" style={{ color: '#FFFFFF', fontSize: 11, fontWeight: 600 }}>
+              <span
+                className="inline-flex items-center gap-1.5"
+                style={{ color: "#FFFFFF", fontSize: 11, fontWeight: 600 }}
+              >
                 ⌨ Shortcuts
               </span>
               <button
                 onClick={() => setShowLegend(false)}
                 className="hover:opacity-70"
                 aria-label="Hide shortcuts"
-                style={{ color: '#9CA3AF', fontSize: 13, lineHeight: 1 }}
+                style={{ color: "#9CA3AF", fontSize: 13, lineHeight: 1 }}
               >
                 ×
               </button>
             </div>
             <div className="flex flex-col" style={{ gap: 6, fontSize: 11 }}>
-              {currentSpecs.map(s => (
+              {currentSpecs.map((s) => (
                 <ShortcutRow key={s.value} label={s.label} k={s.shortcut.toUpperCase()} />
               ))}
               <ShortcutRow label="SKIP" k="S" />
@@ -640,11 +690,11 @@ export const TriageMode: React.FC<TriageModeProps> = ({
             className="absolute inline-flex items-center gap-1.5 rounded-full px-3 h-7 text-[11px] hover:opacity-90"
             style={{
               right: 24,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              background: '#1F2937',
-              border: '1px solid #374151',
-              color: '#FFFFFF',
+              top: "50%",
+              transform: "translateY(-50%)",
+              background: "#1F2937",
+              border: "1px solid #374151",
+              color: "#FFFFFF",
               zIndex: 45,
             }}
           >
@@ -652,21 +702,20 @@ export const TriageMode: React.FC<TriageModeProps> = ({
           </button>
         )}
       </div>
-
     </div>
   );
 };
 
 const ShortcutRow: React.FC<{ label: string; k: string }> = ({ label, k }) => (
   <div className="flex justify-between items-center">
-    <span style={{ color: '#9CA3AF' }}>{label}</span>
+    <span style={{ color: "#9CA3AF" }}>{label}</span>
     <kbd
       className="font-mono-nums"
       style={{
-        padding: '1px 6px',
+        padding: "1px 6px",
         borderRadius: 3,
-        background: '#374151',
-        color: '#FFFFFF',
+        background: "#374151",
+        color: "#FFFFFF",
         fontSize: 11,
       }}
     >
@@ -681,9 +730,9 @@ const Metric: React.FC<{ label: string; value: string; accent?: string }> = ({ l
       style={{
         fontSize: 10,
         fontWeight: 500,
-        textTransform: 'uppercase',
-        letterSpacing: '0.08em',
-        color: '#9CA3AF',
+        textTransform: "uppercase",
+        letterSpacing: "0.08em",
+        color: "#9CA3AF",
         marginBottom: 6,
       }}
     >
@@ -694,9 +743,9 @@ const Metric: React.FC<{ label: string; value: string; accent?: string }> = ({ l
       style={{
         fontSize: 24,
         fontWeight: 700,
-        color: accent ?? '#111827',
+        color: accent ?? "#111827",
         lineHeight: 1.05,
-        letterSpacing: '-0.02em',
+        letterSpacing: "-0.02em",
       }}
     >
       {value}
@@ -713,40 +762,36 @@ const CompletionCard: React.FC<{
   <div
     className="bg-white text-center animate-fade-in"
     style={{
-      width: '85%',
+      width: "85%",
       maxWidth: 640,
       borderRadius: 16,
-      padding: '48px 40px',
-      boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
+      padding: "48px 40px",
+      boxShadow: "0 25px 60px rgba(0,0,0,0.5)",
     }}
   >
     <div
       className="mx-auto w-14 h-14 rounded-full flex items-center justify-center animate-scale-in"
-      style={{ background: 'rgba(5, 150, 105, 0.12)' }}
+      style={{ background: "rgba(5, 150, 105, 0.12)" }}
     >
-      <CheckCircle2 className="w-8 h-8" style={{ color: '#059669' }} strokeWidth={2.4} />
+      <CheckCircle2 className="w-8 h-8" style={{ color: "#059669" }} strokeWidth={2.4} />
     </div>
-    <h2 className="mt-5 text-[24px] font-semibold" style={{ color: '#111827' }}>
+    <h2 className="mt-5 text-[24px] font-semibold" style={{ color: "#111827" }}>
       All {total} decisions made
     </h2>
-    <p className="mt-2 text-[14px]" style={{ color: '#6B7280' }}>
-      <span className="font-semibold" style={{ color: '#059669' }}>
+    <p className="mt-2 text-[14px]" style={{ color: "#6B7280" }}>
+      <span className="font-semibold" style={{ color: "#059669" }}>
         ${Math.round(savings).toLocaleString()}
-      </span>{' '}
+      </span>{" "}
       addressed
     </p>
     <button
       onClick={onGenerate}
       className="mt-6 w-full inline-flex items-center justify-center gap-1.5 h-11 rounded-lg text-[14px] font-semibold text-white btn-press"
-      style={{ background: '#0D9488' }}
+      style={{ background: "#0D9488" }}
     >
       Generate Amazon file <ArrowRight className="w-4 h-4" />
     </button>
-    <button
-      onClick={onReview}
-      className="mt-3 text-[13px] hover:underline"
-      style={{ color: '#9CA3AF' }}
-    >
+    <button onClick={onReview} className="mt-3 text-[13px] hover:underline" style={{ color: "#9CA3AF" }}>
       Review decisions first
     </button>
   </div>
