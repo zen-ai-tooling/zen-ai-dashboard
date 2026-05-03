@@ -860,6 +860,7 @@ export const ReviewAllMode = ({
                           boxShadow: "-1px 0 0 #E5E7EB",
                         }}
                       >
+                        <div className="flex items-center gap-1 flex-wrap">
                         {decisionPill ? (
                           <Select value={decision} onValueChange={(val) => setDecision(key, val)}>
                             <SelectTrigger
@@ -886,7 +887,7 @@ export const ReviewAllMode = ({
                           />
                         )}
                         {decision?.startsWith('Cut Bid') && (
-                          <div className="flex items-center gap-0.5 mt-1">
+                          <div className="flex items-center gap-0.5">
                             <input
                               type="number"
                               min={1}
@@ -903,6 +904,7 @@ export const ReviewAllMode = ({
                             <span className="text-[11px]" style={{ color: '#9CA3AF' }}>%</span>
                           </div>
                         )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
