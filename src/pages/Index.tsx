@@ -935,6 +935,7 @@ const Index = () => {
               !decisionResults &&
               !validatorResults && (
                 <div className="max-w-[760px] mx-auto pt-4">
+                  <OnboardingBanner moduleName="bleeders1" />
                   <UploadCard onFileUpload={handleFileUpload} isVisible={true} />
                 </div>
               )}
