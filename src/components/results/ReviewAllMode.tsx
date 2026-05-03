@@ -196,7 +196,7 @@ export const ReviewAllMode = ({
     currentRows.forEach((r, idx) => {
       const sug = suggestB1Row({ clicks: r.clicks ?? 0, spend: r.spend ?? 0, sales: r.sales ?? 0, orders: r.orders ?? 0 });
       if (sug.kind === 'pause') pause++;
-      if (sug.kind === 'review' || sug.kind === 'monitor') review++;
+      if ((sug.kind as string) === 'review' || sug.kind === 'monitor') review++;
       if (decisions[`${currentSheet}-ROWINDEX-${idx}`]) decided++;
       if ((r.spend || 0) >= q75 && q75 > 0) highspend++;
     });
@@ -211,7 +211,7 @@ export const ReviewAllMode = ({
     if (focusFilter === 'highspend') return (r.spend || 0) >= focusMeta.q75 && focusMeta.q75 > 0;
     const sug = suggestB1Row({ clicks: r.clicks ?? 0, spend: r.spend ?? 0, sales: r.sales ?? 0, orders: r.orders ?? 0 });
     if (focusFilter === 'pause') return sug.kind === 'pause';
-    if (focusFilter === 'review') return sug.kind === 'review' || sug.kind === 'monitor';
+    if (focusFilter === 'review') return (sug.kind as string) === 'review' || sug.kind === 'monitor';
     return true;
   };
 

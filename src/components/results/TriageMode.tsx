@@ -322,15 +322,30 @@ export const TriageMode: React.FC<TriageModeProps> = ({
         ) : allDone ? (
           <CompletionCard total={total} savings={savingsTarget} onGenerate={onGenerate} onReview={onSwitchToReview} />
         ) : current ? (
+          (() => {
+            const _spec = currentSpecs.find((s) => s.value === currentDecision);
+            const _bg = _spec?.bg ?? "";
+            const _tint = currentDecision
+              ? _bg.includes("EF4444")
+                ? "rgba(239,68,68,0.03)"
+                : _bg.includes("F59E0B")
+                  ? "rgba(245,158,11,0.03)"
+                  : _bg.includes("059669")
+                    ? "rgba(5,150,105,0.03)"
+                    : "#FFFFFF"
+              : "#FFFFFF";
+            return (
           <div
             key={current.key + ":" + (phase === "exiting" ? "out" : "in") + ":" + direction}
-            className="bg-white text-[#111827] overflow-y-auto"
+            className="text-[#111827] overflow-y-auto"
             style={{
               width: "85%",
               maxWidth: 640,
               maxHeight: "calc(100vh - 52px - 48px - 64px)",
               borderRadius: 16,
               padding: 22,
+              background: _tint,
+              borderLeft: currentDecision ? `4px solid ${_bg || "#0D9488"}` : undefined,
               boxShadow: "0 25px 60px rgba(0,0,0,0.5)",
               animation:
                 phase === "exiting"
@@ -362,17 +377,12 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                     const spec = currentSpecs.find((s) => s.value === currentDecision);
                     if (!spec) return null;
                     return (
-                      <span className="inline-flex items-center gap-1.5" style={{ color: spec.bg }}>
-                        <span
-                          style={{
-                            width: 6,
-                            height: 6,
-                            borderRadius: 999,
-                            background: spec.bg,
-                            display: "inline-block",
-                          }}
-                        />
-                        <span style={{ fontWeight: 600 }}>{spec.label}</span>
+                      <span
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold"
+                        style={{ background: spec.bg, color: "#FFFFFF" }}
+                      >
+                        <CheckCircle2 className="w-3 h-3" />
+                        {spec.label}
                       </span>
                     );
                   })()}
@@ -384,6 +394,42 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                 className="h-full transition-all duration-300"
                 style={{ width: `${progressPct}%`, background: "#0D9488", borderRadius: 2 }}
               />
+            </div>
+
+            {/* mini-map progress strip — clickable dots per item */}
+            <div className="flex items-center gap-1.5 flex-wrap" style={{ marginTop: 10 }}>
+              {queue.slice(0, 20).map((item, i) => {
+                const dec = decisions[item.key];
+                const ispec = decisionSpecsBySheet(item.sheet).find((s) => s.value === dec);
+                const isCurrent = i === cursor;
+                const isSkip = skipped.has(item.key);
+                const dotColor = dec ? (ispec?.bg ?? "#0D9488") : isSkip ? "#F59E0B" : "#E5E7EB";
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => {
+                      const dir = i > cursor ? "right" : "left";
+                      sequence(dir, () => setCursor(i));
+                    }}
+                    style={{
+                      width: isCurrent ? 9 : 7,
+                      height: isCurrent ? 9 : 7,
+                      borderRadius: 999,
+                      background: isCurrent ? "#FFFFFF" : dotColor,
+                      boxShadow: isCurrent ? "0 0 0 2px rgba(255,255,255,0.4)" : undefined,
+                      flexShrink: 0,
+                      transition: "all 150ms ease",
+                      border: "none",
+                      padding: 0,
+                      cursor: "pointer",
+                    }}
+                    aria-label={`Go to item ${i + 1}`}
+                  />
+                );
+              })}
+              {queue.length > 20 && (
+                <span style={{ color: "#9CA3AF", fontSize: 11 }}>+{queue.length - 20}</span>
+              )}
             </div>
 
             {/* b. Entity name — ASINs render muted with prefix label */}
@@ -551,8 +597,8 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                       fontWeight: 700,
                       letterSpacing: "0.05em",
                       textTransform: "uppercase",
-                      boxShadow: isSelected ? "0 0 0 2px #FFFFFF, 0 0 0 4px " + spec.bg + "55" : undefined,
-                      opacity: hasDecision && !isSelected ? 0.8 : 1,
+                      boxShadow: isSelected ? "0 0 0 3px #FFFFFF, 0 0 0 5px " + spec.bg : undefined,
+                      opacity: hasDecision && !isSelected ? 0.4 : 1,
                     }}
                   >
                     {isSelected && <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" strokeWidth={2.6} />}
@@ -585,7 +631,7 @@ export const TriageMode: React.FC<TriageModeProps> = ({
                 className="text-[13px] inline-flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-80"
                 style={{ color: "#9CA3AF" }}
               >
-                <Undo2 className="w-3.5 h-3.5" /> {currentDecision ? "Clear decision (Z)" : "Undo last (Z)"}
+                <Undo2 className="w-3.5 h-3.5" /> {currentDecision ? "Change decision (Z)" : "Undo last (Z)"}
               </button>
               <button
                 onClick={handleSkip}
@@ -596,6 +642,8 @@ export const TriageMode: React.FC<TriageModeProps> = ({
               </button>
             </div>
           </div>
+            );
+          })()
         ) : (
           <div className="bg-white text-center" style={{ borderRadius: 16, padding: 40, maxWidth: 640, width: "85%" }}>
             <h2 className="text-[20px] font-semibold" style={{ color: "#111827" }}>
