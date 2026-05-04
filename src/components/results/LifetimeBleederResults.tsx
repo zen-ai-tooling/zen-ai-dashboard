@@ -51,7 +51,7 @@ interface LifetimeBleederResultsProps {
   onStartNew?: () => void;
 }
 
-const DECISION_OPTIONS = ['Pause', 'Cut Bid 50%', 'Keep'];
+const DECISION_OPTIONS = ['Pause', 'Keep'];
 
 /** Map a UI Decision label to canonical action + cutBidPercent */
 function decisionToAction(decision: string): { action: CanonicalBulkInputRow['action']; cutBidPercent?: number } | null {
