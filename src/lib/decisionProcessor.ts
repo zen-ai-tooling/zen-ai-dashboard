@@ -183,7 +183,7 @@ const findHeaderIndex = (rawHeaders: string[], canonical: string): number => {
 // Fuzzy match decision values using shared normalizer
 const fuzzyMatchDecision = (
   value: any,
-): { decision: "pause" | "negative" | "negative phrase" | "keep"; wasRepaired: boolean } => {
+): { decision: "pause" | "negative" | "negative phrase" | "cut bid" | "keep"; wasRepaired: boolean } => {
   if (
     value === null ||
     value === undefined ||
