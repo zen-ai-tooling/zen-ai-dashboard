@@ -1,7 +1,7 @@
 // UI-only helper — does NOT affect business logic.
 // Suggestion pills shown on Lifetime Audit results table.
 
-export type LifetimeSuggestionKind = 'pause' | 'review' | 'monitor' | 'keep';
+export type LifetimeSuggestionKind = "pause" | "review" | "monitor" | "keep";
 
 export interface LifetimeSuggestion {
   kind: LifetimeSuggestionKind;
@@ -35,38 +35,38 @@ export function suggestLifetimeRow(row: LifetimeSuggestionInput): LifetimeSugges
 
   if (isZeroSale && clicks >= 20) {
     return {
-      kind: 'pause',
-      label: 'Pause',
-      decision: 'Pause',
-      bg: 'rgba(239, 68, 68, 0.10)',
-      color: '#B91C1C',
-      border: 'rgba(239, 68, 68, 0.25)',
-      reason: '20+ lifetime clicks with 0 sales',
+      kind: "pause",
+      label: "Pause",
+      decision: "Pause",
+      bg: "rgba(239, 68, 68, 0.10)",
+      color: "#B91C1C",
+      border: "rgba(239, 68, 68, 0.25)",
+      reason: "20+ lifetime clicks with 0 sales",
       rationale: `${clicks} lifetime clicks with zero conversions — strong pause candidate`,
     };
   }
 
   if (isZeroSale && clicks >= 10) {
     return {
-      kind: 'review',
-      label: 'Review',
-      decision: 'Cut Bid 50%',
-      bg: 'rgba(245, 158, 11, 0.10)',
-      color: '#B45309',
-      border: 'rgba(245, 158, 11, 0.25)',
-      reason: '10-19 lifetime clicks with 0 sales',
+      kind: "review",
+      label: "Review",
+      decision: "Pause",
+      bg: "rgba(245, 158, 11, 0.10)",
+      color: "#B45309",
+      border: "rgba(245, 158, 11, 0.25)",
+      reason: "10-19 lifetime clicks with 0 sales",
       rationale: `${clicks} lifetime clicks with no conversions — review before deciding`,
     };
   }
 
   return {
-    kind: 'keep',
-    label: 'Keep?',
-    decision: 'Keep',
-    bg: 'rgba(16, 185, 129, 0.10)',
-    color: '#047857',
-    border: 'rgba(16, 185, 129, 0.25)',
-    reason: 'Below review threshold',
-    rationale: 'Lifetime activity below review threshold — keep and monitor',
+    kind: "keep",
+    label: "Keep?",
+    decision: "Keep",
+    bg: "rgba(16, 185, 129, 0.10)",
+    color: "#047857",
+    border: "rgba(16, 185, 129, 0.25)",
+    reason: "Below review threshold",
+    rationale: "Lifetime activity below review threshold — keep and monitor",
   };
 }
