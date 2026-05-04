@@ -595,7 +595,6 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 setDecisions(allSuggested);
                 setCutBidPcts({});
               }}
-              }}
               className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12.5px] font-semibold text-white btn-press"
               style={{ background: "#0D9488" }}
             >
