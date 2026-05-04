@@ -177,7 +177,7 @@ export function buildBulkRowsFromCanonical(inputs: CanonicalBulkInputRow[]): Bui
     if (row.action === "keep") continue;
 
     let bid: number | undefined = undefined;
-    if (row.action === "cutBid" && row.currentBid && row.cutBidPercent) {
+    if (row.action === "cutBid" && row.currentBid && row.cutBidPercent != null) {
       const rawBid = row.currentBid * (1 - row.cutBidPercent / 100);
       bid = Math.max(0.02, parseFloat(rawBid.toFixed(2)));
     }
