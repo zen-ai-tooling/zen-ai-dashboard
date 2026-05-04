@@ -540,7 +540,17 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                   <SortHeader active={sortKey === 'acos'} dir={sortDir} onClick={() => toggleSort('acos')} align="right">ACoS</SortHeader>
                 </TableHead>
                 <TableHead className="w-[80px]" style={{ letterSpacing: '0.08em' }}>Suggestion</TableHead>
-                <TableHead className="w-[180px]" style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
+                <TableHead
+                  style={{
+                    width: 140,
+                    letterSpacing: '0.08em',
+                    position: 'sticky',
+                    right: 0,
+                    zIndex: 7,
+                    background: '#F9FAFB',
+                    boxShadow: '-1px 0 0 #E5E7EB',
+                  }}
+                >Decision</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
