@@ -482,10 +482,11 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                 suggestions.forEach((s, idx) => { all[idx] = s.decision; });
                 setDecisions(all);
               }}
-              className="bulk-btn btn-press"
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12.5px] font-semibold text-white btn-press"
+              style={{ background: '#A855F7' }}
             >
-              <span className="decision-dot" style={{ background: '#4F6EF7' }} />
-              Apply all suggestions
+              <Sparkles className="w-3.5 h-3.5" />
+              Apply recommendations
             </button>
             <button onClick={() => setAll('Pause')} className="bulk-btn btn-press">
               <span className="decision-dot" style={{ background: '#EF4444' }} />
