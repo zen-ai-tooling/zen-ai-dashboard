@@ -311,7 +311,6 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
         ]}
         breakdown={[
           { label: 'Paused', count: breakdownCounts['Pause'] ?? 0, color: '#EF4444' },
-          { label: 'Cut Bid', count: breakdownCounts['Cut Bid 50%'] ?? 0, color: '#F59E0B' },
           { label: 'Keep', count: breakdownCounts['Keep'] ?? 0, color: '#10B981' },
           { label: 'No decision', count: Math.max(0, bleeders.length - decisionsMade), color: '#D1D5DB' },
         ]}
