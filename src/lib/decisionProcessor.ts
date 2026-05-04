@@ -1045,6 +1045,8 @@ export const processDecisions = async (file: File): Promise<ProcessingResult> =>
         keywordText,
         targetingText,
         matchType: matchTypeFinal,
+        currentBid: action === "cutBid" ? bidValue : undefined,
+        cutBidPercent: action === "cutBid" ? 0 : undefined,
       });
     }
   }
