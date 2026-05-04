@@ -554,7 +554,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedIndices.map((idx) => {
+              {sortedIndices.filter(matchesFocus).map((idx) => {
                 const b = bleeders[idx];
                 const sug = suggestions[idx];
                 const decision = decisions[idx];
