@@ -396,7 +396,17 @@ export const AnalysisResults = ({
             row.keywordId ?? "",
             row.productTargetingId ?? "",
             row.targetingId ?? "",
-            row.bid ?? "",
+            (() => {
+              if (row._decision?.startsWith("Cut Bid")) {
+                const pctMatch = row._decision.match(/(\d+)%/);
+                const pct = pctMatch ? parseInt(pctMatch[1]) : 50;
+                const originalBid = parseFloat(String(row.bid ?? "0")) || 0;
+                if (originalBid > 0) {
+                  return Math.max(0.02, parseFloat((originalBid * (1 - pct / 100)).toFixed(2)));
+                }
+              }
+              return row.bid ?? "";
+            })(),
           ]);
         });
       }

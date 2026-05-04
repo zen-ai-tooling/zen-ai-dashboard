@@ -216,6 +216,16 @@ const fuzzyMatchDecision = (
 
   const normalized = sharedNormalizeDecision(original);
 
+  if (lower.includes("negative") || lower.includes("negate")) {
+    return { decision: "negative", wasRepaired: lower !== "negative" };
+  }
+
+  if (lower.includes("cut bid") || lower.includes("cut-bid") || (lower.includes("cut") && lower.includes("bid"))) {
+    return { decision: "cut bid", wasRepaired: lower !== "cut bid" };
+  }
+
+  const normalized = sharedNormalizeDecision(original);
+
   const wasRepaired = !["pause", "negative", "keep"].includes(lower);
 
   if (normalized === "pause") return { decision: "pause", wasRepaired };
@@ -605,6 +615,26 @@ export const processDecisions = async (file: File): Promise<ProcessingResult> =>
 
           negativesCreated++;
         }
+      } else if (decision === "cut bid") {
+        // Cut Bid: Update the keyword/target with a reduced bid
+        setRowValue("operation", "update");
+        setRowValue("state", "enabled");
+
+        // Default entity if blank
+        const currentEntity = getRowValue("entity");
+        if (!currentEntity || String(currentEntity).trim() === "") {
+          const txt = (keywordText || productTargeting).toLowerCase();
+          if (txt.includes("asin=") || txt.includes("category=")) {
+            setRowValue("entity", "Product Targeting");
+          } else {
+            setRowValue("entity", "Keyword");
+          }
+          entityBackfilledCount++;
+        }
+        // Bid value is already written in the intermediate file
+        // (calculated as originalBid * (1 - pct/100) in AnalysisResults.tsx)
+        // The action will be set to "cutBid" in the canonical inputs step below
+        // because: operation === "update" && bidValue > 0
       }
 
       // Final entity sanity check
