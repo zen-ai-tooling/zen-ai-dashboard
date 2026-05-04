@@ -672,6 +672,8 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
           </div>
         </div>
       </div>
+      </>
+      )}
 
       {/* Master/detail side panel */}
       {(() => {
