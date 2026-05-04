@@ -214,12 +214,6 @@ const fuzzyMatchDecision = (
     return { decision: "negative", wasRepaired: lower !== "negative" };
   }
 
-  const normalized = sharedNormalizeDecision(original);
-
-  if (lower.includes("negative") || lower.includes("negate")) {
-    return { decision: "negative", wasRepaired: lower !== "negative" };
-  }
-
   if (lower.includes("cut bid") || lower.includes("cut-bid") || (lower.includes("cut") && lower.includes("bid"))) {
     return { decision: "cut bid", wasRepaired: lower !== "cut bid" };
   }
