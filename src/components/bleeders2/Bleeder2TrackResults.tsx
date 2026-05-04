@@ -261,19 +261,16 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
           const isProductTargeting =
             bleeder.entity?.toLowerCase().includes('asin=') ||
             bleeder.entity?.toLowerCase().includes('category=');
-          const hasBid = (bleeder.bid ?? bleeder.cpc ?? 0) > 0;
-          const effectiveDecision =
-            decision === 'Cut Bid' && !hasBid ? 'Pause' : decision;
           ws.addRow([
             bleeder.campaignName ?? '',
             bleeder.adGroupName ?? '',
             isProductTargeting ? '' : (bleeder.entity ?? ''),
             isProductTargeting ? (bleeder.entity ?? '') : '',
             bleeder.matchType ?? '',
-            effectiveDecision === 'Cut Bid'
+            decision === 'Cut Bid'
               ? (bleeder.bid ?? bleeder.cpc ?? 0)
               : 0,
-            effectiveDecision,
+            decision,
             (bleeder as any).source ?? '',
             bleeder.campaignId ?? '',
             bleeder.adGroupId ?? '',
@@ -598,6 +595,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 setDecisions(allSuggested);
                 setCutBidPcts({});
               }}
+              }}
               className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12.5px] font-semibold text-white btn-press"
               style={{ background: "#0D9488" }}
             >
@@ -655,7 +653,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                   <SortHeader active={sortKey === 'acos'} dir={sortDir} onClick={() => toggleSort('acos')} align="right">ACoS</SortHeader>
                 </TableHead>
                 <TableHead className="w-[80px]" style={{ letterSpacing: '0.08em' }}>Suggestion</TableHead>
-                <TableHead className="w-[160px]" style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
+                <TableHead style={{ width: 170, letterSpacing: '0.08em', position: 'sticky', right: 0, zIndex: 7, background: '#F9FAFB', boxShadow: '-1px 0 0 #E5E7EB' }}>Decision</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -741,8 +739,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                         {suggestion.shortLabel}
                       </button>
                     </TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-1 min-w-0 max-w-[160px]">
+                    <TableCell onClick={(e) => e.stopPropagation()} style={{ width: 170, position: 'sticky', right: 0, zIndex: 4, background: 'var(--card)', boxShadow: '-1px 0 0 #E5E7EB' }}>
+                      <div className="flex items-center gap-1 min-w-0">
                         <div className="flex-shrink-0">
                           <DecisionSelect
                             value={decision}
@@ -754,15 +752,14 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                         </div>
                         {decisions[idx] === 'Cut Bid' && (
                           <div className="flex items-center gap-0.5 flex-shrink-0">
-                            <Input
+                            <input
                               type="number"
                               min={1}
                               max={99}
-                              autoComplete="off"
-                              className="h-7 w-14 text-[12px] font-mono-nums"
-                              style={{ maxWidth: '48px' }}
+                              className="h-7 w-16 text-[12px] rounded border border-border px-1.5 font-mono"
                               value={cutBidPcts[idx] ?? 50}
                               onChange={(e) => setCutBidPcts(prev => ({ ...prev, [idx]: parseInt(e.target.value) || 50 }))}
+                              onClick={(e) => e.stopPropagation()}
                             />
                             <span className="text-[11px]" style={{ color: '#9CA3AF' }}>%</span>
                           </div>
