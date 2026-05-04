@@ -384,6 +384,7 @@ export const AnalysisResults = ({
           "Bid",
         ]);
         rows.forEach((row: any) => {
+          console.log("ROW BID:", row._decision, row.bid, row.keyword_text, row.campaign?.slice(0, 30));
           ws.addRow([
             row.campaign ?? "",
             row.ad_group ?? "",
