@@ -713,7 +713,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
 
         const buttonSpecs: DecisionButtonSpec[] = [
           { value: 'Pause',       label: 'Pause',       bg: 'rgba(239, 68, 68, 0.10)', color: '#B91C1C', border: 'rgba(239, 68, 68, 0.20)', hoverBg: 'rgba(239, 68, 68, 0.20)' },
-          { value: 'Cut Bid 50%', label: 'Cut Bid 50%', bg: 'rgba(245, 158, 11, 0.10)', color: '#B45309', border: 'rgba(245, 158, 11, 0.20)', hoverBg: 'rgba(245, 158, 11, 0.20)' },
+          
           { value: 'Keep',        label: 'Keep',        bg: 'rgba(16, 185, 129, 0.10)', color: '#047857', border: 'rgba(16, 185, 129, 0.20)', hoverBg: 'rgba(16, 185, 129, 0.20)' },
         ];
 
