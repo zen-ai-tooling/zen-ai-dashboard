@@ -16,7 +16,7 @@ import * as React from 'react';
 import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { CheckCircle2, Loader2, XCircle, Download } from 'lucide-react';
+import { CheckCircle2, Loader2, XCircle, Download, Zap, List, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { CompactStatsBar } from '@/components/shared/CompactStatsBar';
 import { CompletionView } from '@/components/shared/CompletionView';
@@ -25,6 +25,7 @@ import { SpendDistributionStrip } from '@/components/shared/SpendDistributionStr
 import { DecisionSelect, decisionRowClass } from '@/components/shared/DecisionSelect';
 import { SortHeader, useSortable } from '@/components/shared/SortHeader';
 import { RowDetailPanel, type DecisionButtonSpec, type RowDetail } from '@/components/shared/RowDetailPanel';
+import { TriageMode, type TriageItem, type TriageDecisionSpec } from '@/components/results/TriageMode';
 import { suggestLifetimeRow } from '@/lib/ui/lifetimeSuggestion';
 import type { LifetimeBleederResult, LifetimeBleederRow } from '@/lib/lifetimeBleederAnalysis';
 import {
