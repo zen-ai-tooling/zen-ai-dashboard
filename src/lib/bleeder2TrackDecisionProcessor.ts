@@ -179,7 +179,7 @@ export const processTrackDecisionFile = async (
 
     // --- REPLACEMENT for Header Row Index Finding Block (around line 186) ---
     let headerRowIndex = -1;
-    for (let i = 1; i < Math.min(20, data.length); i++) {
+    for (let i = 0; i < Math.min(20, data.length); i++) {
       const row = data[i]; // Look for the 'Campaign' header, which is mandatory.
       if (row && row.some((cell: any) => normalizeHeader(String(cell || "")).includes("campaign"))) {
         headerRowIndex = i;
