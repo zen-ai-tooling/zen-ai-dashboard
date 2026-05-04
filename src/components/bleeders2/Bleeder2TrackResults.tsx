@@ -261,16 +261,19 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
           const isProductTargeting =
             bleeder.entity?.toLowerCase().includes('asin=') ||
             bleeder.entity?.toLowerCase().includes('category=');
+          const hasBid = (bleeder.bid ?? bleeder.cpc ?? 0) > 0;
+          const effectiveDecision =
+            decision === 'Cut Bid' && !hasBid ? 'Pause' : decision;
           ws.addRow([
             bleeder.campaignName ?? '',
             bleeder.adGroupName ?? '',
             isProductTargeting ? '' : (bleeder.entity ?? ''),
             isProductTargeting ? (bleeder.entity ?? '') : '',
             bleeder.matchType ?? '',
-            decision === 'Cut Bid'
+            effectiveDecision === 'Cut Bid'
               ? (bleeder.bid ?? bleeder.cpc ?? 0)
               : 0,
-            decision,
+            effectiveDecision,
             (bleeder as any).source ?? '',
             bleeder.campaignId ?? '',
             bleeder.adGroupId ?? '',
@@ -595,7 +598,6 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 setDecisions(allSuggested);
                 setCutBidPcts({});
               }}
-              }}
               className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12.5px] font-semibold text-white btn-press"
               style={{ background: "#0D9488" }}
             >
@@ -740,7 +742,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                       </button>
                     </TableCell>
                     <TableCell onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-1 min-w-0">
+                      <div className="flex items-center gap-1 min-w-0 max-w-[160px]">
                         <div className="flex-shrink-0">
                           <DecisionSelect
                             value={decision}
@@ -756,9 +758,11 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                               type="number"
                               min={1}
                               max={99}
-                              className="h-7 w-16 text-[12px] font-mono-nums"
+                              autoComplete="off"
+                              className="h-7 w-14 text-[12px] font-mono-nums"
+                              style={{ maxWidth: '48px' }}
                               value={cutBidPcts[idx] ?? 50}
-                              onChange={(e) => setCutBidPcts(prev => ({ ...prev, [idx]: parseInt(e.target.value) || 25 }))}
+                              onChange={(e) => setCutBidPcts(prev => ({ ...prev, [idx]: parseInt(e.target.value) || 50 }))}
                             />
                             <span className="text-[11px]" style={{ color: '#9CA3AF' }}>%</span>
                           </div>
