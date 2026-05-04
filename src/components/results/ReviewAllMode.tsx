@@ -270,9 +270,10 @@ export const ReviewAllMode = ({
         orders: r.orders ?? 0,
         acos: parseAcosNum(r.acos),
       });
-      const displayKind = (isSearchTermSheet &&
-        (sug.kind === "cut_bid" || sug.kind === "monitor" || sug.kind === "pause"))
-        ? "pause" : sug.kind;
+      const displayKind =
+        isSearchTermSheet && (sug.kind === "cut_bid" || sug.kind === "monitor" || sug.kind === "pause")
+          ? "pause"
+          : sug.kind;
       if (displayKind === "pause") pause++;
       else if (displayKind === "cut_bid" || displayKind === "monitor") review++;
       if (decisions[`${currentSheet}-ROWINDEX-${idx}`]) decided++;
@@ -287,14 +288,24 @@ export const ReviewAllMode = ({
     const dec = decisions[`${currentSheet}-ROWINDEX-${rowIdx}`];
     if (focusFilter === "decided") return !!dec;
     if (focusFilter === "highspend") return (r.spend || 0) >= focusMeta.q75 && focusMeta.q75 > 0;
+
     const sug = suggestB1Row({
       clicks: r.clicks ?? 0,
       spend: r.spend ?? 0,
       sales: r.sales ?? 0,
       orders: r.orders ?? 0,
+      acos: parseAcosNum(r.acos), // ← add acos
     });
-    if (focusFilter === "pause") return sug.kind === "pause";
-    if (focusFilter === "review") return (sug.kind as string) === "review" || sug.kind === "monitor";
+
+    // Apply search term remapping — same logic as focusMeta
+    const effectiveKind =
+      isSearchTermSheet && (sug.kind === "cut_bid" || sug.kind === "monitor" || sug.kind === "pause")
+        ? "pause"
+        : sug.kind;
+
+    if (focusFilter === "pause") return effectiveKind === "pause";
+    // 'review' maps to cut_bid and monitor (non-search-term sheets only)
+    if (focusFilter === "review") return effectiveKind === "cut_bid" || effectiveKind === "monitor";
     return true;
   };
 
@@ -673,11 +684,19 @@ export const ReviewAllMode = ({
                           </TooltipTrigger>
                           <TooltipContent side="bottom" className="max-w-[280px] text-[12px] leading-relaxed">
                             <div className="space-y-1.5">
-                              <div><strong>Pause</strong>: ACoS ≥ 100% or 30+ clicks with zero conversions</div>
-                              <div><strong>Cut Bid</strong>: ACoS 80–99% or moderate spend, no conversions</div>
-                              <div><strong>Monitor</strong>: Some activity, not enough signal yet</div>
-                              <div><strong>None</strong>: Acceptable performance</div>
-                              <div style={{ marginTop: 4, color: '#9CA3AF' }}>
+                              <div>
+                                <strong>Pause</strong>: ACoS ≥ 100% or 30+ clicks with zero conversions
+                              </div>
+                              <div>
+                                <strong>Cut Bid</strong>: ACoS 80–99% or moderate spend, no conversions
+                              </div>
+                              <div>
+                                <strong>Monitor</strong>: Some activity, not enough signal yet
+                              </div>
+                              <div>
+                                <strong>None</strong>: Acceptable performance
+                              </div>
+                              <div style={{ marginTop: 4, color: "#9CA3AF" }}>
                                 On search term sheets, suggestions automatically show Negative.
                               </div>
                             </div>
@@ -753,9 +772,10 @@ export const ReviewAllMode = ({
                     orders: row.orders ?? 0,
                     acos: parseAcosNum(row.acos),
                   });
-                  const displayKind = (isSearchTermSheet &&
-                    (sug.kind === "cut_bid" || sug.kind === "monitor" || sug.kind === "pause"))
-                    ? "pause" : sug.kind;
+                  const displayKind =
+                    isSearchTermSheet && (sug.kind === "cut_bid" || sug.kind === "monitor" || sug.kind === "pause")
+                      ? "pause"
+                      : sug.kind;
                   const sugStyle = SUGGESTION_PILL_CLASS[displayKind] ?? SUGGESTION_PILL_CLASS.keep;
                   const acosNum = parseAcosNum(row.acos);
                   const hasAcos = acosNum >= 0 && row.acos && row.acos !== "0" && row.acos !== "0%";
@@ -861,49 +881,51 @@ export const ReviewAllMode = ({
                         }}
                       >
                         <div className="flex items-center gap-1 flex-wrap">
-                        {decisionPill ? (
-                          <Select value={decision} onValueChange={(val) => setDecision(key, val)}>
-                            <SelectTrigger
-                              className="h-7 w-auto inline-flex border-0 px-2.5 rounded-full text-[11.5px] font-semibold gap-1.5 [&>svg]:opacity-70 [&>svg]:w-3 [&>svg]:h-3 hover:scale-[1.02] transition-transform"
-                              style={{ background: decisionPill.bg, color: decisionPill.color }}
-                            >
-                              {decisionPill.label}
-                            </SelectTrigger>
-                            <SelectContent>
-                              {decisionOptions.map((opt) => (
-                                <SelectItem key={opt} value={opt} className="text-[12.5px]">
-                                  {opt}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <DecisionSelect
-                            value={decision}
-                            onChange={(val) => setDecision(key, val)}
-                            options={decisionOptions}
-                            width="100%"
-                            placeholder="Decide…"
-                          />
-                        )}
-                        {decision?.startsWith('Cut Bid') && (
-                          <div className="flex items-center gap-0.5">
-                            <input
-                              type="number"
-                              min={1}
-                              max={99}
-                              className="h-7 w-14 text-[12px] rounded border border-border px-1.5 font-mono"
-                              value={cutBidPcts[key] ?? 50}
-                              onChange={(e) => {
-                                const pct = parseInt(e.target.value) || 50;
-                                setCutBidPcts(prev => ({ ...prev, [key]: pct }));
-                                setDecision(key, `Cut Bid ${pct}%`);
-                              }}
-                              onClick={(e) => e.stopPropagation()}
+                          {decisionPill ? (
+                            <Select value={decision} onValueChange={(val) => setDecision(key, val)}>
+                              <SelectTrigger
+                                className="h-7 w-auto inline-flex border-0 px-2.5 rounded-full text-[11.5px] font-semibold gap-1.5 [&>svg]:opacity-70 [&>svg]:w-3 [&>svg]:h-3 hover:scale-[1.02] transition-transform"
+                                style={{ background: decisionPill.bg, color: decisionPill.color }}
+                              >
+                                {decisionPill.label}
+                              </SelectTrigger>
+                              <SelectContent>
+                                {decisionOptions.map((opt) => (
+                                  <SelectItem key={opt} value={opt} className="text-[12.5px]">
+                                    {opt}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <DecisionSelect
+                              value={decision}
+                              onChange={(val) => setDecision(key, val)}
+                              options={decisionOptions}
+                              width="100%"
+                              placeholder="Decide…"
                             />
-                            <span className="text-[11px]" style={{ color: '#9CA3AF' }}>%</span>
-                          </div>
-                        )}
+                          )}
+                          {decision?.startsWith("Cut Bid") && (
+                            <div className="flex items-center gap-0.5">
+                              <input
+                                type="number"
+                                min={1}
+                                max={99}
+                                className="h-7 w-14 text-[12px] rounded border border-border px-1.5 font-mono"
+                                value={cutBidPcts[key] ?? 50}
+                                onChange={(e) => {
+                                  const pct = parseInt(e.target.value) || 50;
+                                  setCutBidPcts((prev) => ({ ...prev, [key]: pct }));
+                                  setDecision(key, `Cut Bid ${pct}%`);
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                              <span className="text-[11px]" style={{ color: "#9CA3AF" }}>
+                                %
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>

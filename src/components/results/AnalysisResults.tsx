@@ -361,7 +361,9 @@ export const AnalysisResults = ({
         const row = sheetRows[rowIdx];
         const outputSheet = sheetNameMap[sheetName] ?? sheetName;
         if (!grouped[outputSheet]) grouped[outputSheet] = [];
-        grouped[outputSheet].push({ ...row, _decision: decision });
+        // If Cut Bid but no bid in source file, convert to Pause (safe fallback)
+        const effectiveDecision = decision.startsWith("Cut Bid") && !(row.bid > 0) ? "Pause" : decision;
+        grouped[outputSheet].push({ ...row, _decision: effectiveDecision });
       });
       for (const [tabName, rows] of Object.entries(grouped)) {
         const ws = wb.addWorksheet(tabName);
