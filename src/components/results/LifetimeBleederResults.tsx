@@ -16,7 +16,7 @@ import * as React from 'react';
 import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { CheckCircle2, Loader2, XCircle, Download } from 'lucide-react';
+import { CheckCircle2, Loader2, XCircle, Download, Zap, List, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { CompactStatsBar } from '@/components/shared/CompactStatsBar';
 import { CompletionView } from '@/components/shared/CompletionView';
@@ -25,6 +25,7 @@ import { SpendDistributionStrip } from '@/components/shared/SpendDistributionStr
 import { DecisionSelect, decisionRowClass } from '@/components/shared/DecisionSelect';
 import { SortHeader, useSortable } from '@/components/shared/SortHeader';
 import { RowDetailPanel, type DecisionButtonSpec, type RowDetail } from '@/components/shared/RowDetailPanel';
+import { TriageMode, type TriageItem, type TriageDecisionSpec } from '@/components/results/TriageMode';
 import { suggestLifetimeRow } from '@/lib/ui/lifetimeSuggestion';
 import type { LifetimeBleederResult, LifetimeBleederRow } from '@/lib/lifetimeBleederAnalysis';
 import {
@@ -50,7 +51,7 @@ interface LifetimeBleederResultsProps {
   onStartNew?: () => void;
 }
 
-const DECISION_OPTIONS = ['Pause', 'Cut Bid 50%', 'Keep'];
+const DECISION_OPTIONS = ['Pause', 'Keep'];
 
 /** Map a UI Decision label to canonical action + cutBidPercent */
 function decisionToAction(decision: string): { action: CanonicalBulkInputRow['action']; cutBidPercent?: number } | null {
@@ -84,6 +85,10 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
   const [flashIdx, setFlashIdx] = useState<{ idx: number; cls: string; ts: number } | null>(null);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [panelComplete, setPanelComplete] = useState(false);
+  const [viewMode, setViewMode] = useState<'triage' | 'review'>('review');
+
+  type FocusFilter = 'all' | 'pause' | 'review' | 'decided' | 'highspend';
+  const [focusFilter, setFocusFilter] = useState<FocusFilter>('all');
 
   const setDecisionWithFlash = (idx: number, val: string) => {
     setDecisions((prev) => ({ ...prev, [idx]: val }));
@@ -136,6 +141,29 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
     const q = (p: number) => spends[Math.min(spends.length - 1, Math.floor(spends.length * p))];
     return { high: q(0.75), low: q(0.25) };
   }, [bleeders]);
+
+  const focusMeta = useMemo(() => {
+    let pause = 0, review = 0, decided = 0, highspend = 0;
+    bleeders.forEach((b, idx) => {
+      const sug = suggestions[idx];
+      if (sug?.kind === 'pause') pause++;
+      else if (sug?.kind === 'review' || sug?.kind === 'monitor') review++;
+      if (decisions[idx]) decided++;
+      if ((b.spend || 0) >= urgencyBands.high && (b.spend || 0) > 0) highspend++;
+    });
+    return { all: bleeders.length, pause, review, decided, highspend };
+  }, [bleeders, suggestions, decisions, urgencyBands.high]);
+
+  const matchesFocus = (idx: number): boolean => {
+    if (focusFilter === 'all') return true;
+    const b = bleeders[idx];
+    const sug = suggestions[idx];
+    if (focusFilter === 'pause') return sug?.kind === 'pause';
+    if (focusFilter === 'review') return sug?.kind === 'review' || sug?.kind === 'monitor';
+    if (focusFilter === 'decided') return !!decisions[idx];
+    if (focusFilter === 'highspend') return (b.spend || 0) >= urgencyBands.high && (b.spend || 0) > 0;
+    return true;
+  };
 
   // ── Bulk actions ──
   const setAll = (val: string) => {
@@ -283,7 +311,6 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
         ]}
         breakdown={[
           { label: 'Paused', count: breakdownCounts['Pause'] ?? 0, color: '#EF4444' },
-          { label: 'Cut Bid', count: breakdownCounts['Cut Bid 50%'] ?? 0, color: '#F59E0B' },
           { label: 'Keep', count: breakdownCounts['Keep'] ?? 0, color: '#10B981' },
           { label: 'No decision', count: Math.max(0, bleeders.length - decisionsMade), color: '#D1D5DB' },
         ]}
@@ -332,6 +359,113 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
         }))}
       />
 
+      {/* Mode toggle */}
+      <div className="flex items-center justify-center">
+        <div className="inline-flex items-center gap-1 p-1 rounded-full bg-[hsl(var(--secondary))]">
+          <button
+            onClick={() => setViewMode('triage')}
+            className={`inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full text-[12.5px] font-medium transition-colors ${
+              viewMode === 'triage'
+                ? 'text-white shadow-sm'
+                : 'text-[hsl(var(--text-secondary))] hover:text-foreground'
+            }`}
+            style={viewMode === 'triage' ? { background: '#A855F7' } : undefined}
+          >
+            <Zap className="w-3.5 h-3.5" /> Triage
+          </button>
+          <button
+            onClick={() => setViewMode('review')}
+            className={`inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full text-[12.5px] font-medium transition-colors ${
+              viewMode === 'review'
+                ? 'text-white shadow-sm'
+                : 'text-[hsl(var(--text-secondary))] hover:text-foreground'
+            }`}
+            style={viewMode === 'review' ? { background: '#A855F7' } : undefined}
+          >
+            <List className="w-3.5 h-3.5" /> Review All
+          </button>
+        </div>
+      </div>
+
+      {viewMode === 'triage' && (() => {
+        const triageItems: TriageItem[] = bleeders.map((b, idx) => ({
+          key: String(idx),
+          sheet: 'Lifetime Audit',
+          campaign: b.campaignName || '—',
+          adGroup: b.adGroupName || '',
+          entity: b.targetingText || '—',
+          matchType: b.matchType || undefined,
+          clicks: b.clicks ?? 0,
+          spend: b.spend ?? 0,
+          sales: b.sales ?? 0,
+          acosNum: b.acos ?? 0,
+          orders: b.orders ?? 0,
+          acos: b.acos ? `${b.acos.toFixed(1)}%` : '',
+        }));
+
+        const triageDecisions: Record<string, string> = {};
+        Object.entries(decisions).forEach(([k, v]) => {
+          triageDecisions[String(k)] = v;
+        });
+
+        const triageSpecsBySheet = (): TriageDecisionSpec[] => [
+          { value: 'Pause', label: 'PAUSE', bg: '#EF4444', color: '#FFFFFF', shortcut: 'P', countsAsSavings: true },
+          { value: 'Keep', label: 'KEEP', bg: '#059669', color: '#FFFFFF', shortcut: 'K', countsAsSavings: false },
+        ];
+
+        return (
+          <TriageMode
+            items={triageItems}
+            decisions={triageDecisions}
+            decisionSpecsBySheet={triageSpecsBySheet}
+            onDecide={(key, val) => setDecisionWithFlash(Number(key), val)}
+            onUndo={(key) => setDecisions(prev => {
+              const n = { ...prev };
+              delete n[Number(key)];
+              return n;
+            })}
+            onGenerate={async () => {
+              await handleGenerate();
+              toast.success('Amazon file ready', {
+                description: `${decisionsMade} decisions`,
+                duration: 3000,
+              });
+            }}
+            onSwitchToReview={() => setViewMode('review')}
+            totalSpend={result.totalSpend}
+            sheetsCount={1}
+            addressedSavings={addressedSpend}
+            shortSheetLabel={(s) => s}
+          />
+        );
+      })()}
+
+      {viewMode === 'review' && (
+      <>
+      {/* Filter pills */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-[12px] text-[hsl(var(--text-secondary))] font-medium">
+          Lifetime Audit:
+        </span>
+        {([
+          { id: 'all', label: 'All', icon: '', count: focusMeta.all },
+          { id: 'pause', label: 'Pause candidates', icon: '🔴', count: focusMeta.pause },
+          { id: 'review', label: 'Needs review', icon: '🟡', count: focusMeta.review },
+          { id: 'decided', label: 'Decided', icon: '✓', count: focusMeta.decided },
+          { id: 'highspend', label: 'High spend', icon: '💰', count: focusMeta.highspend },
+        ] as const).map(f => (
+          <button
+            key={f.id}
+            onClick={() => setFocusFilter(f.id as FocusFilter)}
+            className={`focus-pill ${focusFilter === f.id ? 'is-active' : ''}`}
+          >
+            {f.icon && <span>{f.icon}</span>}
+            {f.label}
+            <span className="count">· {f.count}</span>
+          </button>
+        ))}
+      </div>
+
       {/* Decision table */}
       <div className="decision-table-card">
         {/* Bulk actions */}
@@ -348,10 +482,11 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                 suggestions.forEach((s, idx) => { all[idx] = s.decision; });
                 setDecisions(all);
               }}
-              className="bulk-btn btn-press"
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12.5px] font-semibold text-white btn-press"
+              style={{ background: '#A855F7' }}
             >
-              <span className="decision-dot" style={{ background: '#4F6EF7' }} />
-              Apply all suggestions
+              <Sparkles className="w-3.5 h-3.5" />
+              Apply recommendations
             </button>
             <button onClick={() => setAll('Pause')} className="bulk-btn btn-press">
               <span className="decision-dot" style={{ background: '#EF4444' }} />
@@ -370,7 +505,19 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
 
         {/* Table */}
         <div className="max-h-[58vh] overflow-auto table-sticky-header decision-table">
-          <Table>
+          <Table style={{ tableLayout: 'fixed' }}>
+            <colgroup>
+              <col style={{ width: '18%' }} />
+              <col style={{ width: '14%' }} />
+              <col style={{ width: '20%' }} />
+              <col style={{ width: '8%' }} />
+              <col style={{ width: '7%' }} />
+              <col style={{ width: '8%' }} />
+              <col style={{ width: '8%' }} />
+              <col style={{ width: '7%' }} />
+              <col style={{ width: '80px' }} />
+              <col style={{ width: '140px' }} />
+            </colgroup>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
                 <TableHead style={{ letterSpacing: '0.08em' }}>
@@ -394,11 +541,21 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                   <SortHeader active={sortKey === 'acos'} dir={sortDir} onClick={() => toggleSort('acos')} align="right">ACoS</SortHeader>
                 </TableHead>
                 <TableHead className="w-[80px]" style={{ letterSpacing: '0.08em' }}>Suggestion</TableHead>
-                <TableHead className="w-[180px]" style={{ letterSpacing: '0.08em' }}>Decision</TableHead>
+                <TableHead
+                  style={{
+                    width: 140,
+                    letterSpacing: '0.08em',
+                    position: 'sticky',
+                    right: 0,
+                    zIndex: 7,
+                    background: '#F9FAFB',
+                    boxShadow: '-1px 0 0 #E5E7EB',
+                  }}
+                >Decision</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedIndices.map((idx) => {
+              {sortedIndices.filter(matchesFocus).map((idx) => {
                 const b = bleeders[idx];
                 const sug = suggestions[idx];
                 const decision = decisions[idx];
@@ -471,11 +628,18 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                         {sug.label}
                       </button>
                     </TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
+                    <TableCell
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        width: 140,
+                        position: 'sticky',
+                        right: 0,
+                        zIndex: 4,
+                        background: idx % 2 === 1 ? '#F9FAFB' : '#FFFFFF',
+                        boxShadow: '-1px 0 0 #E5E7EB',
+                      }}
+                    >
                       <div className="flex items-center gap-1.5">
-                        {decision && (
-                          <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#10B981' }} />
-                        )}
                         <DecisionSelect
                           value={decision}
                           onChange={(val) => setDecisionWithFlash(idx, val)}
@@ -515,7 +679,6 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                   total={bleeders.length}
                   segments={[
                     { key: 'Pause', count: Object.values(decisions).filter((d) => d === 'Pause').length, color: '#EF4444' },
-                    { key: 'Cut', count: Object.values(decisions).filter((d) => d === 'Cut Bid 50%').length, color: '#F59E0B' },
                     { key: 'Keep', count: Object.values(decisions).filter((d) => d === 'Keep').length, color: '#10B981' },
                   ]}
                 />
@@ -539,6 +702,8 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
           </div>
         </div>
       </div>
+      </>
+      )}
 
       {/* Master/detail side panel */}
       {(() => {
@@ -548,7 +713,7 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
 
         const buttonSpecs: DecisionButtonSpec[] = [
           { value: 'Pause',       label: 'Pause',       bg: 'rgba(239, 68, 68, 0.10)', color: '#B91C1C', border: 'rgba(239, 68, 68, 0.20)', hoverBg: 'rgba(239, 68, 68, 0.20)' },
-          { value: 'Cut Bid 50%', label: 'Cut Bid 50%', bg: 'rgba(245, 158, 11, 0.10)', color: '#B45309', border: 'rgba(245, 158, 11, 0.20)', hoverBg: 'rgba(245, 158, 11, 0.20)' },
+          
           { value: 'Keep',        label: 'Keep',        bg: 'rgba(16, 185, 129, 0.10)', color: '#047857', border: 'rgba(16, 185, 129, 0.20)', hoverBg: 'rgba(16, 185, 129, 0.20)' },
         ];
 
