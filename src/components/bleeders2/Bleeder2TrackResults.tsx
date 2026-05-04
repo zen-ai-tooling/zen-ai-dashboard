@@ -756,7 +756,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                               type="number"
                               min={1}
                               max={99}
-                              className="h-7 text-[12px] rounded border border-border font-mono text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              className="h-7 text-[12px] rounded border border-border font-mono text-center no-spinner"
                               style={{ width: 44, padding: '0 4px' }}
                               value={cutBidPcts[idx] ?? 50}
                               onChange={(e) => setCutBidPcts(prev => ({ ...prev, [idx]: parseInt(e.target.value) || 50 }))}
