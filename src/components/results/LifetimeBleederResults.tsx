@@ -504,7 +504,19 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
 
         {/* Table */}
         <div className="max-h-[58vh] overflow-auto table-sticky-header decision-table">
-          <Table>
+          <Table style={{ tableLayout: 'fixed' }}>
+            <colgroup>
+              <col style={{ width: '18%' }} />
+              <col style={{ width: '14%' }} />
+              <col style={{ width: '20%' }} />
+              <col style={{ width: '8%' }} />
+              <col style={{ width: '7%' }} />
+              <col style={{ width: '8%' }} />
+              <col style={{ width: '8%' }} />
+              <col style={{ width: '7%' }} />
+              <col style={{ width: '80px' }} />
+              <col style={{ width: '140px' }} />
+            </colgroup>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border">
                 <TableHead style={{ letterSpacing: '0.08em' }}>
