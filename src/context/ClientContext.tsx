@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 export interface Client {
   id: string;
@@ -14,14 +14,14 @@ interface ClientContextValue {
   clients: Client[];
   activeClient: Client;
   setActiveClient: (client: Client) => void;
-  addClient: (client: Omit<Client, 'id' | 'createdAt'>) => void;
+  addClient: (client: Omit<Client, "id" | "createdAt">) => void;
   updateClient: (client: Client) => void;
 }
 
 const defaultClient: Client = {
-  id: 'gno-001',
-  name: 'GNO Partners',
-  initials: 'GN',
+  id: "phico-001",
+  name: "Phico Ventures",
+  initials: "PV",
   acosTarget: 35,
   fewerThanOrders: 5,
   excludeRanking: true,
@@ -33,20 +33,22 @@ const ClientContext = createContext<ClientContextValue | null>(null);
 export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [clients, setClients] = useState<Client[]>(() => {
     try {
-      const saved = localStorage.getItem('gno-adops-clients');
+      const saved = localStorage.getItem("gno-adops-clients");
       return saved ? JSON.parse(saved) : [defaultClient];
-    } catch { return [defaultClient]; }
+    } catch {
+      return [defaultClient];
+    }
   });
 
   const [activeClient, setActiveClientState] = useState<Client>(() => {
     try {
-      const savedId = localStorage.getItem('gno-adops-active-client');
-      const saved = localStorage.getItem('gno-adops-clients');
+      const savedId = localStorage.getItem("gno-adops-active-client");
+      const saved = localStorage.getItem("gno-adops-clients");
       if (saved && savedId) {
         const parsed = JSON.parse(saved);
         return parsed.find((c: Client) => c.id === savedId) ?? parsed[0] ?? defaultClient;
       }
-      const saved2 = localStorage.getItem('gno-adops-clients');
+      const saved2 = localStorage.getItem("gno-adops-clients");
       if (saved2) {
         const parsed = JSON.parse(saved2);
         return parsed[0] ?? defaultClient;
@@ -56,26 +58,26 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   });
 
   useEffect(() => {
-    localStorage.setItem('gno-adops-clients', JSON.stringify(clients));
+    localStorage.setItem("gno-adops-clients", JSON.stringify(clients));
   }, [clients]);
 
   const setActiveClient = (client: Client) => {
     setActiveClientState(client);
-    localStorage.setItem('gno-adops-active-client', client.id);
+    localStorage.setItem("gno-adops-active-client", client.id);
   };
 
-  const addClient = (data: Omit<Client, 'id' | 'createdAt'>) => {
+  const addClient = (data: Omit<Client, "id" | "createdAt">) => {
     const newClient: Client = {
       ...data,
       id: `client-${Date.now()}`,
       createdAt: new Date().toISOString(),
     };
-    setClients(prev => [...prev, newClient]);
+    setClients((prev) => [...prev, newClient]);
     setActiveClient(newClient);
   };
 
   const updateClient = (updated: Client) => {
-    setClients(prev => prev.map(c => c.id === updated.id ? updated : c));
+    setClients((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
     if (activeClient.id === updated.id) setActiveClientState(updated);
   };
 
@@ -88,6 +90,6 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
 export const useClient = (): ClientContextValue => {
   const ctx = useContext(ClientContext);
-  if (!ctx) throw new Error('useClient must be used within ClientProvider');
+  if (!ctx) throw new Error("useClient must be used within ClientProvider");
   return ctx;
 };
