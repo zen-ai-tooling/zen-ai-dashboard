@@ -649,7 +649,6 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
                   total={bleeders.length}
                   segments={[
                     { key: 'Pause', count: Object.values(decisions).filter((d) => d === 'Pause').length, color: '#EF4444' },
-                    { key: 'Cut', count: Object.values(decisions).filter((d) => d === 'Cut Bid 50%').length, color: '#F59E0B' },
                     { key: 'Keep', count: Object.values(decisions).filter((d) => d === 'Keep').length, color: '#10B981' },
                   ]}
                 />
