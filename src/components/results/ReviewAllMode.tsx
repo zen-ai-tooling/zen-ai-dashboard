@@ -880,7 +880,7 @@ export const ReviewAllMode = ({
                           boxShadow: "-1px 0 0 #E5E7EB",
                         }}
                       >
-                        <div className="flex items-center gap-1 flex-wrap">
+                        <div className="flex items-center gap-1 flex-nowrap min-w-0">
                           {decisionPill ? (
                             <Select value={decision} onValueChange={(val) => setDecision(key, val)}>
                               <SelectTrigger
@@ -907,12 +907,13 @@ export const ReviewAllMode = ({
                             />
                           )}
                           {decision?.startsWith("Cut Bid") && (
-                            <div className="flex items-center gap-0.5">
+                            <div className="flex items-center gap-0.5 shrink-0">
                               <input
                                 type="number"
                                 min={1}
                                 max={99}
-                                className="h-7 w-16 text-[12px] rounded border border-border px-1.5 font-mono"
+                                className="h-7 text-[12px] rounded border border-border font-mono text-center no-spinner"
+                                style={{ width: 38, padding: "0 2px" }}
                                 value={cutBidPcts[key] ?? 50}
                                 onChange={(e) => {
                                   const pct = parseInt(e.target.value) || 50;
