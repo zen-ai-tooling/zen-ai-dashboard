@@ -85,6 +85,10 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
   const [flashIdx, setFlashIdx] = useState<{ idx: number; cls: string; ts: number } | null>(null);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [panelComplete, setPanelComplete] = useState(false);
+  const [viewMode, setViewMode] = useState<'triage' | 'review'>('review');
+
+  type FocusFilter = 'all' | 'pause' | 'review' | 'decided' | 'highspend';
+  const [focusFilter, setFocusFilter] = useState<FocusFilter>('all');
 
   const setDecisionWithFlash = (idx: number, val: string) => {
     setDecisions((prev) => ({ ...prev, [idx]: val }));
