@@ -244,7 +244,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
         sheetRows[sheetName].push({
           bleeder,
           decision,
-          cutPct: cutBidPcts[idx] ?? 25,
+          cutPct: cutBidPcts[idx] ?? 50,
         });
       });
 
@@ -289,7 +289,7 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
       );
       const cutBidPctValues = Object.keys(decisions)
         .filter(k => decisions[Number(k)] === 'Cut Bid')
-        .map(k => cutBidPcts[Number(k)] ?? 25);
+        .map(k => cutBidPcts[Number(k)] ?? 50);
       const dominantCutPct = cutBidPctValues.length > 0
         ? Math.round(
             cutBidPctValues.reduce((a, b) => a + b, 0) /
@@ -593,6 +593,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                 const allSuggested: Record<number, string> = {};
                 suggestions.forEach((s, idx) => { allSuggested[idx] = s.decision; });
                 setDecisions(allSuggested);
+                setCutBidPcts({});
+              }}
               }}
               className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12.5px] font-semibold text-white btn-press"
               style={{ background: "#0D9488" }}
@@ -754,8 +756,8 @@ export const Bleeder2TrackResults: React.FC<Bleeder2TrackResultsProps> = ({
                               type="number"
                               min={1}
                               max={99}
-                              className="h-7 w-12 text-[12px] font-mono-nums"
-                              value={cutBidPcts[idx] ?? 25}
+                              className="h-7 w-16 text-[12px] font-mono-nums"
+                              value={cutBidPcts[idx] ?? 50}
                               onChange={(e) => setCutBidPcts(prev => ({ ...prev, [idx]: parseInt(e.target.value) || 25 }))}
                             />
                             <span className="text-[11px]" style={{ color: '#9CA3AF' }}>%</span>

@@ -111,7 +111,7 @@ export function suggestDecision(bleeder: BleederInput): Suggestion {
       decision: "Cut Bid",
       confidence: "low",
       reason: `${bleeder.orders} order(s), $${bleeder.spend.toFixed(2)} spend — review`,
-      shortLabel: "Review",
+      shortLabel: "Cut bid",
     };
   }
 
