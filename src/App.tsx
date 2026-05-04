@@ -53,7 +53,7 @@ const App = () => {
             gap: 24,
           }}
         >
-          <svg width="64" height="72" viewBox="18 104 116 116" xmlns="http://www.w3.org/2000/svg">
+          <svg width="64" height="90" viewBox="18 104 116 116" xmlns="http://www.w3.org/2000/svg">
             <g transform="translate(76,162)">
               <circle cx="0" cy="0" r="58" fill="#9333ea" />
               <path
