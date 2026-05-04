@@ -169,8 +169,8 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
       highspend = 0;
     bleeders.forEach((b, idx) => {
       const sug = suggestions[idx];
-      if (sug?.kind === "pause") pause++;
-      else if (sug?.kind === "review" || sug?.kind === "monitor") review++;
+      if (sug?.kind === "pause" || sug?.kind === "review") pause++;
+      else if (sug?.kind === "monitor") review++;
       if (decisions[idx]) decided++;
       if ((b.spend || 0) >= urgencyBands.high && (b.spend || 0) > 0) highspend++;
     });
@@ -181,8 +181,8 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
     if (focusFilter === "all") return true;
     const b = bleeders[idx];
     const sug = suggestions[idx];
-    if (focusFilter === "pause") return sug?.kind === "pause";
-    if (focusFilter === "review") return sug?.kind === "review" || sug?.kind === "monitor";
+    if (focusFilter === "pause") return sug?.kind === "pause" || sug?.kind === "review";
+    if (focusFilter === "review") return sug?.kind === "monitor";
     if (focusFilter === "decided") return !!decisions[idx];
     if (focusFilter === "highspend") return (b.spend || 0) >= urgencyBands.high && (b.spend || 0) > 0;
     return true;
