@@ -359,6 +359,113 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
         }))}
       />
 
+      {/* Mode toggle */}
+      <div className="flex items-center justify-center">
+        <div className="inline-flex items-center gap-1 p-1 rounded-full bg-[hsl(var(--secondary))]">
+          <button
+            onClick={() => setViewMode('triage')}
+            className={`inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full text-[12.5px] font-medium transition-colors ${
+              viewMode === 'triage'
+                ? 'text-white shadow-sm'
+                : 'text-[hsl(var(--text-secondary))] hover:text-foreground'
+            }`}
+            style={viewMode === 'triage' ? { background: '#A855F7' } : undefined}
+          >
+            <Zap className="w-3.5 h-3.5" /> Triage
+          </button>
+          <button
+            onClick={() => setViewMode('review')}
+            className={`inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full text-[12.5px] font-medium transition-colors ${
+              viewMode === 'review'
+                ? 'text-white shadow-sm'
+                : 'text-[hsl(var(--text-secondary))] hover:text-foreground'
+            }`}
+            style={viewMode === 'review' ? { background: '#A855F7' } : undefined}
+          >
+            <List className="w-3.5 h-3.5" /> Review All
+          </button>
+        </div>
+      </div>
+
+      {viewMode === 'triage' && (() => {
+        const triageItems: TriageItem[] = bleeders.map((b, idx) => ({
+          key: String(idx),
+          sheet: 'Lifetime Audit',
+          campaign: b.campaignName || '—',
+          adGroup: b.adGroupName || '',
+          entity: b.targetingText || '—',
+          matchType: b.matchType || undefined,
+          clicks: b.clicks ?? 0,
+          spend: b.spend ?? 0,
+          sales: b.sales ?? 0,
+          acosNum: b.acos ?? 0,
+          orders: b.orders ?? 0,
+          acos: b.acos ? `${b.acos.toFixed(1)}%` : '',
+        }));
+
+        const triageDecisions: Record<string, string> = {};
+        Object.entries(decisions).forEach(([k, v]) => {
+          triageDecisions[String(k)] = v;
+        });
+
+        const triageSpecsBySheet = (): TriageDecisionSpec[] => [
+          { value: 'Pause', label: 'PAUSE', bg: '#EF4444', color: '#FFFFFF', shortcut: 'P', countsAsSavings: true },
+          { value: 'Keep', label: 'KEEP', bg: '#059669', color: '#FFFFFF', shortcut: 'K', countsAsSavings: false },
+        ];
+
+        return (
+          <TriageMode
+            items={triageItems}
+            decisions={triageDecisions}
+            decisionSpecsBySheet={triageSpecsBySheet}
+            onDecide={(key, val) => setDecisionWithFlash(Number(key), val)}
+            onUndo={(key) => setDecisions(prev => {
+              const n = { ...prev };
+              delete n[Number(key)];
+              return n;
+            })}
+            onGenerate={async () => {
+              await handleGenerate();
+              toast.success('Amazon file ready', {
+                description: `${decisionsMade} decisions`,
+                duration: 3000,
+              });
+            }}
+            onSwitchToReview={() => setViewMode('review')}
+            totalSpend={result.totalSpend}
+            sheetsCount={1}
+            addressedSavings={addressedSpend}
+            shortSheetLabel={(s) => s}
+          />
+        );
+      })()}
+
+      {viewMode === 'review' && (
+      <>
+      {/* Filter pills */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-[12px] text-[hsl(var(--text-secondary))] font-medium">
+          Lifetime Audit:
+        </span>
+        {([
+          { id: 'all', label: 'All', icon: '', count: focusMeta.all },
+          { id: 'pause', label: 'Pause candidates', icon: '🔴', count: focusMeta.pause },
+          { id: 'review', label: 'Needs review', icon: '🟡', count: focusMeta.review },
+          { id: 'decided', label: 'Decided', icon: '✓', count: focusMeta.decided },
+          { id: 'highspend', label: 'High spend', icon: '💰', count: focusMeta.highspend },
+        ] as const).map(f => (
+          <button
+            key={f.id}
+            onClick={() => setFocusFilter(f.id as FocusFilter)}
+            className={`focus-pill ${focusFilter === f.id ? 'is-active' : ''}`}
+          >
+            {f.icon && <span>{f.icon}</span>}
+            {f.label}
+            <span className="count">· {f.count}</span>
+          </button>
+        ))}
+      </div>
+
       {/* Decision table */}
       <div className="decision-table-card">
         {/* Bulk actions */}
