@@ -15,9 +15,7 @@ const ACCESS_CODE = "phico";
 const STORAGE_KEY = "adprune_access";
 
 const App = () => {
-  const [unlocked, setUnlocked] = useState(
-    () => localStorage.getItem(STORAGE_KEY) === "true"
-  );
+  const [unlocked, setUnlocked] = useState(() => localStorage.getItem(STORAGE_KEY) === "true");
   const [input, setInput] = useState("");
   const [error, setError] = useState(false);
 
@@ -55,7 +53,7 @@ const App = () => {
             gap: 24,
           }}
         >
-          <svg width="64" height="64" viewBox="18 104 116 116" xmlns="http://www.w3.org/2000/svg">
+          <svg width="64" height="72" viewBox="18 104 116 116" xmlns="http://www.w3.org/2000/svg">
             <g transform="translate(76,162)">
               <circle cx="0" cy="0" r="58" fill="#9333ea" />
               <path
@@ -75,12 +73,8 @@ const App = () => {
             </g>
           </svg>
           <div style={{ textAlign: "center" }}>
-            <p style={{ color: "#F9FAFB", fontSize: 18, fontWeight: 600, margin: 0 }}>
-              AdPrune
-            </p>
-            <p style={{ color: "#9CA3AF", fontSize: 14, marginTop: 6 }}>
-              Enter access code to continue
-            </p>
+            <p style={{ color: "#F9FAFB", fontSize: 18, fontWeight: 600, margin: 0 }}>AdPrune</p>
+            <p style={{ color: "#9CA3AF", fontSize: 14, marginTop: 6 }}>Enter access code to continue</p>
           </div>
           <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
             <input
@@ -102,11 +96,7 @@ const App = () => {
               }}
               autoFocus
             />
-            {error && (
-              <p style={{ color: "#EF4444", fontSize: 13, margin: 0 }}>
-                Incorrect code
-              </p>
-            )}
+            {error && <p style={{ color: "#EF4444", fontSize: 13, margin: 0 }}>Incorrect code</p>}
             <button
               onClick={handleSubmit}
               style={{
