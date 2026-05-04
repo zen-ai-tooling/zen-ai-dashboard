@@ -142,6 +142,29 @@ export const LifetimeBleederResults: React.FC<LifetimeBleederResultsProps> = ({
     return { high: q(0.75), low: q(0.25) };
   }, [bleeders]);
 
+  const focusMeta = useMemo(() => {
+    let pause = 0, review = 0, decided = 0, highspend = 0;
+    bleeders.forEach((b, idx) => {
+      const sug = suggestions[idx];
+      if (sug?.kind === 'pause') pause++;
+      else if (sug?.kind === 'review' || sug?.kind === 'monitor') review++;
+      if (decisions[idx]) decided++;
+      if ((b.spend || 0) >= urgencyBands.high && (b.spend || 0) > 0) highspend++;
+    });
+    return { all: bleeders.length, pause, review, decided, highspend };
+  }, [bleeders, suggestions, decisions, urgencyBands.high]);
+
+  const matchesFocus = (idx: number): boolean => {
+    if (focusFilter === 'all') return true;
+    const b = bleeders[idx];
+    const sug = suggestions[idx];
+    if (focusFilter === 'pause') return sug?.kind === 'pause';
+    if (focusFilter === 'review') return sug?.kind === 'review' || sug?.kind === 'monitor';
+    if (focusFilter === 'decided') return !!decisions[idx];
+    if (focusFilter === 'highspend') return (b.spend || 0) >= urgencyBands.high && (b.spend || 0) > 0;
+    return true;
+  };
+
   // ── Bulk actions ──
   const setAll = (val: string) => {
     const all: Record<number, string> = {};
