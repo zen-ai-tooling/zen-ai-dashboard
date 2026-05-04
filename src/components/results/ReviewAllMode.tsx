@@ -912,7 +912,7 @@ export const ReviewAllMode = ({
                                 type="number"
                                 min={1}
                                 max={99}
-                                className="h-7 w-14 text-[12px] rounded border border-border px-1.5 font-mono"
+                                className="h-7 w-16 text-[12px] rounded border border-border px-1.5 font-mono"
                                 value={cutBidPcts[key] ?? 50}
                                 onChange={(e) => {
                                   const pct = parseInt(e.target.value) || 50;
